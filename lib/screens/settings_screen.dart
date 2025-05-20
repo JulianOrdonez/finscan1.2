@@ -110,7 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                         children: [
                           pw.Text(
-                              '${income.title} - ${DateFormat('dd/MM/yyyy').format(income.date)}'),
+                              '${income.title} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(income.date))}'),
                           pw.Text(
                               '+${income.amount.toStringAsFixed(2)} ${Provider.of<CurrencyProvider>(this.context).getCurrencySymbol()}'),
                         ],

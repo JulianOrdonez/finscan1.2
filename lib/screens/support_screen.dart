@@ -100,7 +100,7 @@ class SupportScreen extends StatelessWidget {
       ),
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(horizontal: 16.0, bottom: 8.0),
+          padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
           child: Text(answer),
         ),
       ],

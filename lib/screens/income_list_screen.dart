@@ -63,7 +63,7 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
                         ),
                         Text(
                           DateFormat('yyyy-MM-dd').format(income.date),
-                          style: TextStyle(fontSize: 12.0, color: Colors.grey[600]),
+                          style: const TextStyle(fontSize: 12.0, color: Colors.grey),
                         ),
                       ],
                     ),

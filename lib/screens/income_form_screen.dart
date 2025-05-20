@@ -28,7 +28,13 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
       _titleController.text = widget.income!.title;
       _descriptionController.text = widget.income!.description;
       _amountController.text = widget.income!.amount.toString();
-      _selectedDate = DateTime.parse(widget.income!.date);
+      // Assuming income.date is stored as a DateTime in the Income model
+      // If it's a String, you might need to parse it:
+      // _selectedDate = DateTime.parse(widget.income!.date as String);
+      // Otherwise, directly assign the DateTime:
+      if (widget.income!.date is DateTime) {
+        _selectedDate = widget.income!.date as DateTime;
+      }
     }
   }
 
@@ -62,7 +68,8 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
         title: _titleController.text,
         description: _descriptionController.text,
         amount: double.parse(_amountController.text),
-        date: _selectedDate,
+        // Store date as DateTime or a consistent string format if needed
+        date: _selectedDate, // Assuming Income model expects DateTime
       );
 
       if (widget.income == null) {
