@@ -44,10 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
   /// Navigates to the home screen.
   ///
   /// Uses [Navigator] to replace the current route with the [HomePage].
-  void _navigateToHome() {
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+  void _navigateToHome() {Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage()), (Route<dynamic> route) => false,
     );
   }
 
