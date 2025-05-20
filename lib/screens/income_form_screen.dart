@@ -28,7 +28,7 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
       _descriptionController.text = widget.income!.description;
       _amountController.text = widget.income!.amount.toString();
       // Parse the date string from the database into a DateTime object
-      _selectedDate = DateTime.parse(widget.income!.date); 
+      _selectedDate = DateFormat('yyyy-MM-dd').parse(widget.income!.date);
     }
   }
 
@@ -63,7 +63,7 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
         description: _descriptionController.text,
         amount: double.parse(_amountController.text),
         // Format the DateTime object to a String for saving to the database
-        date: _selectedDate.toIso8601String().split('T').first, 
+        date: DateFormat('yyyy-MM-dd').format(_selectedDate),
       );
       if (widget.income == null) {
         // Agregar nuevo ingreso

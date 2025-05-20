@@ -135,8 +135,7 @@ class _HomePageState extends State<HomePage> {
             child: _screens[_selectedIndex],
           ), // Update body to use _screens
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[ // Add Income tab to BottomNavigationBar
+ bottomNavigationBar: BottomNavigationBar(items: const <BottomNavigationBarItem>[ // Add Income tab to BottomNavigationBar
             BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Gastos'),
             BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Ingresos'),
             BottomNavigationBarItem(
@@ -152,8 +151,7 @@ class _HomePageState extends State<HomePage> {
           onTap: _onItemTapped,
           backgroundColor: themeProvider.themeData.cardColor,
           selectedLabelStyle: const TextStyle(fontFamily: 'Roboto'),
-          unselectedLabelStyle: const TextStyle(fontFamily: 'Roboto'),
-          type: BottomNavigationBarType.fixed,\
+ unselectedLabelStyle: const TextStyle(fontFamily: 'Roboto'), type: BottomNavigationBarType.fixed,
 
         ),
         floatingActionButton: FloatingActionButton(

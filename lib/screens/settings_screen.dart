@@ -12,8 +12,9 @@ import 'package:flutter_application_2/screens/support_screen.dart';
 import '../currency_provider.dart';
 import 'package:flutter_application_2/theme_provider.dart';
 
+
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  const SettingsScreen({super.key, required this.userId});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -42,23 +43,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _generateAndShareReport(BuildContext context) async {
-    final authService = Provider.of<AuthService>(context, listen: false);
-    final currentUser = authService.currentUser;
-
-    if (currentUser == null) {
- ScaffoldMessenger.of(context).showSnackBar(
- const SnackBar(content: Text('User not logged in')),
- );
- return;
-    }
-    final userId = currentUser.id;
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not logged in')),
-      );
-      return;
-    }
-
+    final userId = widget.userId; // Use the userId from the widget
+    
     final status = await Permission.storage.request();
     if (status.isGranted) {
       final pdfData = await ReportService().generateReport(userId);

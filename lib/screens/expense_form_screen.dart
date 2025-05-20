@@ -125,7 +125,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
         
         final expense = Expense(
           id: widget.expense?.id ?? -1,
-          userId: userId!,
+          userId: widget.userId,
           title: _titleController.text,
           description: "",
           amount: amount,

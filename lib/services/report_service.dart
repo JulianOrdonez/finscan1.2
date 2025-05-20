@@ -9,11 +9,9 @@ import '../services/database_helper.dart';
 
 class ReportService {
   Future<Uint8List> generateReport(int userId) async {
-    final DatabaseHelper _dbHelper = DatabaseHelper();
-
     // Fetch data
-    List<Expense> expenses = await _dbHelper.getExpenses(userId);
-    List<Income> incomes = await _dbHelper.getIncomes(userId);
+    List<Expense> expenses = await DatabaseHelper.instance.getExpenses(userId);
+    List<Income> incomes = await DatabaseHelper.instance.getIncomes(userId);
 
     // Calculate statistics
     double totalIncome =

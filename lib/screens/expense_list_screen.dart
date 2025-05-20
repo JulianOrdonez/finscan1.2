@@ -176,7 +176,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => ExpenseFormScreen(
-                                          expense: expense)));
+                                          expense: expense, userId: widget.userId)));
                               _refreshExpenses();
                             },
                           ),
@@ -195,7 +195,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
           await Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const ExpenseFormScreen()));
+                  builder: (context) => ExpenseFormScreen(userId: widget.userId)));
           _refreshExpenses();
         },
         child: const Icon(Icons.add),

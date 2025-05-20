@@ -35,17 +35,17 @@ class DatabaseHelper {
 
   static const tableCurrentUser = 'current_user';
   static const columnCurrentUserId = 'id';
-
-  DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
-
   static Database? _database;
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
   } 
-
+  
+  // Private constructor for singleton
+  DatabaseHelper._privateConstructor();
+  
   /// Initialize the database.
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), _databaseName);
@@ -114,10 +114,26 @@ class DatabaseHelper {
     // Si hay futuras versiones de la base de datos, se añadirían aquí las migraciones
   }
   
+  // Explicitly defining getExpenses and getIncomes methods as requested
+
+  /// Get all expenses for a given user ID from the database.
+  Future<List<Expense>> getExpenses(int userId) async {
+    Database db = await instance.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableExpenses,
+      where: '$columnExpenseUserId = ?',
+      whereArgs: [userId],
+    );
+    return List.generate(maps.length, (i) {
+      return Expense.fromMap(maps[i]);
+    });
+  }
+
   /// Insert a user into the database.
   Future<int> insertUser(User user) async {
     Database db = await instance.database;
     return await db.insert(tableUsers, {
+
       columnUserEmail: user.email,
       columnUserName: user.name,
       columnUserPassword: user.password,
@@ -167,38 +183,19 @@ class DatabaseHelper {
     }
   } 
 
-  /// Get all expenses for a given user ID from the database.
-  Future<List<Expense>> getAllExpenses(int userId) async {
+  /// Get all incomes for a given user ID from the database.
+  Future<List<Income>> getIncomes(int userId) async {
     Database db = await instance.database;
-    try {
-      final List<Map<String, dynamic>> result = await db.query(
-        tableExpenses,
-        where: '$columnExpenseUserId = ?',
-        whereArgs: [userId],
-      );
-    return result.map((map) => Expense.fromMap(map)).toList();
-    } catch (e) {
-       print('Error getting all expenses: $e');
-    }
-    return [];
-  } 
-
-   /// Get all incomes for a given user ID from the database. // Nuevo método para obtener ingresos
-  Future<List<Income>> getAllIncomes(int userId) async {
-    Database db = await instance.database;
-    try { 
-      List<Map<String, dynamic>> result = await db.query(
-        tableIncomes,
-        where: '$columnIncomeUserId = ?',
-        whereArgs: [userId],
-      );
-    return result.map((map) => Income.fromMap(map)).toList();
-    } catch (e) {
-       print('Error getting all incomes: $e');
-    }
-    return [];
-  } 
-
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableIncomes,
+      where: '$columnIncomeUserId = ?',
+      whereArgs: [userId],
+    );
+    return List.generate(maps.length, (i) {
+      return Income.fromMap(maps[i]);
+    });
+  }
+  
 
   /// Delete an expense from the database.
   Future<int> deleteExpense(int id) async {
