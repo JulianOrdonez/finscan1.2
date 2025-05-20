@@ -28,7 +28,7 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
       _titleController.text = widget.income!.title;
       _descriptionController.text = widget.income!.description;
       _amountController.text = widget.income!.amount.toString();
-      _selectedDate = widget.income!.date;
+      _selectedDate = DateTime.parse(widget.income!.date);
     }
   }
 

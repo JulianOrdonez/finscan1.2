@@ -89,7 +89,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           pw.Text(
                               '${expense.title} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(expense.date))}'),
                           pw.Text(
-                              '-${expense.amount.toStringAsFixed(2)} ${Provider.of<CurrencyProvider>(context).getCurrencySymbol()}'),
+                              '-${expense.amount.toStringAsFixed(2)} ${Provider.of<CurrencyProvider>(this.context).getCurrencySymbol()}'),
                         ],
                       ),
                     );
@@ -112,7 +112,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           pw.Text(
                               '${income.title} - ${DateFormat('dd/MM/yyyy').format(income.date)}'),
                           pw.Text(
-                              '+${income.amount.toStringAsFixed(2)} ${Provider.of<CurrencyProvider>(context).getCurrencySymbol()}'),
+                              '+${income.amount.toStringAsFixed(2)} ${Provider.of<CurrencyProvider>(this.context).getCurrencySymbol()}'),
                         ],
                       ),
                     );

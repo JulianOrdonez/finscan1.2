@@ -167,7 +167,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                                 IconButton(
                                   icon: const Icon(Icons.delete,
                                       color: Colors.red),
-                                  onPressed: () => _deleteExpense(expense.id),
+                                  onPressed: () { if (expense.id != null) _deleteExpense(expense.id!); },
                                 ),
                               ],
                             ),

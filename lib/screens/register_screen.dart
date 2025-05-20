@@ -55,7 +55,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       extendBodyBehindAppBar: true,
       body: Container(
         decoration: BoxDecoration(
-          gradient: themeProvider.appBarGradient,
+          gradient: LinearGradient(
+            colors: [
+              themeProvider.themeData.colorScheme.primary,
+              themeProvider.themeData.colorScheme.primaryContainer,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
         child: Center(
           child: SingleChildScrollView(

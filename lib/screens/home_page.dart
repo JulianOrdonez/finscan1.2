@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).textTheme.bodyText1?.color,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                 ),
                 onTap: () {
@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                     color: Theme.of(context).textTheme.bodyText1?.color,
+                     color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                 ),
                 onTap: () {

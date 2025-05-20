@@ -150,6 +150,21 @@ class DatabaseHelper {
     return null;
   }
 
+  Future<User?> getUserByEmailAndPassword(String email, String password) async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> maps = await db.query(
+      tableUsers,
+      where: '$columnUserEmail = ? AND $columnUserPassword = ?',
+      whereArgs: [email, password],
+    );
+    if (maps.isNotEmpty) {
+      // Assuming password is not hashed/salted. In a real app,
+      // use a secure password hashing method like bcrypt.
+      return User.fromMap(maps.first);
+    }
+    return null;
+  }
+
 
   // Current User
   Future<int?> getCurrentUserId() async {

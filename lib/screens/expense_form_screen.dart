@@ -102,7 +102,6 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                     return 'Please enter a title';
                   }
                   return null;
-                Gasto
                 },
               ),
               TextFormField(
@@ -125,7 +124,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
               ),
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
-                decoration: const InputDecoration(labelText: 'Category'),
+                decoration: const InputDecoration(labelText: 'Category',),
                 items: Helpers.expenseCategories.map((String category) {
                   return DropdownMenuItem<String>(
                     value: category,

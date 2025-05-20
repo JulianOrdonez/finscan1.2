@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// Helper methods for category colors and icons
 class Helpers {
   static Color getCategoryColor(String category) {
     switch (category) {
@@ -38,4 +39,16 @@ class Helpers {
         return Icons.category;
     }
   }
+
+  // List of predefined expense categories
+  static List<String> get expenseCategories => [
+        'Food',
+        'Transport',
+        'Shopping',
+        'Utilities',
+        'Entertainment',
+        'Health',
+        'Education',
+        'Other',
+      ];
 }

@@ -74,4 +74,5 @@ class ThemeProvider extends ChangeNotifier {
     unselectedWidgetColor: Colors.grey[400],
     // Add other theme properties as needed
   );
+
 }
