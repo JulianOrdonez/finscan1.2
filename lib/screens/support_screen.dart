@@ -1,57 +1,7 @@
 import 'package:flutter/material.dart';
 
-class SupportScreen extends StatefulWidget {
-  const SupportScreen({super.key});
-
-  @override
-  _SupportScreenState createState() => _SupportScreenState();
-}
-
-class _SupportScreenState extends State<SupportScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _messageController = TextEditingController();
-  bool _isLoading = false;
-
-  void _sendMessage(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        // Aquí puedes implementar la lógica para enviar el mensaje,
-        // por ejemplo, a través de una API o guardarlo en la base de datos.
-        // Para este ejemplo, simplemente mostraremos un mensaje de éxito.
-        await Future.delayed(const Duration(seconds: 2)); // Simula el envío
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Mensaje enviado con éxito')),
-        );
-        _nameController.clear();
-        _emailController.clear();
-        _messageController.clear();
-      } catch (e) {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al enviar el mensaje: $e')),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _messageController.dispose();
-    super.dispose();
-  }
+class SupportScreen extends StatelessWidget {
+  const SupportScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -59,77 +9,101 @@ class _SupportScreenState extends State<SupportScreen> {
       appBar: AppBar(
         title: const Text('Soporte al Usuario'),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, ingresa tu nombre';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.email),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, ingresa tu email';
-                        }
-                        if (!value.contains('@')) {
-                          return 'Por favor, ingresa un email válido';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _messageController,
-                      decoration: const InputDecoration(
-                        labelText: 'Mensaje',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.message),
-                        alignLabelWithHint: true,
-                      ),
-                      maxLines: 5,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, ingresa tu mensaje';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: () => _sendMessage(context),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text('Enviar Mensaje'),
-                    ),
-                  ],
-                ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Bienvenido al Centro de Soporte de FinScan',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
               ),
             ),
+            const SizedBox(height: 16),
+            Text(
+              'Estamos aquí para ayudarte con cualquier pregunta o problema que puedas tener con la aplicación FinScan.',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Preguntas Frecuentes (FAQs)',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            // You can add FAQ sections here, e.g.:
+            // _buildFAQItem(
+            //   question: '¿Cómo añado un nuevo gasto?',
+            //   answer: 'Para añadir un gasto, ve a la pantalla de inicio y toca el botón "+" en la esquina inferior derecha. Selecciona "Gasto" y rellena los detalles.',
+            // ),
+            // _buildFAQItem(
+            //   question: '¿Cómo cambio la moneda?',
+            //   answer: 'Puedes cambiar la moneda en la sección de Ajustes.',
+            // ),
+            const SizedBox(height: 24),
+            Text(
+              'Contacto',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: Icon(Icons.email),
+              title: Text('Correo Electrónico'),
+              subtitle: Text('soporte@finscanapp.com'),
+              onTap: () {
+                // TODO: Implement email sending
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.web),
+              title: Text('Sitio Web de Soporte'),
+              subtitle: Text('www.finscanapp.com/support'),
+              onTap: () {
+                // TODO: Implement opening website
+              },
+            ),
+            // You can add more contact options like phone number, social media, etc.
+            const SizedBox(height: 24),
+            Text(
+              'Recursos Adicionales',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: Icon(Icons.link),
+              title: Text('Guía de Usuario'),
+              onTap: () {
+                // TODO: Implement opening user guide
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFAQItem({required String question, required String answer}) {
+    return ExpansionTile(
+      title: Text(
+        question,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, bottom: 8.0),
+          child: Text(answer),
+        ),
+      ],
     );
   }
 }

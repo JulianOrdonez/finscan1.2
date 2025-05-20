@@ -4,12 +4,12 @@ import 'package:flutter_application_2/theme_provider.dart';
 import 'package:flutter_application_2/screens/expense_list_screen.dart';
 import 'package:flutter_application_2/screens/expense_stats_screen.dart';
 import 'package:flutter_application_2/screens/settings_screen.dart';
-import 'package:flutter_application_2/screens/login_screen.dart';
 import 'package:flutter_application_2/services/database_helper.dart';
 import 'categorized_expense_screen.dart';
-import 'expense_form_screen.dart'; // Importar pantalla de formulario de gasto
-import 'income_form_screen.dart'; // Importar pantalla de formulario de ingreso
-import 'income_list_screen.dart'; // Importar pantalla de lista de ingresos
+import 'expense_form_screen.dart';
+import 'income_form_screen.dart';
+import 'income_list_screen.dart';
+import 'login_screen.dart'; // Assuming LoginScreen is needed for redirection
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -34,9 +34,9 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _userId = userId;
       if (_userId != null) {
-        _screens = [ // Update _screens to include IncomeListScreen
+        _screens = [
           ExpenseListScreen(userId: _userId!),
-          IncomeListScreen(userId: _userId!), // Add IncomeListScreen
+          IncomeListScreen(userId: _userId!),
           ExpenseStatsScreen(userId: _userId!),
           CategorizedExpenseScreen(userId: _userId!),
           SettingsScreen(userId: _userId!),
@@ -51,50 +51,70 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _showAddDialog() {
+  void _showAddOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16.0),
+              topRight: Radius.circular(16.0),
+            ),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               ListTile(
-                leading: const Icon(Icons.remove_circle_outline),
-                title: const Text('Gasto'),
-                onTap: () async {
-                  Navigator.of(context).pop(); // Cerrar el diálogo
-                  await Navigator.push(
+                leading: const Icon(Icons.remove_circle_outline, color: Colors.redAccent),
+                title: Text(
+                  'Add Expense',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).textTheme.bodyText1?.color,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => ExpenseFormScreen(userId: _userId!),
                     ),
-                  );
-                  // Recargar la lista de gastos si estamos en esa pantalla
-                  if (_selectedIndex == 0) {
-                    _loadUserId();
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.add_circle_outline),
-                title: const Text('Ingreso'),
-                onTap: () async {
-                  Navigator.of(context).pop(); // Cerrar el diálogo
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => IncomeFormScreen(userId: _userId!),
-                    ), // Pass userId here
                   ).then((_) {
-                    // Recargar la pantalla de lista de ingresos después de agregar uno
-                    if (_selectedIndex == 1) { // Assuming IncomeListScreen is at index 1
-                      _loadUserId(); // Recarga para actualizar la lista
+                    if (_selectedIndex == 0) {
+                      _loadUserId(); // Refresh expense list if currently on that tab
                     }
                   });
                 },
-
               ),
+              ListTile(
+                leading: const Icon(Icons.add_circle_outline, color: Colors.green),
+                title: Text(
+                  'Add Income',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                     color: Theme.of(context).textTheme.bodyText1?.color,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => IncomeFormScreen(userId: _userId!),
+                    ),
+                  ).then((_) {
+                    if (_selectedIndex == 1) {
+                      _loadUserId(); // Refresh income list if currently on that tab
+                    }
+                  });
+                },
+              ),
+              const SizedBox(height: 16.0),
             ],
           ),
         );
@@ -130,11 +150,12 @@ class _HomePageState extends State<HomePage> {
           transitionBuilder: (Widget child, Animation<double> animation) =>
               FadeTransition(opacity: animation, child: child),
           child: Center(
-            key: ValueKey<int>(_selectedIndex), // Use ValueKey for AnimatedSwitcher
+            key: ValueKey<int>(_selectedIndex),
             child: _screens[_selectedIndex],
-          ), // Update body to use _screens
+          ),
         ),
- bottomNavigationBar: BottomNavigationBar(items: const <BottomNavigationBarItem>[ // Add Income tab to BottomNavigationBar
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Gastos'),
             BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Ingresos'),
             BottomNavigationBarItem(
@@ -150,11 +171,11 @@ class _HomePageState extends State<HomePage> {
           onTap: _onItemTapped,
           backgroundColor: themeProvider.themeData.cardColor,
           selectedLabelStyle: const TextStyle(fontFamily: 'Roboto'),
- unselectedLabelStyle: const TextStyle(fontFamily: 'Roboto'), type: BottomNavigationBarType.fixed,
-
+          unselectedLabelStyle: const TextStyle(fontFamily: 'Roboto'),
+          type: BottomNavigationBarType.fixed,
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: _showAddDialog,
+          onPressed: () => _showAddOptions(context),
           tooltip: 'Agregar',
           child: const Icon(Icons.add),
         ),

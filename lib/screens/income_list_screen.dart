@@ -18,7 +18,7 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
   @override
   void initState() {
     super.initState();
-    _incomesFuture = DatabaseHelper.instance.getIncomes(widget.userId);
+    _refreshIncomeList();
   }
 
   Future<void> _refreshIncomeList() async {
@@ -30,9 +30,6 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Income List'),
-      ),
       body: FutureBuilder<List<Income>>(
         future: _incomesFuture,
         builder: (context, snapshot) {

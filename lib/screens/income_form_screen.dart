@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_2/models/income.dart';
-import 'package:flutter_application_2/services/database_helper.dart';
 import 'package:intl/intl.dart';
+import '../models/income.dart';
+import '../services/database_helper.dart';
 
 class IncomeFormScreen extends StatefulWidget {
   final int userId;
-  final Income? income; // Para editar un ingreso existente
+  final Income? income;
 
-  const IncomeFormScreen({Key? key, required this.userId, this.income}) : super(key: key);
+  const IncomeFormScreen({Key? key, required this.userId, this.income})
+      : super(key: key);
 
   @override
   _IncomeFormScreenState createState() => _IncomeFormScreenState();
 }
 
 class _IncomeFormScreenState extends State<IncomeFormScreen> {
-  final _formKey = GlobalKey<FormState>(); // GlobalKey para el estado del formulario
+  final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _amountController = TextEditingController();
@@ -27,7 +28,7 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
       _titleController.text = widget.income!.title;
       _descriptionController.text = widget.income!.description;
       _amountController.text = widget.income!.amount.toString();
-      _selectedDate = widget.income!.date; // Assuming the date field in Income model is DateTime
+      _selectedDate = widget.income!.date;
     }
   }
 
@@ -53,24 +54,24 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
     }
   }
 
-  void _saveIncome() async {
+  Future<void> _saveIncome() async {
     if (_formKey.currentState!.validate()) {
-      final newIncome = Income(
-        id: widget.income?.id, // Si es edición, mantiene el ID
-        userId: widget.userId, // Asegúrate de que userId esté disponible aquí
+      final income = Income(
+        id: widget.income?.id,
+        userId: widget.userId,
         title: _titleController.text,
         description: _descriptionController.text,
-        amount: double.parse(_amountController.text), // Assuming the date field in Income model is DateTime
+        amount: double.parse(_amountController.text),
         date: _selectedDate,
       );
+
       if (widget.income == null) {
-        // Agregar nuevo ingreso
-        await DatabaseHelper.instance.insertIncome(newIncome);
+        await DatabaseHelper.instance.insertIncome(income);
       } else {
-        // Actualizar ingreso existente
-        await DatabaseHelper.instance.updateIncome(newIncome);
+        await DatabaseHelper.instance.updateIncome(income);
       }
 
+      Navigator.of(context).pop();
     }
   }
 
@@ -78,7 +79,7 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.income == null ? 'Agregar Ingreso' : 'Editar Ingreso'),
+        title: Text(widget.income == null ? 'Add Income' : 'Edit Income'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -88,42 +89,43 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
             children: <Widget>[
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Título'),
+                decoration: const InputDecoration(labelText: 'Title'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Por favor, ingresa un título';
+                    return 'Please enter a title';
                   }
                   return null;
                 },
               ),
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Descripción (Opcional)'),
+                decoration: const InputDecoration(labelText: 'Description'),
               ),
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(labelText: 'Cantidad'),
+                decoration: const InputDecoration(labelText: 'Amount'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Por favor, ingresa una cantidad';
+                    return 'Please enter an amount';
                   }
                   if (double.tryParse(value) == null) {
-                    return 'Por favor, ingresa un número válido';
+                    return 'Please enter a valid number';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 16.0),
               ListTile(
-                title: Text('Fecha: ${DateFormat('yyyy-MM-dd').format(_selectedDate)}'),
+                title: const Text('Date'),
+                subtitle: Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () => _selectDate(context),
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: _saveIncome,
-                child: Text(widget.income == null ? 'Guardar Ingreso' : 'Actualizar Ingreso'),
+                child: Text(widget.income == null ? 'Save Income' : 'Update Income'),
               ),
             ],
           ),

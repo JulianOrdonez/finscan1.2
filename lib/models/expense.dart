@@ -1,22 +1,22 @@
 class Expense {
-  int id;
+  int? id;
   int userId;
   String title;
   String description;
   double amount;
   String category;
   String date;
-  String receiptPath;
+  String? receiptPath;
 
   Expense({
-    required this.id,
+    this.id,
     required this.userId,
     required this.title,
-    required this.description,
+    this.description = '',
     required this.amount,
     required this.category,
     required this.date,
-    required this.receiptPath,
+    this.receiptPath,
   });
 
   Map<String, dynamic> toMap() {
@@ -37,7 +37,7 @@ class Expense {
       id: map['id'],
       userId: map['user_id'],
       title: map['title'],
-      description: map['description'],
+      description: map['description'] ?? '',
       amount: map['amount'],
       category: map['category'],
       date: map['date'],

@@ -1,49 +1,59 @@
-import 'package:flutter_application_2/services/database_helper.dart';
-import 'package:flutter_application_2/models/user.dart';
+import '../models/user.dart';
+import 'database_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  static Future<int?> getCurrentUserId() async {
-    return await DatabaseHelper.instance.getCurrentUserId();
-  }
+  final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
+  static const String _loggedInUserIdKey = 'loggedInUserId';
 
+  /// Logs in a user.
+  ///
+  /// Queries the database for a user with the provided email and password.
+  /// Returns `true` and stores the user ID if login is successful, `false` otherwise.
   Future<bool> login(String email, String password) async {
-    try {
-      final db = await DatabaseHelper.instance.database;
+    final user = await _databaseHelper.getUserByEmailAndPassword(email, password);
+    if (user != null) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_loggedInUserIdKey, user.id);
+      return true;
+    }
+    return false;
+  }
 
-      final users = await db.query('users',
-          where: 'email = ? AND password = ?',
-          whereArgs: [email, password]);
-      if (users.isNotEmpty) {
-        final user = User.fromMap(users.first);
-        await DatabaseHelper.instance.setCurrentUser(user.id);
-        return true;
-      }
-      return false;
+  /// Registers a new user.
+  ///
+  /// Inserts a new user into the database. Returns `true` if registration
+  /// is successful, `false` otherwise.
+  Future<bool> register(String name, String email, String password) async {
+    // Check if user with the same email already exists
+    final existingUser = await _databaseHelper.getUserByEmail(email);
+    if (existingUser != null) {
+      return false; // User with this email already exists
+    }
+
+    try {
+      final newUser = User(id: 0, name: name, email: email, password: password); // ID will be auto-generated
+      await _databaseHelper.insertUser(newUser);
+      return true;
     } catch (e) {
-      print('Error during login: $e');
-      rethrow;
+      print('Error registering user: $e');
+      return false;
     }
   }
 
-  Future<bool> createUser(User user) async {
-    try {
-      final id = await DatabaseHelper.instance.insertUser(user);
-      if (id > 0) {
-        user.id = id;
-        await DatabaseHelper.instance.setCurrentUser(user.id);
-        return true;
-      }
-      return false;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
+  /// Logs out the current user.
+  ///
+  /// Clears the stored user ID from shared preferences.
   Future<void> logout() async {
-    try {
-      await DatabaseHelper.instance.clearCurrentUser();
-    } catch (e) {
-      rethrow;
-    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_loggedInUserIdKey);
+  }
+
+  /// Gets the currently logged-in user ID.
+  ///
+  /// Returns the user ID if a user is logged in, otherwise returns `null`.
+  Future<int?> getCurrentUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_loggedInUserIdKey);
   }
 }

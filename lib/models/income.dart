@@ -4,7 +4,7 @@ class Income {
   final String title;
   final String description;
   final double amount;
-  final DateTime date;
+  final String date;
 
   Income({
     this.id,
@@ -35,7 +35,7 @@ class Income {
       title: map['title'],
       description: map['description'] ?? '',
       amount: map['amount'],
-      date: DateTime.parse(map['date']),
+      date: map['date'],
     );
   }
 }

@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     } catch (e) {
       _showErrorSnackBar('Error de conexion');
-      }
+    }
   }
 
   /// Navigates to the home screen.
@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
   /// Uses [Navigator] to replace the current route with the [HomePage].
   void _navigateToHome() {
     Navigator.pushReplacement(
-        context, 
+        context,
         MaterialPageRoute(builder: (context) => HomePage()),
     );
   }
@@ -66,12 +66,19 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {    
+  Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return  Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: themeProvider.appBarGradient,
+          gradient: LinearGradient(
+            colors: [
+              themeProvider.themeData.colorScheme.primary,
+              themeProvider.themeData.colorScheme.primaryContainer,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -167,4 +174,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

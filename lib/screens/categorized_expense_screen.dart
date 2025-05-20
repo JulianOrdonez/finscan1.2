@@ -1,115 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_2/models/expense.dart';
+import 'package:flutter_application_2/services/database_helper.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_application_2/helpers.dart';
-import '../models/expense.dart';
-import '../currency_provider.dart';
-import '../services/database_helper.dart';
 
 class CategorizedExpenseScreen extends StatefulWidget {
   final int userId;
+
   const CategorizedExpenseScreen({Key? key, required this.userId}) : super(key: key);
 
   @override
-  State<CategorizedExpenseScreen> createState() => _CategorizedExpenseScreenState();
+  _CategorizedExpenseScreenState createState() => _CategorizedExpenseScreenState();
 }
 
 class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
-  late Future<List<Expense>> expensesFuture;
+  late Future<Map<String, List<Expense>>> _categorizedExpensesFuture;
 
   @override
   void initState() {
     super.initState();
-    refreshExpenses();
+    _categorizedExpensesFuture = _fetchAndCategorizeExpenses();
   }
 
-  Future<void> refreshExpenses() async {
-    setState(() {
-      expensesFuture = DatabaseHelper.instance.getExpenses(widget.userId);
+  Future<Map<String, List<Expense>>> _fetchAndCategorizeExpenses() async {
+    final expenses = await DatabaseHelper.instance.getExpenses(widget.userId);
+    final Map<String, List<Expense>> categorizedExpenses = {};
 
-    });
+    for (var expense in expenses) {
+      if (!categorizedExpenses.containsKey(expense.category)) {
+        categorizedExpenses[expense.category] = [];
+      }
+      categorizedExpenses[expense.category]!.add(expense);
+    }
+
+    return categorizedExpenses;
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Expense>>(
-      future: expensesFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Categorized Expenses'),
+      ),
+      body: FutureBuilder<Map<String, List<Expense>>>(
+        future: _categorizedExpensesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No categorized expenses found.'));
+          } else {
+            final categorizedExpenses = snapshot.data!;
+            final categories = categorizedExpenses.keys.toList();
 
-        if (snapshot.hasError) {
-          return const Center(
-            child: Text('Error: An error occurred while loading expenses.'),
-          );
-        }
+            return ListView.builder(
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                final expensesInCategory = categorizedExpenses[category]!;
 
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No expenses found. Add some expenses to see the data.', textAlign: TextAlign.center,));
-        }
-        
-        final expenses = snapshot.data!;
-        Map<String, List<Expense>> categorizedExpenses =
-            {}; // Map to hold categorized expenses
-
-        // Categorize expenses
-        for (var expense in expenses) {
-          categorizedExpenses
-              .putIfAbsent(expense.category, () => [])
-              .add(expense);
-        }
-
- return Consumer<CurrencyProvider>(
- builder: (context, currencyProvider, child) {
- return ListView(
- padding: const EdgeInsets.all(16.0),
- children: categorizedExpenses.entries.map((entry) {
- final totalAmount = entry.value.fold(0.0, (sum, expense) => sum + expense.amount);
- final convertedTotalAmount = currencyProvider.convertAmountToSelectedCurrency(totalAmount);
-
- return Card(
- margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
- child: ExpansionTile(
- leading: CircleAvatar(
- backgroundColor: Helpers.getCategoryColor(entry.key),
- child: Icon(Helpers.getCategoryIcon(entry.key), color: Colors.white, size: 20),
- ),
- title: Text(entry.key, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
- subtitle: Text(
- 'Total: ${currencyProvider.formatAmount(convertedTotalAmount)}',
- style: TextStyle(color: Theme.of(context).colorScheme.secondary),
- ),
- children: entry.value.map((expense) {
- final convertedExpenseAmount = currencyProvider.convertAmountToSelectedCurrency(expense.amount);
- return ListTile(
- contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
- title: Text(
- expense.description,
- style: const TextStyle(
- fontSize: 16,
- ),
- ),
- subtitle: Padding(
- padding: const EdgeInsets.only(top: 4.0),
- child: Text(DateFormat('dd/MM/yyyy').format(DateTime.parse(expense.date))),
- ),
- trailing: Padding(
- padding: const EdgeInsets.symmetric(horizontal: 8),
- child: Text(
- currencyProvider.formatAmount(convertedExpenseAmount),
- style: const TextStyle(fontWeight: FontWeight.bold),
- ),
- ),
- );
- }).toList(),
- ),
- );
- }).toList(),
- );
- }
-        );
-      },
+                return ExpansionTile(
+                  title: Text('$category (${expensesInCategory.length})'),
+                  children: expensesInCategory.map((expense) {
+                    return ListTile(
+                      title: Text(expense.title),
+                      subtitle: Text('${expense.description} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(expense.date))}'),
+                      trailing: Text(
+                        '\$${expense.amount.toStringAsFixed(2)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            );
+          }
+        },
+      ),
     );
   }
 }

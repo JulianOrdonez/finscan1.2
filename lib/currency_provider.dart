@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Exchange rates relative to USD
-const Map<String, double> _exchangeRates = {
-  'USD': 1.0,
-  'EUR': 0.93, // As of 2024-03-04
-  'MXN': 17.0, // As of 2024-03-04
-  'COP': 3950.0, // As of 2024-03-04
-};
-class CurrencyProvider extends ChangeNotifier {List<String> get supportedCurrencies => ['COP', 'USD', 'EUR'];
-  String _selectedCurrency = 'COP';
+class CurrencyProvider with ChangeNotifier {
+  String _selectedCurrency = 'USD';
+  final List<String> supportedCurrencies = ['USD', 'EUR', 'GBP', 'JPY', 'COP']; // Add your supported currencies
 
   CurrencyProvider() {
     _loadSelectedCurrency();
@@ -17,52 +11,51 @@ class CurrencyProvider extends ChangeNotifier {List<String> get supportedCurrenc
 
   String getSelectedCurrency() => _selectedCurrency;
 
+  Future<void> setSelectedCurrency(String currency) async {
+    if (supportedCurrencies.contains(currency)) {
+      _selectedCurrency = currency;
+      notifyListeners();
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('currency', currency);
+    } else {
+      // Optionally handle unsupported currency selection
+      print('Unsupported currency: $currency');
+    }
+  }
+
+  Future<void> _loadSelectedCurrency() async {
+    final prefs = await SharedPreferences.getInstance();
+    _selectedCurrency = prefs.getString('currency') ?? 'USD'; // Default to USD if no currency is saved
+    notifyListeners();
+  }
+
   String getCurrencySymbol() {
     switch (_selectedCurrency) {
       case 'USD':
         return '\$';
       case 'EUR':
         return '€';
-      case 'MXN':
-        return 'MX\$';
+      case 'GBP':
+        return '£';
+      case 'JPY':
+        return '¥';
       case 'COP':
-        return 'COL\$';
+        return '\$'; // Or use the specific COP symbol if available and desired
       default:
-        return '';
+        return '\$';
     }
   }
 
   String formatAmount(double amount) {
-    return '${getCurrencySymbol()}${amount.toStringAsFixed(2)}';
-  }
-
-  Future<void> setSelectedCurrency(String currency) async {
-    _selectedCurrency = currency;
-    notifyListeners();
-
-    await _saveSelectedCurrency(currency);
-  }
-
-  Future<void> _loadSelectedCurrency() async {
-    final prefs = await SharedPreferences.getInstance();
-    _selectedCurrency = prefs.getString('currency') ?? 'COP';
-    notifyListeners();
-  }
-
-  Future<void> _saveSelectedCurrency(String currency) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('currency', currency);
+    // Simple formatting, you can enhance this with more advanced formatting based on locale
+    return amount.toStringAsFixed(2);
   }
 
   double convertAmountToSelectedCurrency(double amountInUSD) {
-    if (_exchangeRates.containsKey(_selectedCurrency)) {
-      return amountInUSD * _exchangeRates[_selectedCurrency]!;
-    }
-    return amountInUSD; // Return as is if currency not found
-  }
-
-  double convertAmountToUSD(double amountInSelectedCurrency) {
-    // Assuming the input amount is in the currently selected currency
-     return amountInSelectedCurrency / _exchangeRates[_selectedCurrency]!;
+    // Implement currency conversion logic here.
+    // This is a placeholder; you would typically use exchange rates.
+    // For now, assuming a simple conversion or no conversion for simplicity.
+    // You might need to pass the original currency of the amount if it's not always USD.
+    return amountInUSD; // Assuming amounts are stored in USD or no conversion is needed yet.
   }
 }

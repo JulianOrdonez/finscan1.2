@@ -5,61 +5,138 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:io';
-import '../services/report_service.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:intl/intl.dart';
+
+import '../services/database_helper.dart';
+import '../models/expense.dart';
+import '../models/income.dart';
 import 'package:flutter_application_2/screens/login_screen.dart';
 import '../services/auth_service.dart';
 import 'package:flutter_application_2/screens/support_screen.dart';
 import '../currency_provider.dart';
 import 'package:flutter_application_2/theme_provider.dart';
 
-
 class SettingsScreen extends StatefulWidget {
   final int userId;
 
-  const SettingsScreen({super.key, required this.userId});
+  const SettingsScreen({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // String _selectedCurrency = 'USD'; // Removed as currency is now managed by CurrencyProvider
-
   @override
   void initState() {
     super.initState();
     _loadSelectedCurrency();
   }
 
-  /// Load the selected currency from shared preferences.
   Future<void> _loadSelectedCurrency() async {
-    final currencyProvider = Provider.of<CurrencyProvider>(context, listen: false);
+    final currencyProvider =
+        Provider.of<CurrencyProvider>(context, listen: false);
     final prefs = await SharedPreferences.getInstance();
     final savedCurrency = prefs.getString('currency') ?? 'COP';
+    currencyProvider.setSelectedCurrency(savedCurrency);
   }
 
-  /// Save the selected currency to shared preferences.
   Future<void> _saveSelectedCurrency(String currency) async {
-    final prefs = await SharedPreferences.getInstance(); // Kept for saving
+    final prefs = await SharedPreferences.getInstance();
     await prefs.setString('currency', currency);
   }
 
   Future<void> _generateAndShareReport(BuildContext context) async {
-    final userId = widget.userId; // Use the userId from the widget
-    
+    final userId = widget.userId;
+
     final status = await Permission.storage.request();
     if (status.isGranted) {
-      final pdfData = await ReportService().generateReport(userId);
+      final expenses = await DatabaseHelper.instance.getExpenses(userId);
+      final incomes = await DatabaseHelper.instance.getIncomes(userId);
+
+      final pdf = pw.Document();
+
+      pdf.addPage(
+        pw.Page(
+          build: (pw.Context context) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Center(
+                  child: pw.Text(
+                    'Financial Report',
+                    style: pw.TextStyle(
+                      fontSize: 24,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                ),
+                pw.SizedBox(height: 20),
+                pw.Text('Expenses:',
+                    style: pw.TextStyle(
+                        fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                pw.SizedBox(height: 10),
+                pw.ListView.builder(
+                  itemCount: expenses.length,
+                  itemBuilder: (context, index) {
+                    final expense = expenses[index];
+                    return pw.Padding(
+                      padding: const pw.EdgeInsets.symmetric(vertical: 2),
+                      child: pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                              '${expense.title} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(expense.date))}'),
+                          pw.Text(
+                              '-${expense.amount.toStringAsFixed(2)} ${Provider.of<CurrencyProvider>(context).getCurrencySymbol()}'),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                pw.SizedBox(height: 20),
+                pw.Text('Incomes:',
+                    style: pw.TextStyle(
+                        fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                pw.SizedBox(height: 10),
+                pw.ListView.builder(
+                  itemCount: incomes.length,
+                  itemBuilder: (context, index) {
+                    final income = incomes[index];
+                    return pw.Padding(
+                      padding: const pw.EdgeInsets.symmetric(vertical: 2),
+                      child: pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                              '${income.title} - ${DateFormat('dd/MM/yyyy').format(income.date)}'),
+                          pw.Text(
+                              '+${income.amount.toStringAsFixed(2)} ${Provider.of<CurrencyProvider>(context).getCurrencySymbol()}'),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                // You can add total calculations and other summaries here
+              ],
+            );
+          },
+        ),
+      );
+
       final output = await getTemporaryDirectory();
-      final file = File('${output.path}/expense_income_report.pdf');
-      await file.writeAsBytes(pdfData);
-      await Share.shareXFiles([XFile(file.path)], text: 'Here is your expense and income report.');
+      final file = File('${output.path}/finscan_report_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.pdf');
+      await file.writeAsBytes(await pdf.save());
+
+      await Share.shareXFiles([XFile(file.path)], text: 'Here is your FinScan financial report.');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Storage permission not granted')),
       );
     }
   }
+
   Future<void> _logout(BuildContext context) async {
     await AuthService().logout();
     // ignore: use_build_context_synchronously
@@ -105,15 +182,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               trailing: DropdownButton<String>(
                 value: currencyProvider.getSelectedCurrency(),
                 items: currencyProvider.supportedCurrencies.map((String currency) {
-                  return DropdownMenuItem<String>( // Use the supportedCurrencies list from the currency provider
+                  return DropdownMenuItem<String>(
                     value: currency,
                     child: Text(currency),
                   );
                 }).toList(),
                 onChanged: (String? newValue) {
                   if (newValue != null) {
-                    currencyProvider.setSelectedCurrency(newValue); // Update currency in provider
-                    _saveSelectedCurrency(newValue); // Change the setCurrency method call to setSelectedCurrency
+                    currencyProvider.setSelectedCurrency(newValue);
+                    _saveSelectedCurrency(newValue);
                   }
                 },
               ),
