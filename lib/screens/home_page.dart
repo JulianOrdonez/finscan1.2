@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
           IncomeListScreen(userId: _userId!), // Add IncomeListScreen
           ExpenseStatsScreen(userId: _userId!),
           CategorizedExpenseScreen(userId: _userId!),
-          const SettingsScreen(),
+          SettingsScreen(userId: _userId!),
         ];
       }
     });

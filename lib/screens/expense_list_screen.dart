@@ -25,7 +25,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
 
   Future<void> _refreshExpenses() async {
     setState(() {
-      _expensesFuture = DatabaseHelper.instance.getAllExpenses(widget.userId);
+      _expensesFuture = DatabaseHelper.instance.getExpenses(widget.userId);
     });
   }
 
