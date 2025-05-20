@@ -5,19 +5,26 @@ class Helpers {
   static Color getCategoryColor(String category) {
     switch (category) {
       case 'Comida':
+ case 'Food':
         return Colors.orange;
       case 'Transporte':
+ case 'Transport':
         return Colors.blueAccent;
       case 'Compras':
+ case 'Shopping':
         return Colors.purple;
       case 'Servicios':
         return Colors.redAccent;
       case 'Entretenimiento':
+ case 'Entertainment':
         return Colors.greenAccent;
       case 'Salud':
+ case 'Health':
         return Colors.pinkAccent;
- case 'Educación':
- return Colors.teal; // Added a color for Education
+      case 'Educación':
+        return Colors.teal; // Added a color for Education
+      case 'Otros':
+        return Colors.grey;
       default:
         return Colors.grey;
     }

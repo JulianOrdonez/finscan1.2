@@ -30,6 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
           .login(_emailController.text, _passwordController.text)
           .then((isLogged) {
         if (isLogged) {
+          print('User logged in successfully. Navigating to home.');
           _navigateToHome();
         } else {
           _showErrorSnackBar('Usuario o contraseña incorrectos');

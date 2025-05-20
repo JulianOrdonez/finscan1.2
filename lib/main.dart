@@ -34,7 +34,9 @@ class MyApp extends StatelessWidget {
           theme: themeProvider.themeData,
           home: FutureBuilder<User?>(
             future: DatabaseHelper.instance.getCurrentUserId().then((userId) async {
+ print('Retrieved userId: $userId');
               if (userId != null) {
+
                 return await DatabaseHelper.instance.getUserById(userId);
               }
               return null;
@@ -43,6 +45,7 @@ class MyApp extends StatelessWidget {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else {
+ print('User snapshot data: ${snapshot.data}');
                 final user = snapshot.data;
                 if (user != null) {
                   return const HomePage();
