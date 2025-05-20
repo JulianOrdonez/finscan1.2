@@ -16,10 +16,7 @@ class SupportScreen extends StatelessWidget {
           children: [
             Text(
               '¡Bienvenido al Centro de Soporte de FinScan!',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),

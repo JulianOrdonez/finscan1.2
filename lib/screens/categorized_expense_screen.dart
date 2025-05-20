@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_2/models/expense.dart';
-import 'package:flutter_application_2/services/database_helper.dart';
 import 'package:intl/intl.dart';
+import '../models/expense.dart';
+import '../services/database_helper.dart';
+import '../helpers.dart'; // Assuming Helpers.getCategoryColor and Helpers.getCategoryIcon exist
 
 class CategorizedExpenseScreen extends StatefulWidget {
   final int userId;
 
-  const CategorizedExpenseScreen({Key? key, required this.userId}) : super(key: key);
+  const CategorizedExpenseScreen({Key? key, required this.userId})
+      : super(key: key);
 
   @override
-  _CategorizedExpenseScreenState createState() => _CategorizedExpenseScreenState();
+  _CategorizedExpenseScreenState createState() =>
+      _CategorizedExpenseScreenState();
 }
 
 class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
@@ -49,53 +52,47 @@ class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No se encontraron gastos por categoría.'));
+            return const Center(
+                child: Text('No se encontraron gastos categorizados.'));
           } else {
             final categorizedExpenses = snapshot.data!;
             final categories = categorizedExpenses.keys.toList();
 
             return ListView.builder(
-              padding: const EdgeInsets.all(8.0),
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
                 final expensesInCategory = categorizedExpenses[category]!;
 
                 return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  elevation: 4.0,
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 4.0),
+                  elevation: 2.0,
                   child: ExpansionTile(
-                    title: Text(
-                      '$category (${expensesInCategory.length})',
-                      style: const TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
+                    leading: CircleAvatar(
+                      backgroundColor: Helpers.getCategoryColor(category),
+                      child: Icon(
+                        Helpers.getCategoryIcon(category),
+                        color: Colors.white,
+                        size: 20,
                       ),
                     ),
+                    title: Text(
+                      '$category (${expensesInCategory.length})',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     children: expensesInCategory.map((expense) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded( // Use Expanded to prevent overflow
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(expense.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                                  Text('${expense.description} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(expense.date))}'),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              '\$${expense.amount.toStringAsFixed(2)}', // Use CurrencyProvider for symbol later
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ],
+                      return ListTile(
+                        title: Text(expense.title),
+                        subtitle: Text(
+                            '${expense.description} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(expense.date))}'),
+                        trailing: Text(
+                          '\$${expense.amount.toStringAsFixed(2)}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                  ),
                 );
               },
             );
