@@ -25,13 +25,9 @@ class Helpers {
 
   static IconData getCategoryIcon(String category) {
     switch (category) {
-      case 'Food':
- case 'Comida':
+      case 'Comida':
         return Icons.fastfood;
-      case 'Transport':
- case 'Transporte':
-        return Icons.directions_car;
-      case 'Shopping':
+      case 'Transporte':
  case 'Compras':
         return Icons.shopping_cart;
  case 'Servicios':
@@ -39,24 +35,17 @@ class Helpers {
  case 'Entretenimiento':
         return Icons.movie;
       case 'Health':
- case 'Salud':
+      case 'Salud':
         return Icons.favorite;
  case 'Educación':
  return Icons.school; // Added an icon for Education
+ case 'Transporte':
+        return Icons.directions_car;
       default:
         return Icons.category;
     }
   }
 
   // List of predefined expense categories
-  static List<String> get expenseCategories => [
-        'Food',
-        'Transporte',
-        'Compras',
-        'Servicios',
-        'Entretenimiento',
-        'Salud',
-        'Education',
-        'Otros',
-      ];
+  static List<String> get expenseCategories => ['Comida', 'Transporte', 'Compras', 'Servicios', 'Entretenimiento', 'Salud', 'Educación', 'Otros',];
 }
