@@ -9,7 +9,7 @@ import '../services/database_helper.dart';
 
 class ReportService {
   Future<Uint8List> generateReport(int userId) async {
-    final DatabaseHelper _dbHelper = DatabaseHelper.instance;
+    final DatabaseHelper _dbHelper = DatabaseHelper();
 
     // Fetch data
     List<Expense> expenses = await _dbHelper.getExpenses(userId);

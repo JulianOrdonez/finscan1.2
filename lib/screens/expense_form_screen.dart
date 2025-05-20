@@ -10,9 +10,11 @@ import '../services/scan_service.dart';
 
 class ExpenseFormScreen extends StatefulWidget {
   final Expense? expense;
+  final int userId;
 
-  const ExpenseFormScreen({Key? key, this.expense}) : super(key: key);
+  const ExpenseFormScreen({Key? key, this.expense, required this.userId}) : super(key: key);
 
+  @override
   @override
   State<ExpenseFormScreen> createState() => _ExpenseFormScreenState();
 }
@@ -120,8 +122,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
           }
 
         }
-
-        final userId = await AuthService.getCurrentUserId();
+        
         final expense = Expense(
           id: widget.expense?.id ?? -1,
           userId: userId!,

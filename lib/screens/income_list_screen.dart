@@ -18,12 +18,12 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
   @override
   void initState() {
     super.initState();
-    _incomesFuture = DatabaseHelper().getIncomes(widget.userId);
+    _incomesFuture = DatabaseHelper.instance.getIncomes(widget.userId);
   }
 
   Future<void> _refreshIncomeList() async {
     setState(() {
-      _incomesFuture = DatabaseHelper().getIncomes(widget.userId);
+      _incomesFuture = DatabaseHelper.instance.getIncomes(widget.userId);
     });
   }
 

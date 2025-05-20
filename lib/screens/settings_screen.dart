@@ -42,7 +42,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _generateAndShareReport(BuildContext context) async {
-    final userId = Provider.of<AuthService>(context, listen: false).currentUser?.id;
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final currentUser = authService.currentUser;
+
+    if (currentUser == null) {
+ ScaffoldMessenger.of(context).showSnackBar(
+ const SnackBar(content: Text('User not logged in')),
+ );
+ return;
+    }
+    final userId = currentUser.id;
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('User not logged in')),
@@ -56,7 +65,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final output = await getTemporaryDirectory();
       final file = File('${output.path}/expense_income_report.pdf');
       await file.writeAsBytes(pdfData);
-      await Share.shareFiles([file.path], text: 'Here is your expense and income report.');
+      await Share.shareXFiles([XFile(file.path)], text: 'Here is your expense and income report.');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Storage permission not granted')),

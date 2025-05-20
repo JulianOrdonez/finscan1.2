@@ -171,7 +171,7 @@ class DatabaseHelper {
   Future<List<Expense>> getAllExpenses(int userId) async {
     Database db = await instance.database;
     try {
-      List<Map<String, dynamic>> result = await db.query(
+      final List<Map<String, dynamic>> result = await db.query(
         tableExpenses,
         where: '$columnExpenseUserId = ?',
         whereArgs: [userId],
@@ -186,7 +186,7 @@ class DatabaseHelper {
    /// Get all incomes for a given user ID from the database. // Nuevo método para obtener ingresos
   Future<List<Income>> getAllIncomes(int userId) async {
     Database db = await instance.database;
-    try {
+    try { 
       List<Map<String, dynamic>> result = await db.query(
         tableIncomes,
         where: '$columnIncomeUserId = ?',

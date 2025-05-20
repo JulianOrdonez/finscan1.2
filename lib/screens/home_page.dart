@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ExpenseFormScreen(userId: _userId!),
-                    ),
+                    ), // Pass userId here
                   ).then((_) {
                     // Opcional: Recargar la pantalla de lista de gastos después de agregar uno
                     if (_selectedIndex == 0) {
@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => IncomeFormScreen(userId: _userId!),
-                    ),
+                    ), // Pass userId here
                   ).then((_) {
                     // Recargar la pantalla de lista de ingresos después de agregar uno
                     if (_selectedIndex == 1) { // Assuming IncomeListScreen is at index 1
@@ -112,26 +112,26 @@ class _HomePageState extends State<HomePage> {
       return Scaffold(
         appBar: AppBar(
           title: const Text('FinScan'),
-          elevation: 0,\
-          flexibleSpace: Container(\
-            decoration: BoxDecoration(\
-              gradient: LinearGradient(\
-                colors: [\
-                  themeProvider.themeData.colorScheme.primary,\
-                  themeProvider.themeData.colorScheme.primaryContainer\
-                ],\
-                begin: Alignment.topLeft,\
-                end: Alignment.bottomRight,\
-              ),\
-            ),\
-          ),\
+          elevation: 0,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  themeProvider.themeData.colorScheme.primary,
+                  themeProvider.themeData.colorScheme.primaryContainer,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
         ),
         body: AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           transitionBuilder: (Widget child, Animation<double> animation) =>
               FadeTransition(opacity: animation, child: child),
           child: Center(
-            key: ValueKey<int>(_selectedIndex),
+            key: ValueKey<int>(_selectedIndex), // Use ValueKey for AnimatedSwitcher
             child: _screens[_selectedIndex],
           ), // Update body to use _screens
         ),
@@ -145,14 +145,14 @@ class _HomePageState extends State<HomePage> {
                 icon: Icon(Icons.category), label: 'Categorías'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.settings), label: 'Ajustes'),
-            ],\
-          currentIndex: _selectedIndex,\
-          selectedItemColor: const Color(0xFF64B5F6),\
-          unselectedItemColor: themeProvider.themeData.unselectedWidgetColor,\
-          onTap: _onItemTapped,\
-          backgroundColor: themeProvider.themeData.cardColor,\
-          selectedLabelStyle: const TextStyle(fontFamily: \'Roboto\'),\
-          unselectedLabelStyle: const TextStyle(fontFamily: \'Roboto\'),\
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: const Color(0xFF64B5F6),
+          unselectedItemColor: themeProvider.themeData.unselectedWidgetColor,
+          onTap: _onItemTapped,
+          backgroundColor: themeProvider.themeData.cardColor,
+          selectedLabelStyle: const TextStyle(fontFamily: 'Roboto'),
+          unselectedLabelStyle: const TextStyle(fontFamily: 'Roboto'),
           type: BottomNavigationBarType.fixed,\
 
         ),
