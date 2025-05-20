@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (BuildContext context) {
         return Container(
-          content: Column(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               ListTile(
