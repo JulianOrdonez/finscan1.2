@@ -25,7 +25,7 @@ class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
 
   Future<void> refreshExpenses() async {
     setState(() {
-      expensesFuture = DatabaseHelper.instance.getAllExpenses(widget.userId);
+      expensesFuture = DatabaseHelper.instance.getExpenses(widget.userId);
 
     });
   }

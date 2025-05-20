@@ -14,6 +14,8 @@ import 'package:flutter_application_2/theme_provider.dart';
 
 
 class SettingsScreen extends StatefulWidget {
+  final int userId;
+
   const SettingsScreen({super.key, required this.userId});
 
   @override

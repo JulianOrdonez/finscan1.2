@@ -27,7 +27,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
   @override
   void initState() {
     super.initState();
-    expensesFuture = DatabaseHelper.instance.getAllExpenses(widget.userId);
+    expensesFuture = DatabaseHelper.instance.getExpenses(widget.userId);
   }
 
   // Filtrar gastos según el período seleccionado
