@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
               ListTile(
                 leading: const Icon(Icons.remove_circle_outline, color: Colors.redAccent),
                 title: Text(
-                  'Add Expense',
+                  'Añadir Gasto',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -93,7 +93,7 @@ class _HomePageState extends State<HomePage> {
               ListTile(
                 leading: const Icon(Icons.add_circle_outline, color: Colors.green),
                 title: Text(
-                  'Add Income',
+                  'Añadir Ingreso',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -176,7 +176,7 @@ class _HomePageState extends State<HomePage> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => _showAddOptions(context),
-          tooltip: 'Agregar',
+          tooltip: 'Agregar', // Already translated
           child: const Icon(Icons.add),
         ),
       );

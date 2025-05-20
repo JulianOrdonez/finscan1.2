@@ -40,7 +40,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
   Widget build(BuildContext context) {
     final currencyProvider = Provider.of<CurrencyProvider>(context);
 
-    return Scaffold(
+    return Scaffold( // Scaffold removed as it's part of HomePage
       appBar: AppBar(
         title: const Text('Expense Statistics'),
       ),
@@ -69,7 +69,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                        children: [ // Translate text to Spanish
                           Text(
                             'Total Expenses:',
                             style: TextStyle(
@@ -87,7 +87,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Expenses by Category:',
+                    'Gastos por Categoría:', // Translated
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
@@ -99,7 +99,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                           final percentage = (entry.value / totalExpenses) * 100;
                           return PieChartSectionData(
                             color: _getColorForCategory(entry.key), // Implement a helper for colors
-                            value: entry.value,
+                            value: entry.value, // Apply color based on category
                             title: '${entry.key}\n${percentage.toStringAsFixed(1)}%',
                             radius: 50,
                             titleStyle: const TextStyle(
@@ -115,7 +115,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Category Breakdown:',
+                    'Detalle por Categoría:', // Translated
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
@@ -130,7 +130,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                         leading: Container(
                           width: 16,
                           height: 16,
-                          color: _getColorForCategory(entry.key),
+                          color: _getColorForCategory(entry.key), // Apply color based on category
                         ),
                         title: Text(entry.key),
                         trailing: Text(
@@ -151,21 +151,21 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
     // Implement a function to return a color based on the category
     // You can use a predefined map of categories to colors
     switch (category) {
-      case 'Food':
+      case 'Comida': // Translated
         return Colors.redAccent;
-      case 'Transport':
+      case 'Transporte': // Translated
         return Colors.blueAccent;
-      case 'Shopping':
+      case 'Compras': // Translated
         return Colors.purpleAccent;
-      case 'Entertainment':
+      case 'Entretenimiento': // Translated
         return Colors.orangeAccent;
-      case 'Utilities':
+      case 'Servicios': // Translated
         return Colors.greenAccent;
-      case 'Health':
+      case 'Salud': // Translated
         return Colors.tealAccent;
-      case 'Education':
+      case 'Educación': // Translated
         return Colors.cyanAccent;
-      case 'Other':
+      case 'Otros': // Translated
         return Colors.grey;
       default:
         return Colors.blueGrey;

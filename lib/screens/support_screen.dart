@@ -15,7 +15,10 @@ class SupportScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Bienvenido al Centro de Soporte de FinScan',
+              '¡Bienvenido al Centro de Soporte de FinScan!',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -24,7 +27,9 @@ class SupportScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Estamos aquí para ayudarte con cualquier pregunta o problema que puedas tener con la aplicación FinScan.',
-              style: TextStyle(fontSize: 16),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontSize: 16,
+              ),
             ),
             const SizedBox(height: 24),
             Text(
@@ -56,8 +61,8 @@ class SupportScreen extends StatelessWidget {
             ListTile(
               leading: Icon(Icons.email),
               title: Text('Correo Electrónico'),
-              subtitle: Text('soporte@finscanapp.com'),
-              onTap: () {
+              subtitle: const Text('soporte@finscanapp.com'),
+              onTap: () { // TODO: Implement email sending
                 // TODO: Implement email sending
               },
             ),
@@ -65,7 +70,7 @@ class SupportScreen extends StatelessWidget {
               leading: Icon(Icons.web),
               title: Text('Sitio Web de Soporte'),
               subtitle: Text('www.finscanapp.com/support'),
-              onTap: () {
+              onTap: () { // TODO: Implement opening website
                 // TODO: Implement opening website
               },
             ),
@@ -81,7 +86,7 @@ class SupportScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ListTile(
               leading: Icon(Icons.link),
-              title: Text('Guía de Usuario'),
+              title: const Text('Guía de Usuario'),
               onTap: () {
                 // TODO: Implement opening user guide
               },

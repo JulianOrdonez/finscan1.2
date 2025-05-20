@@ -4,18 +4,20 @@ import 'package:flutter/material.dart';
 class Helpers {
   static Color getCategoryColor(String category) {
     switch (category) {
-      case 'Food':
+      case 'Comida':
         return Colors.orange;
-      case 'Transport':
+      case 'Transporte':
         return Colors.blueAccent;
-      case 'Shopping':
+      case 'Compras':
         return Colors.purple;
-      case 'Utilities':
+      case 'Servicios':
         return Colors.redAccent;
-      case 'Entertainment':
+      case 'Entretenimiento':
         return Colors.greenAccent;
-      case 'Health':
+      case 'Salud':
         return Colors.pinkAccent;
+ case 'Educación':
+ return Colors.teal; // Added a color for Education
       default:
         return Colors.grey;
     }
@@ -24,17 +26,23 @@ class Helpers {
   static IconData getCategoryIcon(String category) {
     switch (category) {
       case 'Food':
+ case 'Comida':
         return Icons.fastfood;
       case 'Transport':
+ case 'Transporte':
         return Icons.directions_car;
       case 'Shopping':
+ case 'Compras':
         return Icons.shopping_cart;
-      case 'Utilities':
+ case 'Servicios':
         return Icons.lightbulb;
-      case 'Entertainment':
+ case 'Entretenimiento':
         return Icons.movie;
       case 'Health':
+ case 'Salud':
         return Icons.favorite;
+ case 'Educación':
+ return Icons.school; // Added an icon for Education
       default:
         return Icons.category;
     }
@@ -43,12 +51,12 @@ class Helpers {
   // List of predefined expense categories
   static List<String> get expenseCategories => [
         'Food',
-        'Transport',
-        'Shopping',
-        'Utilities',
-        'Entertainment',
-        'Health',
+        'Transporte',
+        'Compras',
+        'Servicios',
+        'Entretenimiento',
+        'Salud',
         'Education',
-        'Other',
+        'Otros',
       ];
 }

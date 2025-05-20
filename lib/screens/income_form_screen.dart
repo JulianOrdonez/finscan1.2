@@ -82,7 +82,7 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.income == null ? 'Add Income' : 'Edit Income'),
+        title: Text(widget.income == null ? 'Añadir Ingreso' : 'Editar Ingreso'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -92,33 +92,33 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
             children: <Widget>[
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
+                decoration: const InputDecoration(labelText: 'Título'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a title';
+                    return 'Por favor ingresa un título';
                   }
                   return null;
                 },
               ),
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
+                decoration: const InputDecoration(labelText: 'Descripción'),
               ),
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(labelText: 'Amount'),
+                decoration: const InputDecoration(labelText: 'Cantidad'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter an amount';
+                    return 'Por favor ingresa una cantidad';
                   }
                   if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
+                    return 'Por favor ingresa un número válido';
                   }
                   return null;
                 },
               ),
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 20),
               ListTile(
                 title: const Text('Date'),
                 subtitle: Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),

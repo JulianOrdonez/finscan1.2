@@ -38,7 +38,17 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No incomes added yet.'));
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'Aún no hay ingresos registrados.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            );
+
           } else {
             final incomes = snapshot.data!;
             return ListView.builder(
@@ -51,22 +61,26 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
                     title: Text(income.title),
                     subtitle: Text(income.description),
                     trailing: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           '+${income.amount.toStringAsFixed(2)}',
                           style: const TextStyle(
-                            color: Colors.green,
+                            color: Colors.green, // Keep green for income
                             fontWeight: FontWeight.bold,
+                            fontSize: 16.0,
                           ),
                         ),
+                        const SizedBox(height: 4.0),
                         Text(
-                          income.date, // Assuming income.date is a String
+                          // Assuming income.date is a String in 'yyyy-MM-dd' format
+                          DateFormat('dd/MM/yyyy').format(DateTime.parse(income.date)),
                           style: const TextStyle(fontSize: 12.0, color: Colors.grey),
                         ),
                       ],
                     ),
+
                     // You can add onTap for editing/deleting later
                   ),
                 );
