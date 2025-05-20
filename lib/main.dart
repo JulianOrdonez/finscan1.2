@@ -33,7 +33,9 @@ class MyApp extends StatelessWidget {
           title: 'FinScan - Gastos',
           theme: themeProvider.themeData,
           home: FutureBuilder<User?>(
-            future: DatabaseHelper.instance.getCurrentUserId().then((userId) async {
+            future: (() async {
+ await Future.delayed(Duration(milliseconds: 500)); // Add a small delay
+ final userId = await DatabaseHelper.instance.getCurrentUserId();
  print('Retrieved userId: $userId');
               if (userId != null) {
 
@@ -41,7 +43,7 @@ class MyApp extends StatelessWidget {
               }
               return null;
             }),
-            builder: (context, snapshot) {
+ builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else {
