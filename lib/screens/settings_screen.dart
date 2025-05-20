@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
+import 'dart:io';
+import '../services/report_service.dart';
 import 'package:flutter_application_2/screens/login_screen.dart';
 import '../services/auth_service.dart';
 import 'package:flutter_application_2/screens/support_screen.dart';
@@ -36,6 +41,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await prefs.setString('currency', currency);
   }
 
+  Future<void> _generateAndShareReport(BuildContext context) async {
+    final userId = Provider.of<AuthService>(context, listen: false).currentUser?.id;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not logged in')),
+      );
+      return;
+    }
+
+    final status = await Permission.storage.request();
+    if (status.isGranted) {
+      final pdfData = await ReportService().generateReport(userId);
+      final output = await getTemporaryDirectory();
+      final file = File('${output.path}/expense_income_report.pdf');
+      await file.writeAsBytes(pdfData);
+      await Share.shareFiles([file.path], text: 'Here is your expense and income report.');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Storage permission not granted')),
+      );
+    }
+  }
   Future<void> _logout(BuildContext context) async {
     await AuthService().logout();
     // ignore: use_build_context_synchronously
@@ -109,6 +136,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 );
               },
+            ),
+            _buildSettingCard(
+              title: 'Generar Reporte',
+              leading: Icon(Icons.receipt),
+              onTap: () => _generateAndShareReport(context),
             ),
           ],
         ),

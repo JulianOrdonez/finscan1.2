@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'package:path/path.dart';
 import 'package:flutter_application_2/models/expense.dart';
+import 'package:flutter_application_2/models/income.dart'; // Importar el nuevo modelo de ingresos
 import '../models/user.dart';
 import 'package:sqflite/sqflite.dart';
+
 class DatabaseHelper {
   static const _databaseName = "expenses_app.db";
-  static const _databaseVersion = 1;
-
+  static const _databaseVersion = 1; // Incrementar la versión de la base de datos
+  
   static const tableUsers = 'users';
   static const columnUserId = 'id';
   static const columnUserEmail = 'email';
@@ -22,6 +24,14 @@ class DatabaseHelper {
   static const columnExpenseCategory = 'category';
   static const columnExpenseDate = 'date';
   static const columnExpenseReceiptPath = 'receiptPath';
+  
+  static const tableIncomes = 'incomes'; // Nueva tabla de ingresos
+  static const columnIncomeId = 'id';
+  static const columnIncomeUserId = 'user_id';
+  static const columnIncomeTitle = 'title';
+  static const columnIncomeDescription = 'description';
+  static const columnIncomeAmount = 'amount';
+  static const columnIncomeDate = 'date';
 
   static const tableCurrentUser = 'current_user';
   static const columnCurrentUserId = 'id';
@@ -34,7 +44,7 @@ class DatabaseHelper {
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
-  }
+  } 
 
   /// Initialize the database.
   Future<Database> _initDatabase() async {
@@ -43,8 +53,9 @@ class DatabaseHelper {
       path,
       version: _databaseVersion,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade, // Añadir método onUpgrade
     );
-  }
+  } 
 
   /// Create tables.
   Future _onCreate(Database db, int version) async {
@@ -68,6 +79,16 @@ class DatabaseHelper {
             $columnExpenseReceiptPath TEXT
           )
           ''');
+     await db.execute('''
+          CREATE TABLE $tableIncomes (
+            $columnIncomeId INTEGER PRIMARY KEY AUTOINCREMENT,
+            $columnIncomeUserId INTEGER,
+            $columnIncomeTitle TEXT,
+            $columnIncomeDescription TEXT,
+            $columnIncomeAmount REAL,
+            $columnIncomeDate TEXT
+          )
+          '''); // Crear la tabla de ingresos 
     await db.execute('''
           CREATE TABLE $tableCurrentUser (
             $columnCurrentUserId INTEGER PRIMARY KEY
@@ -75,6 +96,24 @@ class DatabaseHelper {
           ''');
   }
 
+  /// Upgrade database schema. 
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 1) {
+      // Si la versión anterior es menor a 1, significa que la tabla de ingresos no existe
+      await db.execute('''
+          CREATE TABLE $tableIncomes (
+            $columnIncomeId INTEGER PRIMARY KEY AUTOINCREMENT,
+            $columnIncomeUserId INTEGER,
+            $columnIncomeTitle TEXT,
+            $columnIncomeDescription TEXT,
+            $columnIncomeAmount REAL,
+            $columnIncomeDate TEXT
+          )
+          ''');
+    }
+    // Si hay futuras versiones de la base de datos, se añadirían aquí las migraciones
+  }
+  
   /// Insert a user into the database.
   Future<int> insertUser(User user) async {
     Database db = await instance.database;
@@ -85,8 +124,8 @@ class DatabaseHelper {
     });
   }
 
-
-  /// Get the current user's ID from the database.
+  
+  /// Get the current user\'s ID from the database.
   Future<int?> getCurrentUserId() async {
     Database db = await instance.database;
     try {
@@ -94,9 +133,11 @@ class DatabaseHelper {
       if (result.isNotEmpty) {
         return result.first[columnCurrentUserId] as int;
       }
-    } catch (e) {}
+    } catch (e) {
+       print('Error getting current user ID: $e');
+    }
     return null;
-  }
+  } 
 
   /// Get a user by their ID from the database.
   Future<User?> getUserById(int id) async {
@@ -110,9 +151,11 @@ class DatabaseHelper {
       if (result.isNotEmpty) {
         return User.fromMap(result.first,);
       }
-    } catch (e) {}
+    } catch (e) {
+      print('Error getting user by ID: $e');
+    }
     return null;
-  }
+  } 
 
    /// Clear the current user from the database.
    Future<void> clearCurrentUser() async {
@@ -122,7 +165,7 @@ class DatabaseHelper {
     } catch (e) {
       print('Error clearing current user: $e');
     }
-  }
+  } 
 
   /// Get all expenses for a given user ID from the database.
   Future<List<Expense>> getAllExpenses(int userId) async {
@@ -134,9 +177,28 @@ class DatabaseHelper {
         whereArgs: [userId],
       );
     return result.map((map) => Expense.fromMap(map)).toList();
-    } catch (e) {}
+    } catch (e) {
+       print('Error getting all expenses: $e');
+    }
     return [];
-  }
+  } 
+
+   /// Get all incomes for a given user ID from the database. // Nuevo método para obtener ingresos
+  Future<List<Income>> getAllIncomes(int userId) async {
+    Database db = await instance.database;
+    try {
+      List<Map<String, dynamic>> result = await db.query(
+        tableIncomes,
+        where: '$columnIncomeUserId = ?',
+        whereArgs: [userId],
+      );
+    return result.map((map) => Income.fromMap(map)).toList();
+    } catch (e) {
+       print('Error getting all incomes: $e');
+    }
+    return [];
+  } 
+
 
   /// Delete an expense from the database.
   Future<int> deleteExpense(int id) async {
@@ -151,7 +213,22 @@ class DatabaseHelper {
       print('Error deleting expense: $e');
       return -1;
     }
-  }
+  } 
+
+   /// Delete an income from the database. // Nuevo método para eliminar ingresos
+  Future<int> deleteIncome(int id) async {
+    Database db = await instance.database;
+    try {
+      return await db.delete(
+        tableIncomes,
+        where: '$columnIncomeId = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      print('Error deleting income: $e');
+      return -1;
+    }
+  } 
 
   Future<int> setCurrentUser(int userId) async {
     Database db = await instance.database;
@@ -161,23 +238,33 @@ class DatabaseHelper {
     } catch (e) {
       print('Error setting current user: $e');
       return -1;
-    }
+    } 
   }
 
   Future<int> insertExpense(Expense expense) async {
     Database db = await instance.database;
     try {
       Map<String, dynamic> expenseMap = expense.toMap();
-      expenseMap.remove('id');
+      expenseMap.remove('id'); // Ensure ID is not inserted if it's auto-generated
       return await db.insert(tableExpenses, expenseMap);
     } catch (e) {
         print('Error inserting expense: $e');
         return -1;
     }
-  }
+  } 
 
-
-
+  /// Insert an income into the database. // Nuevo método para insertar ingresos
+  Future<int> insertIncome(Income income) async {
+    Database db = await instance.database;
+    try {
+      Map<String, dynamic> incomeMap = income.toMap();
+       incomeMap.remove('id'); // Ensure ID is not inserted if it's auto-generated
+      return await db.insert(tableIncomes, incomeMap);
+    } catch (e) {
+        print('Error inserting income: $e');
+        return -1;
+    }
+  } 
 
   Future<int> updateExpense(Expense expense) async {
     Database db = await instance.database;
@@ -187,5 +274,16 @@ class DatabaseHelper {
       print('Error updating expense: $e');
       return -1;
     }
-  }
+  } 
+
+  /// Update an income in the database. // Nuevo método para actualizar ingresos
+  Future<int> updateIncome(Income income) async {
+    Database db = await instance.database;
+    try {
+      return await db.update(tableIncomes, income.toMap(), where: '$columnIncomeId = ?', whereArgs: [income.id]);
+    } catch (e) {
+      print('Error updating income: $e');
+      return -1;
+    }
+  } 
 }

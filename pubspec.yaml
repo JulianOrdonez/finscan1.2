@@ -41,6 +41,11 @@ dependencies:
   image_picker: ^1.1.2
   intl: ^0.20.2
   fl_chart: ^0.71.0
+
+  pdf: any
+  printing: any
+  share_plus: any
+  permission_handler: any
   shared_preferences: ^2.5.3
   provider: ^6.1.5
   flutter_tesseract_ocr: ^0.4.28

@@ -1,0 +1,92 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_application_2/models/income.dart';
+import 'package:flutter_application_2/services/database_helper.dart';
+import 'package:intl/intl.dart';
+
+class IncomeListScreen extends StatefulWidget {
+  final int userId;
+
+  const IncomeListScreen({Key? key, required this.userId}) : super(key: key);
+
+  @override
+  _IncomeListScreenState createState() => _IncomeListScreenState();
+}
+
+class _IncomeListScreenState extends State<IncomeListScreen> {
+  late Future<List<Income>> _incomesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _incomesFuture = DatabaseHelper().getIncomes(widget.userId);
+  }
+
+  Future<void> _refreshIncomeList() async {
+    setState(() {
+      _incomesFuture = DatabaseHelper().getIncomes(widget.userId);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Income List'),
+      ),
+      body: FutureBuilder<List<Income>>(
+        future: _incomesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No incomes added yet.'));
+          } else {
+            final incomes = snapshot.data!;
+            return ListView.builder(
+              itemCount: incomes.length,
+              itemBuilder: (context, index) {
+                final income = incomes[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  child: ListTile(
+                    title: Text(income.title),
+                    subtitle: Text(income.description),
+                    trailing: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '+${income.amount.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          DateFormat('yyyy-MM-dd').format(income.date),
+                          style: TextStyle(fontSize: 12.0, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                    // You can add onTap for editing/deleting later
+                  ),
+                );
+              },
+            );
+          }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // This FAB is typically for adding new items.
+          // In this case, the '+' button on the HomePage handles adding income/expense.
+          // You might remove this FAB or use it for a different purpose here if needed.
+          // For now, we will rely on the HomePage FAB.
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
