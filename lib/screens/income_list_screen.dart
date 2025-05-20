@@ -78,15 +78,6 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // This FAB is typically for adding new items.
-          // In this case, the '+' button on the HomePage handles adding income/expense.
-          // You might remove this FAB or use it for a different purpose here if needed.
-          // For now, we will rely on the HomePage FAB.
-        },
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }

@@ -109,7 +109,7 @@ class DatabaseHelper {
             $columnIncomeAmount REAL,
             $columnIncomeDate TEXT
           )
-          ''');
+          '''); // Crear la tabla de ingresos
     }
     // Si hay futuras versiones de la base de datos, se añadirían aquí las migraciones
   }

@@ -190,16 +190,6 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ExpenseFormScreen(userId: widget.userId)));
-          _refreshExpenses();
-        },
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }

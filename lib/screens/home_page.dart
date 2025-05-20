@@ -52,38 +52,36 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showAddDialog() {
-    showDialog(
+    showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Agregar'),
+        return Container(
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               ListTile(
                 leading: const Icon(Icons.remove_circle_outline),
                 title: const Text('Gasto'),
-                onTap: () {
+                onTap: () async {
                   Navigator.of(context).pop(); // Cerrar el diálogo
-                  Navigator.push(
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => ExpenseFormScreen(userId: _userId!),
-                    ), // Pass userId here
-                  ).then((_) {
-                    // Opcional: Recargar la pantalla de lista de gastos después de agregar uno
-                    if (_selectedIndex == 0) {
-                      _loadUserId(); // Recarga para actualizar la lista
-                    }
-                  });
+                    ),
+                  );
+                  // Recargar la lista de gastos si estamos en esa pantalla
+                  if (_selectedIndex == 0) {
+                    _loadUserId();
+                  }
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.add_circle_outline),
                 title: const Text('Ingreso'),
-                onTap: () {
+                onTap: () async {
                   Navigator.of(context).pop(); // Cerrar el diálogo
-                  Navigator.push(
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => IncomeFormScreen(userId: _userId!),
@@ -95,6 +93,7 @@ class _HomePageState extends State<HomePage> {
                     }
                   });
                 },
+
               ),
             ],
           ),
