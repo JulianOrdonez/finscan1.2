@@ -200,4 +200,16 @@ class DatabaseHelper {
       whereArgs: [id],
     );
   }
+
+  // Método para limpiar la base de datos (solo para desarrollo/debugging)
+  Future<void> clearDatabase() async {
+    Database db = await instance.database;
+    await db.execute('DROP TABLE IF EXISTS users');
+    await db.execute('DROP TABLE IF EXISTS incomes');
+    await db.execute('DROP TABLE IF EXISTS expenses');
+    await _onCreate(db, _databaseVersion);
+    // Cerrar y reabrir la base de datos para asegurar que los cambios se apliquen
+    await db.close();
+    _database = null; // Resetear la instancia de la base de datos
+  }
 }

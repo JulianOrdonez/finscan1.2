@@ -14,10 +14,14 @@ class AuthService {
   Future<bool> login(String email, String password) async {
     final user = await _databaseHelper.getUserByEmailAndPassword(email, password);
     if (user != null) {
+      print('Login successful for user: ${user.email}');
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_loggedInUserIdKey, user.id!); // Usamos user.id! porque user no es nulo aquí
+      print('User ID ${user.id} stored in SharedPreferences.');
       return true;
     }
+    print('Login failed for email: $email');
+
     return false;
   }
 
@@ -29,12 +33,16 @@ class AuthService {
     // Verificar si ya existe un usuario con el mismo email
     final existingUser = await _databaseHelper.getUserByEmail(email);
     if (existingUser != null) {
+      print('Registration failed: User with email $email already exists.');
       return false; // Ya existe un usuario con este email
     }
 
     try {
       final newUser = User(name: name, email: email, password: password); // El ID será auto-generado por la base de datos
-      await _databaseHelper.insertUser(newUser);
+      final id = await _databaseHelper.insertUser(newUser);
+      print('User registered successfully with ID: $id');
+      // Optionally, log the inserted user details if needed
+      // print('Inserted user: ${newUser.toMap()}');
       return true;
     } catch (e) {
       print('Error al registrar usuario: $e');

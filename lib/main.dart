@@ -6,6 +6,7 @@ import 'package:flutter_application_2/currency_provider.dart';
 import 'package:flutter_application_2/services/database_helper.dart';
 import 'package:flutter_application_2/screens/home_page.dart';
 import 'package:flutter_application_2/services/auth_service.dart';
+import 'package:flutter_application_2/screens/register_screen.dart';
 import 'package:flutter_application_2/models/user.dart';
 
 void main() async {
@@ -33,8 +34,13 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           title: 'FinScan - Gastos',
           theme: themeProvider.themeData,
+          routes: {
+            '/register': (context) => RegisterScreen(),
+
+          },
           home: FutureBuilder<User?>(
             future: (() async {
+              print('Checking for logged in user...');
               await Future.delayed(Duration(milliseconds: 500)); // Add a small delay
               final userId = await AuthService().getCurrentUserId();
               print('Retrieved userId: $userId');
