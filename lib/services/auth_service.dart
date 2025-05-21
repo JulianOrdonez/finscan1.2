@@ -1,7 +1,8 @@
 import 'database_helper.dart'; // Asegúrate de que la ruta de importación sea correcta
 import 'package:flutter_application_2/models/user.dart';
 import 'package:sqflite/sqflite.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+ 
 class AuthService {
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
   static const String _loggedInUserIdKey = 'loggedInUserId';
@@ -17,11 +18,24 @@ class AuthService {
       final db = await _databaseHelper.database;
       await db.insert('sessions', {'userId': user.id});
 
-      print('User ID ${user.id} stored in SharedPreferences.');
+      // Store the user ID in SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_loggedInUserIdKey, user.id!);
+
+      print('User ID ${user.id} stored in SharedPreferences and session.');
       return true;
     }
     print('Login failed for email: $email');
 
+    return false;
+  }
+
+  /// Handles the sign-in process from the UI.
+  ///
+  /// Calls the internal `login` method and returns the result.
+  Future<bool> signIn(String email, String password) async {
+    final bool success = await login(email, password);
+    // Additional logic can be added here if needed before returning the result
     return false;
   }
 
@@ -51,14 +65,16 @@ class AuthService {
   }
 
   /// Cierra la sesión del usuario actual.
-  ///
-  /// Elimina el ID de usuario almacenado en SharedPreferences.
-  // Elimina la sesión de la base de datos
+  /// Elimina el ID de usuario almacenado en SharedPreferences y la sesión de la base de datos.
   Future<void> logout() async {
+    // Remove user ID from SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_loggedInUserIdKey);
+
+    // Elimina la sesión de la base de datos
     final db = await _databaseHelper.database;
     await db.delete('sessions');
   }
-
   /// Carga la sesión del usuario desde la base de datos.
   ///
   /// Retorna el ID del usuario si hay una sesión activa, de lo contrario retorna `null`.

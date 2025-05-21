@@ -15,6 +15,19 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _email;
   String? _password;
 
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  void _checkLoginStatus() async {
+    final userId = await Provider.of<AuthService>(context, listen: false).getCurrentUserId();
+    if (userId != null) {
+      Navigator.pushReplacementNamed(context, '/home');
+    }
+  }
+
   void _login() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
