@@ -121,6 +121,7 @@ class DatabaseHelper {
   // Métodos para la tabla de ingresos
   Future<int> insertIncome(Income income) async {
     Database db = await instance.database;
+    print('Inserting income: ${income.toMap()}');
     return await db.insert('incomes', income.toMap());
   }
 
@@ -132,12 +133,14 @@ class DatabaseHelper {
       whereArgs: [userId],
       orderBy: 'date DESC', // Opcional: ordenar por fecha
     );
+    print('Fetched ${maps.length} incomes for userId: $userId');
     return List.generate(maps.length, (i) {
       return Income.fromMap(maps[i]);
     });
   }
 
   Future<int> updateIncome(Income income) async {
+    print('Updating income with ID: ${income.id}');
     Database db = await instance.database;
     return await db.update(
       'incomes',
@@ -148,6 +151,7 @@ class DatabaseHelper {
   }
 
   Future<int> deleteIncome(int id) async {
+    print('Deleting income with ID: $id');
     Database db = await instance.database;
     return await db.delete(
       'incomes',
@@ -160,6 +164,7 @@ class DatabaseHelper {
   // Métodos para la tabla de gastos
   Future<int> insertExpense(Expense expense) async {
     Database db = await instance.database;
+    print('Inserting expense: ${expense.toMap()}');
     return await db.insert('expenses', expense.toMap());
   }
 
@@ -171,12 +176,14 @@ class DatabaseHelper {
       whereArgs: [userId],
       orderBy: 'date DESC', // Opcional: ordenar por fecha
     );
+    print('Fetched ${maps.length} expenses for userId: $userId');
     return List.generate(maps.length, (i) {
       return Expense.fromMap(maps[i]);
     });
   }
 
     Future<List<Expense>> getAllExpenses() async {
+    print('Fetching all expenses');
     Database db = await instance.database;
     final List<Map<String, dynamic>> maps = await db.query('expenses');
     return List.generate(maps.length, (i) {
@@ -186,6 +193,7 @@ class DatabaseHelper {
 
 
   Future<int> updateExpense(Expense expense) async {
+    print('Updating expense with ID: ${expense.id}');
     Database db = await instance.database;
     return await db.update(
       'expenses',
@@ -196,6 +204,7 @@ class DatabaseHelper {
   }
 
   Future<int> deleteExpense(int id) async {
+    print('Deleting expense with ID: $id');
     Database db = await instance.database;
     return await db.delete(
       'expenses',
@@ -206,6 +215,7 @@ class DatabaseHelper {
 
   // Método para limpiar la base de datos (solo para desarrollo/debugging)
   Future<void> clearDatabase() async {
+    print('Clearing database...');
     Database db = await instance.database;
     await db.execute('DROP TABLE IF EXISTS users');
     await db.execute('DROP TABLE IF EXISTS incomes');
@@ -213,6 +223,7 @@ class DatabaseHelper {
     await _onCreate(db, _databaseVersion);
     // Cerrar y reabrir la base de datos para asegurar que los cambios se apliquen
     await db.close();
+    print('Database cleared and recreated.');
     _database = null; // Resetear la instancia de la base de datos
   }
 }
