@@ -91,6 +91,7 @@ class DatabaseHelper {
 
   Future<User?> getUserByEmailAndPassword(String email, String password) async { // Use User model from models/user.dart
     Database db = await instance.database;
+    print('Attempting to get user by email: $email and password: $password');
     List<Map<String, dynamic>> maps = await db.query(
       'users',
       where: 'email = ? AND password = ?',
@@ -99,11 +100,13 @@ class DatabaseHelper {
     if (maps.isNotEmpty) {
       return User.fromMap(maps.first);
     }
+    print('User not found for email: $email');
     return null;
   }
 
   Future<User?> getUserById(int id) async { // Use User model from models/user.dart
     Database db = await instance.database;
+    print('Attempting to get user by ID: $id');
     List<Map<String, dynamic>> maps = await db.query(
       'users',
       where: 'id = ?',

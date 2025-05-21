@@ -11,6 +11,7 @@ import 'package:flutter_application_2/models/user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseHelper.instance.clearDatabase(); // FOR DEBUGGING ONLY - REMOVE LATER
   runApp(
     MultiProvider(
       providers: [
