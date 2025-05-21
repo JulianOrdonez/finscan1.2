@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'database_helper.dart'; // Asegúrate de que la ruta de importación sea correcta
+import 'package:flutter_application_2/models/user.dart';
 
 /// Servicio para manejar la autenticación de usuarios.
 class AuthService {

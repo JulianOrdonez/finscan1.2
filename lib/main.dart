@@ -35,20 +35,19 @@ class MyApp extends StatelessWidget {
           theme: themeProvider.themeData,
           home: FutureBuilder<User?>(
             future: (() async {
- await Future.delayed(Duration(milliseconds: 500)); // Add a small delay
- final userId = await AuthService().getCurrentUserId();
- print('Retrieved userId: $userId');
+              await Future.delayed(Duration(milliseconds: 500)); // Add a small delay
+              final userId = await AuthService().getCurrentUserId();
+              print('Retrieved userId: $userId');
               if (userId != null) {
-
                 return await DatabaseHelper.instance.getUserById(userId);
               }
               return null;
-            }),
- builder: (context, snapshot) {
+            })(),
+            builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else {
- print('User snapshot data: ${snapshot.data}');
+                print('User snapshot data: ${snapshot.data}');
                 final user = snapshot.data;
                 if (user != null) {
                   return const HomePage();
