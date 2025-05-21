@@ -62,7 +62,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
   Future<void> _saveExpense() async {
     if (_formKey.currentState!.validate()) {
       final newExpense = Expense(
-        id: widget.expense?.id ?? 0, // 0 for new expense, existing id for edit
+        id: widget.expense?.id, // Use existing id for edit, null for new
         userId: widget.userId,
         title: _titleController.text,
         description: _descriptionController.text,
@@ -85,7 +85,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar( // AppBar title 'Add Expense' to 'Añadir Gasto' and 'Edit Expense' to 'Editar Gasto'
+      appBar: AppBar(
         title: Text(widget.expense == null ? 'Add Expense' : 'Edit Expense'),
       ),
       body: Padding(
@@ -96,36 +96,36 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
             children: <Widget>[
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Título'), // Label 'Title' to 'Título'
+                decoration: const InputDecoration(labelText: 'Title'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Por favor ingresa un título'; // Validation message 'Please enter a title' to 'Por favor ingresa un título'
+                    return 'Please enter a title';
                   }
                   return null;
                 },
               ),
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Descripción'), // Label 'Description' to 'Descripción'
+                decoration: const InputDecoration(labelText: 'Description'),
               ),
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(labelText: 'Cantidad'), // Label 'Amount' to 'Cantidad'
+                decoration: const InputDecoration(labelText: 'Amount'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Por favor ingresa una cantidad'; // Validation message 'Please enter an amount' to 'Por favor ingresa una cantidad'
+                    return 'Please enter an amount';
                   }
                   if (double.tryParse(value) == null) {
-                    return 'Por favor ingresa un número válido'; // Validation message 'Please enter a valid number' to 'Por favor ingresa un número válido'
+                    return 'Please enter a valid number';
                   }
                   return null;
                 },
               ),
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
-                decoration: const InputDecoration(labelText: 'Categoría',), // Label 'Category' to 'Categoría'
-                items: Helpers.expenseCategories.map((String category) { // Default category 'Comida' is already present in helpers.dart and used here.
+                decoration: const InputDecoration(labelText: 'Category'),
+                items: Helpers.expenseCategories.map((String category) {
                   return DropdownMenuItem<String>(
                     value: category,
                     child: Text(category),
@@ -142,12 +142,12 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
               TextFormField(
                 controller: _dateController,
                 decoration: const InputDecoration(
-                  labelText: 'Fecha', // Label 'Date' to 'Fecha'
+                  labelText: 'Date',
                   suffixIcon: Icon(Icons.calendar_today),
                 ),
                 readOnly: true,
                 onTap: () => _selectDate(context),
-                validator: (value) { // Validation message 'Please select a date' to 'Por favor selecciona una fecha'
+                validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please select a date';
                   }
@@ -157,7 +157,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _saveExpense,
-                child: Text(widget.expense == null ? 'Guardar Gasto' : 'Actualizar Gasto'), // Button text 'Save Expense' to 'Guardar Gasto' and 'Update Expense' to 'Actualizar Gasto'
+                child: Text(widget.expense == null ? 'Save Expense' : 'Update Expense'),
               ),
             ],
           ),

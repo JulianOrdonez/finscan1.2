@@ -7,7 +7,6 @@ import 'package:flutter_application_2/models/user.dart';
 import 'package:flutter_application_2/models/expense.dart';
 
 
-
 class DatabaseHelper {
   static const int _databaseVersion = 1;
   static const String _databaseName = 'finscan.db';
@@ -30,6 +29,11 @@ class DatabaseHelper {
       path,
       version: _databaseVersion,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+      onOpen: (db) {
+        // Enable foreign keys
+        db.execute('PRAGMA foreign_keys = ON');
+      },
     );
   }
 
@@ -50,7 +54,6 @@ class DatabaseHelper {
         title TEXT NOT NULL,
         description TEXT,
         amount REAL NOT NULL,
-        category TEXT NOT NULL,
         date TEXT NOT NULL,
         FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
       )
@@ -70,13 +73,25 @@ class DatabaseHelper {
     ''');
   }
 
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    // For now, simply drop and recreate tables for schema changes
+    // In a real app, you would handle migrations more carefully
+    await db.execute('DROP TABLE IF EXISTS users');
+    await db.execute('DROP TABLE IF EXISTS incomes');
+    await db.execute('DROP TABLE IF EXISTS expenses');
+    await _onCreate(db, newVersion);
+  }
+
+
   // Métodos para la tabla de usuarios
   Future<int> insertUser(User user) async {
     Database db = await instance.database;
-    return await db.insert('users', user.toMap());
+    final id = await db.insert('users', user.toMap());
+    print('Inserted user with ID: $id');
+    return id;
   }
 
-  Future<User?> getUserByEmail(String email) async { // Use User model from models/user.dart
+  Future<User?> getUserByEmail(String email) async {
     Database db = await instance.database;
     List<Map<String, dynamic>> maps = await db.query(
       'users',
@@ -89,7 +104,7 @@ class DatabaseHelper {
     return null;
   }
 
-  Future<User?> getUserByEmailAndPassword(String email, String password) async { // Use User model from models/user.dart
+  Future<User?> getUserByEmailAndPassword(String email, String password) async {
     Database db = await instance.database;
     print('Attempting to get user by email: $email and password: $password');
     List<Map<String, dynamic>> maps = await db.query(
@@ -104,13 +119,14 @@ class DatabaseHelper {
     return null;
   }
 
-  Future<User?> getUserById(int id) async { // Use User model from models/user.dart
+  Future<User?> getUserById(int id) async {
     Database db = await instance.database;
     print('Attempting to get user by ID: $id');
     List<Map<String, dynamic>> maps = await db.query(
       'users',
       where: 'id = ?',
       whereArgs: [id],
+
     );
     if (maps.isNotEmpty) {
       return User.fromMap(maps.first);
@@ -125,13 +141,13 @@ class DatabaseHelper {
     return await db.insert('incomes', income.toMap());
   }
 
-  Future<List<Income>> getIncomes(int userId) async { // Renamed method
+  Future<List<Income>> getIncomes(int userId) async {
     Database db = await instance.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'incomes',
       where: 'userId = ?',
       whereArgs: [userId],
-      orderBy: 'date DESC', // Opcional: ordenar por fecha
+      orderBy: 'date DESC',
     );
     print('Fetched ${maps.length} incomes for userId: $userId');
     return List.generate(maps.length, (i) {
@@ -168,13 +184,13 @@ class DatabaseHelper {
     return await db.insert('expenses', expense.toMap());
   }
 
-  Future<List<Expense>> getExpenses(int userId) async { // Renamed method
+  Future<List<Expense>> getExpenses(int userId) async {
     Database db = await instance.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'expenses',
       where: 'userId = ?',
       whereArgs: [userId],
-      orderBy: 'date DESC', // Opcional: ordenar por fecha
+      orderBy: 'date DESC',
     );
     print('Fetched ${maps.length} expenses for userId: $userId');
     return List.generate(maps.length, (i) {
