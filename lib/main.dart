@@ -11,7 +11,7 @@ import 'package:flutter_application_2/models/user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await DatabaseHelper.instance.clearDatabase(); // FOR DEBUGGING ONLY - REMOVE LATER
+  // await DatabaseHelper.instance.clearDatabase(); // FOR DEBUGGING ONLY - REMOVE LATER
   runApp(
     MultiProvider(
       providers: [
@@ -21,6 +21,9 @@ void main() async {
         ChangeNotifierProvider<CurrencyProvider>(
           create: (context) => CurrencyProvider(),
         ),
+        Provider<AuthService>(
+          create: (_) => AuthService(),
+        )
       ],
       child: MyApp(),
     ),
@@ -37,11 +40,11 @@ class MyApp extends StatelessWidget {
           theme: themeProvider.themeData,
           routes: {
             '/register': (context) => RegisterScreen(),
-
+ '/home': (context) => HomePage(),
           },
           home: FutureBuilder<User?>(
             future: (() async {
-              print('Checking for logged in user...');
+              print('Checking for logged in user...'); // Add debug print
               await Future.delayed(Duration(milliseconds: 500)); // Add a small delay
               final userId = await AuthService().getCurrentUserId();
               print('Retrieved userId: $userId');
@@ -55,7 +58,7 @@ class MyApp extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               } else {
                 print('User snapshot data: ${snapshot.data}');
-                final user = snapshot.data;
+                final user = snapshot.data; // Access the user from the snapshot
                 if (user != null) {
                   return const HomePage();
                 } else {

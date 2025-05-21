@@ -1,8 +1,7 @@
-import 'package:shared_preferences/shared_preferences.dart';
 import 'database_helper.dart'; // Asegúrate de que la ruta de importación sea correcta
 import 'package:flutter_application_2/models/user.dart';
+import 'package:sqflite/sqflite.dart';
 
-/// Servicio para manejar la autenticación de usuarios.
 class AuthService {
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
   static const String _loggedInUserIdKey = 'loggedInUserId';
@@ -14,9 +13,10 @@ class AuthService {
   Future<bool> login(String email, String password) async {
     final user = await _databaseHelper.getUserByEmailAndPassword(email, password);
     if (user != null) {
-      print('Login successful for user: ${user.email}');
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(_loggedInUserIdKey, user.id!); // Usamos user.id! porque user no es nulo aquí
+      // Guardar la sesión en SQLite
+      final db = await _databaseHelper.database;
+      await db.insert('sessions', {'userId': user.id});
+
       print('User ID ${user.id} stored in SharedPreferences.');
       return true;
     }
@@ -53,14 +53,15 @@ class AuthService {
   /// Cierra la sesión del usuario actual.
   ///
   /// Elimina el ID de usuario almacenado en SharedPreferences.
+  // Elimina la sesión de la base de datos
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_loggedInUserIdKey);
+    final db = await _databaseHelper.database;
+    await db.delete('sessions');
   }
 
-  /// Obtiene el ID del usuario actualmente conectado.
+  /// Carga la sesión del usuario desde la base de datos.
   ///
-  /// Retorna el ID del usuario si hay un usuario conectado, de lo contrario retorna `null`.
+  /// Retorna el ID del usuario si hay una sesión activa, de lo contrario retorna `null`.
   Future<int?> getCurrentUserId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(_loggedInUserIdKey);
