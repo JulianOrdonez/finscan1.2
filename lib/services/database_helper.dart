@@ -3,6 +3,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'dart:io';
 import 'package:flutter_application_2/models/income.dart';
+import 'package:flutter_application_2/models/user.dart';
 import 'package:flutter_application_2/models/expense.dart';
 
 // Modelo para el usuario

@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_application_2/theme_provider.dart';
 
 class LoginScreen extends StatefulWidget {
-  @override
+  const LoginScreen({Key? key}) : super(key: key);
   _LoginScreenState createState() => _LoginScreenState();
 }
 
@@ -68,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Switch(
               value: themeProvider.isDarkMode,
               onChanged: (value) {
-                themeProvider.toggleTheme(value);
+                themeProvider.toggleTheme();
               },
             ),
           ],

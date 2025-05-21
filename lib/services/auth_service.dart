@@ -32,7 +32,7 @@ class AuthService {
     }
 
     try {
-      final newUser = User(id: null, name: name, email: email, password: password); // El ID será auto-generado por la base de datos
+      final newUser = User(name: name, email: email, password: password); // El ID será auto-generado por la base de datos
       await _databaseHelper.insertUser(newUser);
       return true;
     } catch (e) {

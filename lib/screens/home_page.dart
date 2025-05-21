@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_2/theme_provider.dart';
-import 'package:flutter_application_2/screens/expense_list_screen.dart';
-import 'package:flutter_application_2/screens/expense_stats_screen.dart';
-import 'package:flutter_application_2/screens/settings_screen.dart';
-import 'package:flutter_application_2/services/database_helper.dart';
+import 'package:flutter_application_2/services/auth_service.dart'; // Import AuthService
 import 'categorized_expense_screen.dart';
 import 'expense_form_screen.dart';
 import 'income_form_screen.dart';
 import 'income_list_screen.dart';
+import 'package:flutter_application_2/screens/expense_list_screen.dart';
+import 'package:flutter_application_2/screens/expense_stats_screen.dart';
+import 'package:flutter_application_2/screens/settings_screen.dart';
 import 'login_screen.dart'; // Assuming LoginScreen is needed for redirection
 
 class HomePage extends StatefulWidget {
@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadUserId() async {
-    final userId = await DatabaseHelper.instance.getCurrentUserId();
+    final userId = await AuthService().getCurrentUserId(); // Use AuthService
     setState(() {
       _userId = userId;
       if (_userId != null) {

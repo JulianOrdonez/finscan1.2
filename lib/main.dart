@@ -5,6 +5,7 @@ import 'package:flutter_application_2/theme_provider.dart';
 import 'package:flutter_application_2/currency_provider.dart';
 import 'package:flutter_application_2/services/database_helper.dart';
 import 'package:flutter_application_2/screens/home_page.dart';
+import 'package:flutter_application_2/services/auth_service.dart';
 import 'package:flutter_application_2/models/user.dart';
 
 void main() async {
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
           home: FutureBuilder<User?>(
             future: (() async {
  await Future.delayed(Duration(milliseconds: 500)); // Add a small delay
- final userId = await DatabaseHelper.instance.getCurrentUserId();
+ final userId = await AuthService().getCurrentUserId();
  print('Retrieved userId: $userId');
               if (userId != null) {
 
