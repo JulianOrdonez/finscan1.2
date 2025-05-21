@@ -6,34 +6,6 @@ import 'package:flutter_application_2/models/income.dart';
 import 'package:flutter_application_2/models/user.dart';
 import 'package:flutter_application_2/models/expense.dart';
 
-// Modelo para el usuario
-class User {
-  int id;
-  String name;
-  String email;
-  String password;
-
-  User({required this.id, required this.name, required this.email, required this.password});
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'email': email,
-      'password': password,
-    };
-  }
-
-  factory User.fromMap(Map<String, dynamic> map) {
-    return User(
-      id: map['id'],
-      name: map['name'],
-      email: map['email'],
-      password: map['password'],
-    );
-  }
-}
-
 
 
 class DatabaseHelper {
@@ -104,7 +76,7 @@ class DatabaseHelper {
     return await db.insert('users', user.toMap());
   }
 
-  Future<User?> getUserByEmail(String email) async {
+  Future<User?> getUserByEmail(String email) async { // Use User model from models/user.dart
     Database db = await instance.database;
     List<Map<String, dynamic>> maps = await db.query(
       'users',
@@ -117,7 +89,7 @@ class DatabaseHelper {
     return null;
   }
 
-  Future<User?> getUserByEmailAndPassword(String email, String password) async {
+  Future<User?> getUserByEmailAndPassword(String email, String password) async { // Use User model from models/user.dart
     Database db = await instance.database;
     List<Map<String, dynamic>> maps = await db.query(
       'users',
@@ -130,7 +102,7 @@ class DatabaseHelper {
     return null;
   }
 
-  Future<User?> getUserById(int id) async {
+  Future<User?> getUserById(int id) async { // Use User model from models/user.dart
     Database db = await instance.database;
     List<Map<String, dynamic>> maps = await db.query(
       'users',
@@ -149,7 +121,7 @@ class DatabaseHelper {
     return await db.insert('incomes', income.toMap());
   }
 
-  Future<List<Income>> getIncomesByUserId(int userId) async {
+  Future<List<Income>> getIncomes(int userId) async { // Renamed method
     Database db = await instance.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'incomes',
@@ -188,7 +160,7 @@ class DatabaseHelper {
     return await db.insert('expenses', expense.toMap());
   }
 
-  Future<List<Expense>> getExpensesByUserId(int userId) async {
+  Future<List<Expense>> getExpenses(int userId) async { // Renamed method
     Database db = await instance.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'expenses',
