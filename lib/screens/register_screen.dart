@@ -45,7 +45,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
           context, '/home', (Route<dynamic> route) => false);
 
     } on FirebaseAuthException catch (e) {
+      String errorMessage = 'Registration failed. Please try again.'; // Default error message
+      if (e.code == 'email-already-in-use') {
+        errorMessage = 'The email address is already in use.';
+      } else if (e.code == 'weak-password') {
+        errorMessage = 'The password provided is too weak.';
+      }
+      // You can add more error code checks here
+
       ScaffoldMessenger.of(context).showSnackBar(
+
         SnackBar(content: Text(errorMessage)),
       );
     } catch (e) {
