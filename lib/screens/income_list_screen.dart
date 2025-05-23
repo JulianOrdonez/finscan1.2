@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../models/income.dart';
+import 'package:flutter_application_2/models/income.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 import 'income_form_screen.dart';
-import '../models/user.dart';
 
 class IncomeListScreen extends StatefulWidget {
-  final int userId;
-
-  const IncomeListScreen({Key? key, required this.userId}) : super(key: key);
+  const IncomeListScreen({Key? key}) : super(key: key);
 
   @override
   _IncomeListScreenState createState() => _IncomeListScreenState();

@@ -31,19 +31,17 @@ class _HomePageState extends State<HomePage> {
 
   Future<String?> _loadUserId() async {
     // Use AuthService to get the current user ID from Firebase Authentication.
-    final userId = AuthService().getCurrentUserId();
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final userId = authService.getCurrentUserId();
 
     // No need to await this setState, as it's synchronous.
     setState(() {
       _userId = userId;
       if (_userId != null) {
         _screens = [
- ExpenseListScreen(userId: _userId!),
-          IncomeListScreen(userId: _userId!), // Assuming IncomeListScreen still expects int
-          ExpenseStatsScreen(userId: _userId!),
-          CategorizedExpenseScreen(userId: _userId!),
+          ExpenseListScreen(userId: _userId!),
+          IncomeListScreen(userId: _userId!),
           SettingsScreen(userId: _userId!),
-        ];
       }
     });
     return userId; // Return the fetched user ID
@@ -134,18 +132,27 @@ class _HomePageState extends State<HomePage> {
     return FutureBuilder<String?>( // Specify the return type of the future to String?
       future: _loadUserId(), // Ensure _loadUserId is called here
       builder: (context, snapshot) {
- return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.connectionState == ConnectionState.waiting && _userId == null) {
           return const Scaffold(
- body: Center(child: CircularProgressIndicator()), // Show loading indicator while waiting
- );
-        } else if (snapshot.hasData && snapshot.data != null) { // Check if the snapshot has data and it's not null
- // If the future completed successfully and data (userId) is not null,
- // proceed to build the main content using the Consumer.
-          // We use snapshot.data here as the definitive source of the userId after the future completes.
-          _userId = snapshot.data; // Update _userId state variable after future completes
-        } else if (snapshot.hasError || _userId == null) {
- return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+            body: Center(child: CircularProgressIndicator()), // Show loading indicator while waiting
+          );
+        } else if (snapshot.hasData && snapshot.data != null || _userId != null) {
+          // If the future completed successfully and data (userId) is not null,
+          // or if _userId is already set, proceed to build the main content.
+          // Use snapshot.data if available, otherwise use the existing _userId.
+          _userId = snapshot.data ?? _userId;
+          if (_userId != null && _screens.isEmpty) {
+             _screens = [
+              ExpenseListScreen(userId: _userId!),
+              IncomeListScreen(userId: _userId!),
+              ExpenseStatsScreen(), // ExpenseStatsScreen does not need userId parameter
+              CategorizedExpenseScreen(userId: _userId!), // Assuming CategorizedExpenseScreen still expects String
+              SettingsScreen(userId: _userId!),
+            ];
+          }
+
+          return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+            return Scaffold(
               appBar: AppBar(
                 title: const Text('FinScan'),
                 elevation: 0,
@@ -165,7 +172,7 @@ class _HomePageState extends State<HomePage> {
               body: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 transitionBuilder: (Widget child, Animation<double> animation) =>
-                    FadeTransition(opacity: animation, child: child),
+                FadeTransition(opacity: animation, child: child),
                 child: Center(
                   key: ValueKey<int>(_selectedIndex),
                   child: _screens[_selectedIndex],
@@ -173,22 +180,17 @@ class _HomePageState extends State<HomePage> {
               ),
               bottomNavigationBar: BottomNavigationBar(
                 items: const <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Gastos'),
-                  BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Ingresos'),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.bar_chart), label: 'Estadísticas'),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.category), label: 'Categorías'),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.settings), label: 'Ajustes'),
+                  BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Gastos'), // Spanish translation
+                  BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Ingresos'), // Spanish translation
+                  BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Estadísticas'), // Spanish translation
+                  BottomNavigationBarItem(icon: Icon(Icons.category), label: 'Categorías'), // Spanish translation
+                  BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'), // Spanish translation
                 ],
                 currentIndex: _selectedIndex,
                 selectedItemColor: const Color(0xFF64B5F6),
                 unselectedItemColor: themeProvider.themeData.unselectedWidgetColor,
                 onTap: _onItemTapped,
                 backgroundColor: themeProvider.themeData.cardColor,
-                selectedLabelStyle: const TextStyle(fontFamily: 'Roboto'),
-                unselectedLabelStyle: const TextStyle(fontFamily: 'Roboto'),
                 type: BottomNavigationBarType.fixed,
               ),
               floatingActionButton: FloatingActionButton(
@@ -197,21 +199,14 @@ class _HomePageState extends State<HomePage> {
                 child: const Icon(Icons.add),
               ),
             );
- });
-        } else {
-          // If there's an error or _userId is still null after loading,
+          });
+        } else { // If there's an error or _userId is still null after loading,
           // navigate to the LoginScreen.
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
-            ); // Return an empty widget while navigating
+            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const LoginScreen()));
           });
-          return const SizedBox.shrink(); // Return an empty widget while navigating
-        } else {
           return const SizedBox.shrink(); // Or any other fallback widget
         }
- });
-        return const SizedBox.shrink();
       },
     );
   }

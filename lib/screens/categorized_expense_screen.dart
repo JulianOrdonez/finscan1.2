@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/expense.dart';
-import '../models/user.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
-import '../helpers.dart'; // Assuming Helpers.getCategoryColor and Helpers.getCategoryIcon exist
 class CategorizedExpenseScreen extends StatefulWidget {
   final int userId;
- 
+
   const CategorizedExpenseScreen({Key? key, required this.userId})
       : super(key: key);
 
@@ -62,7 +60,7 @@ class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
                   elevation: 2.0,
                   child: ExpansionTile(
                     leading: CircleAvatar(
-                      backgroundColor: Helpers.getCategoryColor(category),
+                      backgroundColor: Colors.blue, // Placeholder
                       child: Icon(
                         Helpers.getCategoryIcon(category),
                         color: Colors.white,

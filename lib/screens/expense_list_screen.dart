@@ -129,7 +129,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 10),
                           child: ListTile(
-                            contentPadding: EdgeInsets.zero,
+                            contentPadding: EdgeInsets.zero, // Asegura que el ListTile use el espacio completo
                             leading: CircleAvatar(
                               backgroundColor:
                                   Helpers.getCategoryColor(expense.category),

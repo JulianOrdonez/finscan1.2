@@ -5,7 +5,6 @@ import '../currency_provider.dart';
 import '../models/expense.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
-import '../models/user.dart'; // Import User model if needed, though AuthService provides the ID
 
 class ExpenseStatsScreen extends StatefulWidget {
   const ExpenseStatsScreen({Key? key}) : super(key: key);

@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Expense {
   String? id;
-  int userId;
-  String? userId;
+  String userId;
+  String? title;
   String description;
   double amount;
   String category;

@@ -6,8 +6,8 @@ import 'package:flutter_application_2/currency_provider.dart';
 import 'package:flutter_application_2/screens/home_page.dart';
 import 'package:flutter_application_2/services/auth_service.dart';
 import 'package:flutter_application_2/screens/register_screen.dart';
-import 'package:flutter_application_2/models/user.dart';
 import 'package:firebase_core/firebase_core.dart'; // Importa firebase_core
+import 'package:firebase_auth/firebase_auth.dart'; // Import for Firebase User type
 import 'firebase_options.dart'; // Importa firebase_options.dart
 
 void main() async { // main ahora es async
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
             '/register': (context) => RegisterScreen(),
             '/home': (context) => HomePage(),
           }, // Removed trailing comma
-          home: StreamBuilder<User?>( // Changed FutureBuilder to StreamBuilder
+          home: StreamBuilder<User?>( // Use Firebase User type
             stream: Provider.of<AuthService>(context).authStateChanges,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {

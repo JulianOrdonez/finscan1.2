@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/expense.dart';
 import 'package:provider/provider.dart';
-import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
+import '../services/firestore_service.dart';
  
 class ExpenseFormScreen extends StatefulWidget {
   final String userId;
@@ -28,9 +28,6 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
     'Educación',
     'Otros',
   ];
-
-  String _selectedCategory = 'Comida'; // Default category
-
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
@@ -40,8 +37,8 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
   void initState() {
     super.initState();
     if (widget.expense != null) {
-      _titleController.text = widget.expense!.title;
-      _descriptionController.text = widget.expense!.description;
+      _titleController.text = widget.expense!.title ?? '';
+      _descriptionController.text = widget.expense!.description ?? ''; // Handle null
       _amountController.text = widget.expense!.amount.toString();
       _dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.parse(widget.expense!.date));
       _selectedCategory = widget.expense!.category;
@@ -75,9 +72,8 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
 
   Future<void> _saveExpense() async {
     if (_formKey.currentState!.validate()) {
+      final firestoreService = Provider.of<FirestoreService>(context, listen: false);
       final authService = Provider.of<AuthService>(context, listen: false);
-      final firestoreService =
-          Provider.of<FirestoreService>(context, listen: false);
       final String? userId = authService.getCurrentUserId(); // Correct way to get Firebase user ID
  if (userId == null) {
         // Handle case where user is not logged in (should not happen with current flow)

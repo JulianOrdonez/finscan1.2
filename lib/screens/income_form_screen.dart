@@ -7,7 +7,7 @@ import '../models/income.dart'; // Import the Income model
 
 class IncomeFormScreen extends StatefulWidget {
   final String userId;
-  final Income? income;
+ final String? userId;
 
   const IncomeFormScreen({Key? key, required this.userId, this.income})
       : super(key: key);
