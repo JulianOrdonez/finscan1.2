@@ -215,6 +215,7 @@ class _HomePageState extends State<HomePage> {
         } else {
           return const SizedBox.shrink(); // Or any other fallback widget
         }
+        return const SizedBox.shrink();
       },
     );
   }
