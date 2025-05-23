@@ -49,6 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         SnackBar(content: Text(errorMessage)),
       );
     } catch (e) { // Handle other potential errors
+      print('Unexpected error during registration: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ocurrió un error inesperado: ${e.toString()}')),
       );

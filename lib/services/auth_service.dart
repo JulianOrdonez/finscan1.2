@@ -8,6 +8,7 @@ class AuthService {
   /// Registers a new user.
   ///
   Future<void> register(String name, String email, String password) async {
+    print('Attempting user registration...');
     try {
       UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
@@ -15,13 +16,16 @@ class AuthService {
       );
       await userCredential.user?.updateDisplayName(name);
 
+      print('User created in Auth: ${userCredential.user?.uid}');
       // Create user document in Firestore
       if (userCredential.user != null) {
+        print('Attempting to create user document in Firestore...');
         await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
           'uid': userCredential.user!.uid,
           'email': email,
           'name': name,
           'createdAt': FieldValue.serverTimestamp(),
+
         });
       }
     } on FirebaseAuthException catch (e) {
@@ -29,12 +33,15 @@ class AuthService {
  throw e;
     } catch (e) {
       // Handle other potential errors
+      print('Error during registration in AuthService: $e');
       rethrow;
     }
+    print('User registration and document creation finished.');
   }
 
   /// Logs in a user.
   Future<bool> login(String email, String password) async {
+    print('Attempting user login...');
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
@@ -43,14 +50,18 @@ class AuthService {
       return true;
     } on FirebaseAuthException catch (e) {
       // Rethrow FirebaseAuthException so the UI can handle specific errors
+      print('Error during login in AuthService: $e');
  throw e;
     }
+    print('User login finished.');
   }
 
   /// Logs out the current user.
   Future<void> signOut() async {
+    print('Attempting user sign out...');
     try {
       await _firebaseAuth.signOut();
+      print('User signed out successfully.');
     } catch (e) {
       print('Error signing out: $e'); // Print the error for debugging
       rethrow; // Rethrow the exception
