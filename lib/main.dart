@@ -26,6 +26,9 @@ void main() async { // main ahora es async
         ChangeNotifierProvider<CurrencyProvider>(
           create: (context) => CurrencyProvider(),
         ),
+        Provider<FirestoreService>(
+          create: (_) => FirestoreService(),
+        ),
         Provider<AuthService>(
           create: (_) => AuthService(),
         )
