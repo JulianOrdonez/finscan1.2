@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<String?> _loadUserId() async {
-    // Use AuthService to get the current user ID, which now reads from the database session table.
+    // Use AuthService to get the current user ID from Firebase Authentication.
     final userId = AuthService().getCurrentUserId();
 
     // No need to await this setState, as it's synchronous.
@@ -38,8 +38,8 @@ class _HomePageState extends State<HomePage> {
       _userId = userId;
       if (_userId != null) {
         _screens = [
-          ExpenseListScreen(userId: _userId!),
-          IncomeListScreen(userId: int.parse(_userId!)), // Assuming IncomeListScreen still expects int
+ ExpenseListScreen(userId: _userId!),
+          IncomeListScreen(userId: _userId!), // Assuming IncomeListScreen still expects int
           ExpenseStatsScreen(userId: _userId!),
           CategorizedExpenseScreen(userId: _userId!),
           SettingsScreen(userId: _userId!),
@@ -131,24 +131,21 @@ class _HomePageState extends State<HomePage> {
     // Use FutureBuilder to wait for _loadUserId to complete
     // The FutureBuilder awaits the result of _loadUserId to determine
     // whether to show the loading indicator or the home content/login screen.
-    return FutureBuilder<int?>( // Specify the return type of the future
-      future: _loadUserId().then((userId) => userId != null ? int.parse(userId) : null), // The future that provides the user ID
+    return FutureBuilder<String?>( // Specify the return type of the future to String?
+      future: _loadUserId(), // Ensure _loadUserId is called here
       builder: (context, snapshot) {
+ return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ); // Show loading indicator while waiting
+ body: Center(child: CircularProgressIndicator()), // Show loading indicator while waiting
+ );
         } else if (snapshot.hasData && snapshot.data != null) { // Check if the snapshot has data and it's not null
-          // If the future completed successfully and data (userId) is not null,
-          // proceed to build the main content using the Consumer.
+ // If the future completed successfully and data (userId) is not null,
+ // proceed to build the main content using the Consumer.
           // We use snapshot.data here as the definitive source of the userId after the future completes.
           _userId = snapshot.data; // Update _userId state variable after future completes
         } else if (snapshot.hasError || _userId == null) {
  return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
-            // Ensure _screens is populated before accessing _screens[_selectedIndex]
-            return Scaffold(
               appBar: AppBar(
                 title: const Text('FinScan'),
                 elevation: 0,
@@ -200,12 +197,10 @@ class _HomePageState extends State<HomePage> {
                 child: const Icon(Icons.add),
               ),
             );
-          });
-        } else if (snapshot.hasError || _userId == null) {
+ });
+        } else {
           // If there's an error or _userId is still null after loading,
           // navigate to the LoginScreen.
-          // Using a post-frame callback to avoid issues with
-          // Navigator.push during build.
           WidgetsBinding.instance.addPostFrameCallback((_) {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -215,6 +210,7 @@ class _HomePageState extends State<HomePage> {
         } else {
           return const SizedBox.shrink(); // Or any other fallback widget
         }
+ });
         return const SizedBox.shrink();
       },
     );

@@ -6,7 +6,7 @@ import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
  
 class ExpenseFormScreen extends StatefulWidget {
-  final int userId;
+  final String userId;
   final Expense? expense;
 
   const ExpenseFormScreen({Key? key, required this.userId, this.expense}) : super(key: key);
@@ -18,6 +18,19 @@ class ExpenseFormScreen extends StatefulWidget {
 class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
+  final List<String> expenseCategories = const [
+    'Comida',
+    'Transporte',
+    'Compras',
+    'Entretenimiento',
+    'Servicios',
+    'Salud',
+    'Educación',
+    'Otros',
+  ];
+
+  String _selectedCategory = 'Comida'; // Default category
+
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
@@ -65,8 +78,8 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
       final authService = Provider.of<AuthService>(context, listen: false);
       final firestoreService =
           Provider.of<FirestoreService>(context, listen: false);
-      final String? userId = authService.getCurrentUser()?.uid;
-      if (userId == null) {
+      final String? userId = authService.getCurrentUserId(); // Correct way to get Firebase user ID
+ if (userId == null) {
         // Handle case where user is not logged in (should not happen with current flow)
         return;
       }
@@ -81,7 +94,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
       );
 
       if (widget.expense == null) {
-        // Add new expense to Firestore
+        // Add new expense to Firestoreß
         await firestoreService.addExpense(userId, newExpense);
       } else {
         // Update existing expense in Firestore
@@ -134,7 +147,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
                 decoration: const InputDecoration(labelText: 'Category'),
-                items: Helpers.expenseCategories.map((String category) {
+                items: expenseCategories.map((String category) { // Use the defined list
                   return DropdownMenuItem<String>(
                     value: category,
                     child: Text(category),

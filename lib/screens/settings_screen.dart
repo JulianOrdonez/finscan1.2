@@ -10,14 +10,14 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:intl/intl.dart';
 
 import '../models/expense.dart';
-import '../models/income.dart';
 import 'package:flutter_application_2/screens/login_screen.dart';
+import '../models/income.dart';
 import 'package:flutter_application_2/screens/support_screen.dart';
 import '../currency_provider.dart';
 import 'package:flutter_application_2/theme_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
-  final int userId;
+  final String userId;
 
   const SettingsScreen({Key? key, required this.userId}) : super(key: key);
 
@@ -46,6 +46,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _generateAndShareReport(BuildContext context) async {
+    final firestoreService =
+ Provider.of<FirestoreService>(context, listen: false);
     final userId = widget.userId;
  // Request storage permission
  final status = await Permission.storage.request();
@@ -190,7 +192,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Cerrar Sesión',
                 leading: Icon(Icons.logout),
                 onTap: () async {
- final authService = Provider.of<AuthService>(context, listen: false);
+ final authService = Provider.of<AuthService>(context, listen: false); // Corrected access to AuthService
  await authService.logout();
  // ignore: use_build_context_synchronously
  Navigator.pushReplacement(

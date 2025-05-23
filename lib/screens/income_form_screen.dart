@@ -6,7 +6,7 @@ import '../services/auth_service.dart';
 import '../models/income.dart'; // Import the Income model
 
 class IncomeFormScreen extends StatefulWidget {
-  final int userId;
+  final String userId;
   final Income? income;
 
   const IncomeFormScreen({Key? key, required this.userId, this.income})

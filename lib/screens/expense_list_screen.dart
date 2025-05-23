@@ -10,7 +10,7 @@ import '../services/auth_service.dart';
 import 'expense_form_screen.dart';
 
 class ExpenseListScreen extends StatefulWidget {
-  final int userId;
+  final String userId;
   const ExpenseListScreen({Key? key, required this.userId}) : super(key: key);
   @override
   State<ExpenseListScreen> createState() => _ExpenseListScreenState();
