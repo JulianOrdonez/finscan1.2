@@ -29,10 +29,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _passwordController.text,
       );
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registro exitoso. Por favor, inicie sesión.')),
+        const SnackBar(content: Text('Registro exitoso. ¡Bienvenido!')),
       );
       print('User registered. Current user UID: ${FirebaseAuth.instance.currentUser?.uid}');
-      Navigator.pop(context); // Navigate back to login
       // Navigate to the home screen after successful registration
       Navigator.pushReplacementNamed(context, '/home');
 
