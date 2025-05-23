@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _userId = userId;
       if (_userId != null) {
-        _screens = [
+ _screens = [
           ExpenseListScreen(userId: _userId!),
           IncomeListScreen(userId: _userId!),
           SettingsScreen(userId: _userId!),
@@ -142,14 +142,14 @@ class _HomePageState extends State<HomePage> {
           // Use snapshot.data if available, otherwise use the existing _userId.
           _userId = snapshot.data ?? _userId;
           if (_userId != null && _screens.isEmpty) {
-             _screens = [
+ _screens = [
               ExpenseListScreen(userId: _userId!),
               IncomeListScreen(userId: _userId!),
               ExpenseStatsScreen(), // ExpenseStatsScreen does not need userId parameter
               CategorizedExpenseScreen(userId: _userId!), // Assuming CategorizedExpenseScreen still expects String
               SettingsScreen(userId: _userId!),
             ];
-          }
+ }
 
           return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
             return Scaffold(

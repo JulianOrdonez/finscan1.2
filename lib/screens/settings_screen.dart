@@ -48,16 +48,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _generateAndShareReport(BuildContext context) async {
- final firestoreService = context.read<FirestoreService>(); // Using context.read for a single access
+    final firestoreService = Provider.of<FirestoreService>(context, listen: false); // Using Provider.of for a single access
     final userId = widget.userId;
- // Request storage permission
- final status = await Permission.storage.request();
+    // Request storage permission
+    final status = await Permission.storage.request();
     if (status.isGranted) {
-      final firestoreService =
-          Provider.of<FirestoreService>(context, listen: false);
-      final expenses = await firestoreService.getExpenses(userId).first;
-      final incomes = await firestoreService.getIncomes(userId).first;
-
+      final expenses = await firestoreService.getExpenses(userId!).first; // Use non-null assertion
+      final incomes = await firestoreService.getIncomes(userId!).first; // Use non-null assertion
+      
       final pdf = pw.Document();
 
       pdf.addPage(
@@ -193,10 +191,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Cerrar Sesión',
                 leading: Icon(Icons.logout),
                 onTap: () async {
- final authService = context.read<AuthService>(); // Using context.read for a single access
- await authService.logout();
- // ignore: use_build_context_synchronously
- Navigator.pushReplacement(
+                  final authService = Provider.of<AuthService>(context, listen: false); // Using Provider.of for a single access
+                  await authService.logout();
+                  // ignore: use_build_context_synchronously
+                  Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => const LoginScreen()),
  );

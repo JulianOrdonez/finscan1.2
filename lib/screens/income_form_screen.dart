@@ -6,8 +6,7 @@ import '../services/auth_service.dart';
 import '../models/income.dart'; // Import the Income model
 
 class IncomeFormScreen extends StatefulWidget {
-  final String userId;
- final String? userId;
+  final String? userId;
 
   const IncomeFormScreen({Key? key, required this.userId, this.income})
       : super(key: key);
@@ -16,6 +15,7 @@ class IncomeFormScreen extends StatefulWidget {
   _IncomeFormScreenState createState() => _IncomeFormScreenState();
 }
 
+final Income? income;
 class _IncomeFormScreenState extends State<IncomeFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();

@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import '../helpers.dart';
 import 'package:provider/provider.dart';
 import '../currency_provider.dart';
-import '../models/user.dart';
 import '../models/expense.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
@@ -139,7 +138,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                                   size: 20),
                             ),
                             title: Text(
-                              expense.title,
+                              expense.title ?? '',
                               style: TextStyle(
                                   fontSize: 18, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black
                                   ),
