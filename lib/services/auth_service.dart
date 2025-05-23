@@ -1,98 +1,127 @@
-import 'database_helper.dart'; // Asegúrate de que la ruta de importación sea correcta
-import 'package:flutter_application_2/models/user.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_application_2/models/user.dart';
+import 'package:flutter_application_2/services/database_helper.dart';
 
+/// Custom exception for when a user with the provided email already exists.
 class UserExistsException implements Exception {
   final String message;
   UserExistsException(this.message);
+
+  @override
+  String toString() {
+    return 'UserExistsException: $message';
+  }
 }
 
+/// Custom exception for when a provided password is too weak.
 class WeakPasswordException implements Exception {
   final String message;
   WeakPasswordException(this.message);
+
+  @override
+  String toString() {
+    return 'WeakPasswordException: $message';
+  }
 }
- 
+
+/// Custom exception for authentication failures (e.g., invalid credentials).
+class AuthenticationException implements Exception {
+  final String message;
+  AuthenticationException(this.message);
+
+  @override
+  String toString() {
+    return 'AuthenticationException: $message';
+  }
+}
+
 class AuthService {
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
   static const String _loggedInUserIdKey = 'loggedInUserId';
 
-  /// Inicia sesión de un usuario.
+  /// Registers a new user.
   ///
-  /// Consulta la base de datos para un usuario con el email y la contraseña proporcionados.
-  /// Retorna `true` y almacena el ID del usuario si el inicio de sesión es exitoso, `false` de lo contrario.
-  Future<bool> login(String email, String password) async {
+  /// Throws [UserExistsException] if a user with the email already exists.
+  /// Throws [WeakPasswordException] if the password is too short (less than 6 characters).
+  /// Throws [Exception] for other registration errors.
+  Future<void> register(String name, String email, String password) async {
+    // Basic validation
+    if (password.length < 6) {
+      throw WeakPasswordException('Password should be at least 6 characters long.');
+    }
+
+    // Check if user already exists
+    final existingUser = await _databaseHelper.getUserByEmail(email);
+    if (existingUser != null) {
+      throw UserExistsException('User with email $email already exists.');
+    }
+
+    try {
+      final newUser = User(name: name, email: email, password: password);
+      await _databaseHelper.insertUser(newUser);
+      print('User registered successfully: ${newUser.email}');
+    } catch (e) {
+      print('Error during registration: $e');
+      throw Exception('Failed to register user.');
+    }
+  }
+
+  /// Logs in a user.
+  ///
+  /// Throws [AuthenticationException] if login fails (invalid email or password).
+  /// Throws [Exception] for other login errors.
+  Future<void> login(String email, String password) async {
     try {
       final user = await _databaseHelper.getUserByEmailAndPassword(email, password);
-      if (user != null) {
-        // Guardar la sesión en SQLite
-        final db = await _databaseHelper.database;
-        await db.insert('sessions', {'userId': user.id});
-
-        // Store the user ID in SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setInt(_loggedInUserIdKey, user.id!);
-
-        print('User ID ${user.id} stored in SharedPreferences and session.');
-        return true;
+      if (user == null) {
+        throw AuthenticationException('Invalid email or password.');
       }
-      return false; // User not found or password incorrect
+
+      // Store the user ID in SharedPreferences for session management
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_loggedInUserIdKey, user.id!);
+
+      // You might also want to store session information in the database if needed
+      // final db = await _databaseHelper.database;
+      // await db.insert('sessions', {'userId': user.id});
+
+      print('User logged in successfully: ${user.email}');
     } catch (e) {
       print('Error during login: $e');
-      throw Exception('Error during login: $e');
+      if (e is AuthenticationException) {
+        rethrow; // Rethrow the specific authentication exception
+      }
+      throw Exception('Failed to log in.');
     }
   }
 
-  /// Handles the sign-in process from the UI.
-  ///
-  /// Calls the internal `login` method and returns the result.
-  Future<bool> signIn(String email, String password) async {
-    final bool success = await login(email, password);
-    // Additional logic can be added here if needed before returning the result
-    return success;
-  }
-
-  /// Registra un nuevo usuario.
-  ///
-  /// Inserta un nuevo usuario en la base de datos. Retorna `true` si el registro
-  /// es exitoso, `false` de lo contrario (por ejemplo, si el email ya existe).
-  Future<bool> register(String name, String email, String password) async {
-    // Verificar si ya existe un usuario con el mismo email
-    final existingUser = await _databaseHelper.getUserByEmail(email);
-    if (existingUser != null) throw UserExistsException('Registration failed: User with email $email already exists.');
-    
-    // Basic password length validation
-    if (password.length < 6) {
-      throw WeakPasswordException('Registration failed: Password must be at least 6 characters long.');
-    }
-
-    try {
-      final newUser = User(name: name, email: email, password: password); // El ID será auto-generado por la base de datos
-      final id = await _databaseHelper.insertUser(newUser);
-      // Optionally, log the inserted user details if needed
-      // print('Inserted user: ${newUser.toMap()}');
-      return true;
-    } catch (e) {
-      throw Exception('Error during registration: $e');
-    }
-  }
-
-  /// Cierra la sesión del usuario actual.
-  /// Elimina el ID de usuario almacenado en SharedPreferences y la sesión de la base de datos.
+  /// Logs out the current user.
   Future<void> logout() async {
-    // Remove user ID from SharedPreferences
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_loggedInUserIdKey);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_loggedInUserIdKey);
 
-    // Elimina la sesión de la base de datos
-    final db = await _databaseHelper.database;
-    await db.delete('sessions');
+      // You might also want to remove session information from the database
+      // final db = await _databaseHelper.database;
+      // await db.delete('sessions', where: 'userId = ?', whereArgs: [userId]); // Need to get current user ID first
+
+      print('User logged out.');
+    } catch (e) {
+      print('Error during logout: $e');
+      throw Exception('Failed to log out.');
+    }
   }
-  /// Carga la sesión del usuario desde la base de datos.
-  ///
-  /// Retorna el ID del usuario si hay una sesión activa, de lo contrario retorna `null`.
+
+  /// Gets the ID of the currently logged-in user.
+  /// Returns null if no user is logged in.
   Future<int?> getCurrentUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(_loggedInUserIdKey);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getInt(_loggedInUserIdKey);
+    } catch (e) {
+      print('Error getting current user ID: $e');
+      return null;
+    }
   }
 }

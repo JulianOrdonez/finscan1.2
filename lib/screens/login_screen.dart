@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_2/screens/register_screen.dart';
 import 'package:flutter_application_2/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_application_2/screens/home_page.dart'; // Assuming you have a home page
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,6 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   String? _email;
   String? _password;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -24,37 +26,44 @@ class _LoginScreenState extends State<LoginScreen> {
   void _checkLoginStatus() async {
     final userId = await Provider.of<AuthService>(context, listen: false).getCurrentUserId();
     if (userId != null) {
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/home'); // Use named route if available
+       // Alternatively: Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
     }
   }
+
 
   void _login() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      setState(() {
+        _isLoading = true;
+      });
+
       try {
-        bool success = await Provider.of<AuthService>(context, listen: false)
-            .signIn(_email!, _password!);
+        final authService = Provider.of<AuthService>(context, listen: false);
+        final success = await authService.login(_email!, _password!);
+
         if (success) {
-        Navigator.pushReplacementNamed(context, '/home');
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+          Navigator.pushReplacementNamed(context, '/home'); // Use named route if available
+          // Alternatively: Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Invalid email or password')),
           );
         }
-      } catch (e) {
-        // Handle specific authentication errors
-        String errorMessage = 'Login failed. Please try again.';
-        if (e.toString().contains('User not found')) {
-          errorMessage = 'User not found. Please check your email.';
-        } else if (e.toString().contains('Incorrect password')) {
-        errorMessage = 'Incorrect password. Please try again.';
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
+      } on Exception catch (e) {
+         ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login failed: ${e.toString()}')),
+          );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -144,20 +153,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     }
                   ),
                   const SizedBox(height: 30.0),
-                  ElevatedButton(
-                    onPressed: _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange, // Orange background
-                      padding: const EdgeInsets.symmetric(vertical: 15.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                    child: const Text(
-                      'Iniciar Sesión',
-                      style: TextStyle(fontSize: 18.0, color: Colors.white), // White text
-                    ),
-                  ),
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ElevatedButton(
+                          onPressed: _login,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange, // Orange background
+                            padding: const EdgeInsets.symmetric(vertical: 15.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          child: const Text(
+                            'Iniciar Sesión',
+                            style: TextStyle(fontSize: 18.0, color: Colors.white), // White text
+                          ),
+                        ),
                   const SizedBox(height: 20.0),
                   TextButton(
                     onPressed: () {

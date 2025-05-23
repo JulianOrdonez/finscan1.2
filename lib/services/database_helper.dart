@@ -2,9 +2,9 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'dart:io';
-import 'package:flutter_application_2/models/income.dart';
 import 'package:flutter_application_2/models/user.dart';
-import 'package:flutter_application_2/models/expense.dart';
+import 'package:flutter_application_2/models/income.dart'; // Assuming you have these models
+import 'package:flutter_application_2/models/expense.dart'; // Assuming you have these models
 
 
 class DatabaseHelper {
@@ -24,9 +24,6 @@ class DatabaseHelper {
 
   _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    // IMPORTANT: Calling clearDatabase() here will wipe all existing data.
-    // Remove this call in production.
-    await clearDatabase();
     String path = join(documentsDirectory.path, _databaseName);
     return await openDatabase(
       path,
@@ -40,7 +37,7 @@ class DatabaseHelper {
     );
   }
 
-  // Crea las tablas de usuario, ingresos y gastos
+  // Crea las tablas de usuario, ingresos, gastos y sesiones
   Future _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE users (
@@ -74,7 +71,7 @@ class DatabaseHelper {
         FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
       )
     ''');
-    await db.execute('''
+     await db.execute('''
       CREATE TABLE sessions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         userId INTEGER NOT NULL UNIQUE,
@@ -86,11 +83,13 @@ class DatabaseHelper {
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     // For now, simply drop and recreate tables for schema changes
     // In a real app, you would handle migrations more carefully
-    await db.execute('DROP TABLE IF EXISTS users');
-    await db.execute('DROP TABLE IF EXISTS incomes');
-    await db.execute('DROP TABLE IF EXISTS expenses');
-    await db.execute('DROP TABLE IF EXISTS sessions');
-    await _onCreate(db, newVersion);
+    if (oldVersion < newVersion) {
+      await db.execute('DROP TABLE IF EXISTS users');
+      await db.execute('DROP TABLE IF EXISTS incomes');
+      await db.execute('DROP TABLE IF EXISTS expenses');
+      await db.execute('DROP TABLE IF EXISTS sessions');
+      await _onCreate(db, newVersion);
+    }
   }
 
 
@@ -98,7 +97,6 @@ class DatabaseHelper {
   Future<int> insertUser(User user) async {
     Database db = await instance.database;
     final id = await db.insert('users', user.toMap());
-    print('Inserted user with ID: $id');
     return id;
   }
 
@@ -117,7 +115,6 @@ class DatabaseHelper {
 
   Future<User?> getUserByEmailAndPassword(String email, String password) async {
     Database db = await instance.database;
-    print('Attempting to get user by email: $email and password: $password');
     List<Map<String, dynamic>> maps = await db.query(
       'users',
       where: 'email = ? AND password = ?',
@@ -126,18 +123,15 @@ class DatabaseHelper {
     if (maps.isNotEmpty) {
       return User.fromMap(maps.first);
     }
-    print('User not found for email: $email');
     return null;
   }
 
   Future<User?> getUserById(int id) async {
     Database db = await instance.database;
-    print('Attempting to get user by ID: $id');
     List<Map<String, dynamic>> maps = await db.query(
       'users',
       where: 'id = ?',
       whereArgs: [id],
-
     );
     if (maps.isNotEmpty) {
       return User.fromMap(maps.first);
@@ -145,113 +139,15 @@ class DatabaseHelper {
     return null;
   }
 
-  // Métodos para la tabla de ingresos
-  Future<int> insertIncome(Income income) async {
-    Database db = await instance.database;
-    print('Inserting income: ${income.toMap()}');
-    return await db.insert('incomes', income.toMap());
-  }
-
-  Future<List<Income>> getIncomes(int userId) async {
-    Database db = await instance.database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'incomes',
-      where: 'userId = ?',
-      whereArgs: [userId],
-      orderBy: 'date DESC',
-    );
-    print('Fetched ${maps.length} incomes for userId: $userId');
-    return List.generate(maps.length, (i) {
-      return Income.fromMap(maps[i]);
-    });
-  }
-
-  Future<int> updateIncome(Income income) async {
-    print('Updating income with ID: ${income.id}');
-    Database db = await instance.database;
-    return await db.update(
-      'incomes',
-      income.toMap(),
-      where: 'id = ?',
-      whereArgs: [income.id],
-    );
-  }
-
-  Future<int> deleteIncome(int id) async {
-    print('Deleting income with ID: $id');
-    Database db = await instance.database;
-    return await db.delete(
-      'incomes',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
-
-  // Métodos para la tabla de gastos
-  Future<int> insertExpense(Expense expense) async {
-    Database db = await instance.database;
-    print('Inserting expense: ${expense.toMap()}');
-    return await db.insert('expenses', expense.toMap());
-  }
-
-  Future<List<Expense>> getExpenses(int userId) async {
-    Database db = await instance.database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'expenses',
-      where: 'userId = ?',
-      whereArgs: [userId],
-      orderBy: 'date DESC',
-    );
-    print('Fetched ${maps.length} expenses for userId: $userId');
-    return List.generate(maps.length, (i) {
-      return Expense.fromMap(maps[i]);
-    });
-  }
-
-    Future<List<Expense>> getAllExpenses() async {
-    print('Fetching all expenses');
-    Database db = await instance.database;
-    final List<Map<String, dynamic>> maps = await db.query('expenses');
-    return List.generate(maps.length, (i) {
-      return Expense.fromMap(maps[i]);
-    });
-  }
-
-
-  Future<int> updateExpense(Expense expense) async {
-    print('Updating expense with ID: ${expense.id}');
-    Database db = await instance.database;
-    return await db.update(
-      'expenses',
-      expense.toMap(),
-      where: 'id = ?',
-      whereArgs: [expense.id],
-    );
-  }
-
-  Future<int> deleteExpense(int id) async {
-    print('Deleting expense with ID: $id');
-    Database db = await instance.database;
-    return await db.delete(
-      'expenses',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
-  // Método para limpiar la base de datos (solo para desarrollo/debugging)
+  // Method to clear the database (useful for development)
   Future<void> clearDatabase() async {
-    print('Clearing database...');
     Database db = await instance.database;
     await db.execute('DROP TABLE IF EXISTS users');
     await db.execute('DROP TABLE IF EXISTS incomes');
     await db.execute('DROP TABLE IF EXISTS expenses');
     await db.execute('DROP TABLE IF EXISTS sessions');
     await _onCreate(db, _databaseVersion);
-    // Cerrar y reabrir la base de datos para asegurar que los cambios se apliquen
     await db.close();
-    print('Database cleared and recreated.');
-    _database = null; // Resetear la instancia de la base de datos
+    _database = null; // Reset the database instance
   }
 }
