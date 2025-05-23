@@ -16,20 +16,8 @@ class AuthService {
       );
       await userCredential.user?.updateDisplayName(name);
 
-      print('User created in Auth: ${userCredential.user?.uid}');
-      // Create user document in Firestore
-      if (userCredential.user != null) {
-        print('Attempting to create user document in Firestore...');
-        await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
-          'uid': userCredential.user!.uid,
-          'email': email,
-          'name': name,
-          'createdAt': FieldValue.serverTimestamp(),
-
-        });
-      }
     } on FirebaseAuthException catch (e) {
-      // Rethrow FirebaseAuthException so the UI can handle specific errors
+      print('Error during registration in AuthService: ${e.code}');
  throw e;
     } catch (e) {
       // Handle other potential errors

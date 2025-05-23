@@ -33,8 +33,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       print('User registered. Current user UID: ${FirebaseAuth.instance.currentUser?.uid}');
       // Add a delay to allow auth state to propagate and stabilize
-      await Future.delayed(const Duration(seconds: 1));
-      // Navigate to the home screen after successful registration
       Navigator.pushReplacementNamed(context, '/home');
 
     } on FirebaseAuthException catch (e) {
