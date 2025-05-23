@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../helpers.dart';
-import 'package:provider/provider.dart';
 import '../currency_provider.dart';
 import '../models/expense.dart';
 import '../services/firestore_service.dart';
@@ -16,6 +15,39 @@ class ExpenseListScreen extends StatefulWidget {
 }
 
 class _ExpenseListScreenState extends State<ExpenseListScreen> {
+  // Basic category icon mapping (can be expanded)
+  IconData getCategoryIcon(String category) {
+    switch (category.toLowerCase()) {
+      case 'comida':
+        return Icons.fastfood;
+      case 'transporte':
+        return Icons.directions_car;
+      case 'entretenimiento':
+        return Icons.movie;
+      case 'compras':
+        return Icons.shopping_bag;
+      case 'servicios':
+        return Icons.electrical_services;
+      case 'salud':
+        return Icons.health_and_safety;
+      default:
+        return Icons.category;
+    }
+  }
+
+  // Basic category color mapping (can be expanded)
+  Color getCategoryColor(String category) {
+    switch (category.toLowerCase()) {
+      case 'comida':
+        return Colors.orange;
+      case 'transporte':
+        return Colors.blue;
+      case 'entretenimiento':
+        return Colors.purple;
+      default:
+        return Colors.grey;
+    }
+  }
 
   Future<void> _deleteExpense(int id) async {
     final confirmDelete = await showDialog(
@@ -130,10 +162,8 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                           child: ListTile(
                             contentPadding: EdgeInsets.zero, // Asegura que el ListTile use el espacio completo
                             leading: CircleAvatar(
-                              backgroundColor:
-                                  Helpers.getCategoryColor(expense.category),
-                              child: Icon(
-                                  Helpers.getCategoryIcon(expense.category),
+                              backgroundColor: getCategoryColor(expense.category),
+                              child: Icon(getCategoryIcon(expense.category),
                                   color: Colors.white,
                                   size: 20),
                             ),

@@ -7,7 +7,7 @@ import '../services/auth_service.dart';
 import 'income_form_screen.dart';
 
 class IncomeListScreen extends StatefulWidget {
- final String? userId;
+  final String? userId;
   const IncomeListScreen({Key? key, required this.userId}) : super(key: key);
 
   @override
@@ -32,7 +32,7 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
     final firestoreService = Provider.of<FirestoreService>(context);
- final userId = widget.userId;
+    final userId = widget.userId;
 
     return Scaffold(
       body: userId == null

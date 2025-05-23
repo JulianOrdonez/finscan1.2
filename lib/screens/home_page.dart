@@ -23,10 +23,11 @@ class _HomePageState extends State<HomePage> {
   String? _userId;
   List<Widget> _screens = [];
 
+
   @override
   void initState() {
     super.initState();
-    _loadUserId();
+    // No need to call _loadUserId here, FutureBuilder in build will handle it.
   }
 
   Future<String?> _loadUserId() async {
@@ -35,15 +36,6 @@ class _HomePageState extends State<HomePage> {
     final userId = authService.getCurrentUserId();
 
     // No need to await this setState, as it's synchronous.
-    setState(() {
-      _userId = userId;
-      if (_userId != null) {
- _screens = [
-          ExpenseListScreen(userId: _userId!),
-          IncomeListScreen(userId: _userId!),
-          SettingsScreen(userId: _userId!),
-      }
-    });
     return userId; // Return the fetched user ID
   }
 
@@ -130,20 +122,20 @@ class _HomePageState extends State<HomePage> {
     // The FutureBuilder awaits the result of _loadUserId to determine
     // whether to show the loading indicator or the home content/login screen.
     return FutureBuilder<String?>( // Specify the return type of the future to String?
-      future: _loadUserId(), // Ensure _loadUserId is called here
+      future: _loadUserId(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting && _userId == null) {
+ if (snapshot.connectionState == ConnectionState.waiting && _userId == null) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()), // Show loading indicator while waiting
           );
-        } else if (snapshot.hasData && snapshot.data != null || _userId != null) {
+        } else if (snapshot.hasData && snapshot.data != null) {
           // If the future completed successfully and data (userId) is not null,
           // or if _userId is already set, proceed to build the main content.
-          // Use snapshot.data if available, otherwise use the existing _userId.
+ // Use snapshot.data if available, otherwise use the existing _userId.
           _userId = snapshot.data ?? _userId;
           if (_userId != null && _screens.isEmpty) {
  _screens = [
-              ExpenseListScreen(userId: _userId!),
+ ExpenseListScreen(userId: _userId!),
               IncomeListScreen(userId: _userId!),
               ExpenseStatsScreen(), // ExpenseStatsScreen does not need userId parameter
               CategorizedExpenseScreen(userId: _userId!), // Assuming CategorizedExpenseScreen still expects String
@@ -152,54 +144,54 @@ class _HomePageState extends State<HomePage> {
  }
 
           return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
-            return Scaffold(
-              appBar: AppBar(
-                title: const Text('FinScan'),
-                elevation: 0,
-                flexibleSpace: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        themeProvider.themeData.colorScheme.primary,
-                        themeProvider.themeData.colorScheme.primaryContainer,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                ),
-              ),
-              body: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (Widget child, Animation<double> animation) =>
-                FadeTransition(opacity: animation, child: child),
-                child: Center(
-                  key: ValueKey<int>(_selectedIndex),
-                  child: _screens[_selectedIndex],
-                ),
-              ),
-              bottomNavigationBar: BottomNavigationBar(
-                items: const <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Gastos'), // Spanish translation
-                  BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Ingresos'), // Spanish translation
-                  BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Estadísticas'), // Spanish translation
-                  BottomNavigationBarItem(icon: Icon(Icons.category), label: 'Categorías'), // Spanish translation
-                  BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'), // Spanish translation
-                ],
-                currentIndex: _selectedIndex,
-                selectedItemColor: const Color(0xFF64B5F6),
-                unselectedItemColor: themeProvider.themeData.unselectedWidgetColor,
-                onTap: _onItemTapped,
-                backgroundColor: themeProvider.themeData.cardColor,
-                type: BottomNavigationBarType.fixed,
-              ),
-              floatingActionButton: FloatingActionButton(
-                onPressed: () => _showAddOptions(context),
-                tooltip: 'Agregar', // Already translated
-                child: const Icon(Icons.add),
+ return Scaffold(
+ appBar: AppBar(
+ title: const Text('FinScan'),
+ elevation: 0,
+ flexibleSpace: Container(
+ decoration: BoxDecoration(
+ gradient: LinearGradient(
+ colors: [
+ themeProvider.themeData.colorScheme.primary,
+ themeProvider.themeData.colorScheme.primaryContainer,
+ ],
+ begin: Alignment.topLeft,
+ end: Alignment.bottomRight,
+ ),
+ ),
+ ),
+ ),
+ body: AnimatedSwitcher(
+ duration: const Duration(milliseconds: 300),
+ transitionBuilder: (Widget child, Animation<double> animation) =>
+ FadeTransition(opacity: animation, child: child),
+ child: Center(
+ key: ValueKey<int>(_selectedIndex),
+ child: _screens[_selectedIndex],
+ ),
+ ),
+ bottomNavigationBar: BottomNavigationBar(
+ items: const <BottomNavigationBarItem>[
+ BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Gastos'), // Spanish translation
+ BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Ingresos'), // Spanish translation
+ BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Estadísticas'), // Spanish translation
+ BottomNavigationBarItem(icon: Icon(Icons.category), label: 'Categorías'), // Spanish translation
+ BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'), // Spanish translation
+ ],
+ currentIndex: _selectedIndex,
+ selectedItemColor: const Color(0xFF64B5F6),
+ unselectedItemColor: themeProvider.themeData.unselectedWidgetColor,
+ onTap: _onItemTapped,
+ backgroundColor: themeProvider.themeData.cardColor,
+ type: BottomNavigationBarType.fixed,
+ ),
+ floatingActionButton: FloatingActionButton(
+ onPressed: () => _showAddOptions(context),
+ tooltip: 'Agregar', // Already translated
+ child: const Icon(Icons.add),
               ),
             );
-          });
+ });
         } else { // If there's an error or _userId is still null after loading,
           // navigate to the LoginScreen.
           WidgetsBinding.instance.addPostFrameCallback((_) {

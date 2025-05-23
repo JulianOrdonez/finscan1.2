@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
+import '../models/expense.dart'; // Import the Expense model
 class CategorizedExpenseScreen extends StatefulWidget {
   // Assuming userId is needed for fetching categorized expenses
   final String? userId;
@@ -94,17 +95,17 @@ class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
                       '$category (${expensesInCategory.length})',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    children: expensesInCategory.map((expense) {
-                      return ListTile(
-                        title: Text(expense.title ?? ''), // Handle null title
-                        subtitle: Text(
-                            '${expense.description} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(expense.date))}'),
-                        trailing: Text(
-                          '\$${expense.amount.toStringAsFixed(2)}',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      );
-                    }).toList(),
+                    children: expensesInCategory.map<Widget>((expense) { // Explicitly specify the type as Widget
+ return ListTile(
+ title: Text(expense.title ?? ''), // Handle null title
+ subtitle: Text(
+ '${expense.description} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(expense.date))}'),
+ trailing: Text(
+ '\$${expense.amount.toStringAsFixed(2)}',
+ style: const TextStyle(fontWeight: FontWeight.bold),
+ ),
+ );
+                    }).toList(), // .toList() creates a List<Widget>
                   ),
                 );
               },
@@ -112,6 +113,6 @@ class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
           }
         },
       ),
- );
+    );
   }
 }

@@ -6,6 +6,7 @@ import '../services/auth_service.dart';
 import '../models/income.dart'; // Import the Income model
 
 class IncomeFormScreen extends StatefulWidget {
+  final Income? income;
   final String? userId;
 
   const IncomeFormScreen({Key? key, required this.userId, this.income})
@@ -13,9 +14,6 @@ class IncomeFormScreen extends StatefulWidget {
 
   @override
   _IncomeFormScreenState createState() => _IncomeFormScreenState();
-}
-
-final Income? income;
 class _IncomeFormScreenState extends State<IncomeFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
@@ -70,13 +68,13 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
         return;
       }
 
-      final income = Income(
+      final newOrUpdatedIncome = Income(
         id: widget.income?.id, // Use existing id for edit, null for new
         userId: userId, // Assign the current user ID
         title: _titleController.text,
         description: _descriptionController.text,
         amount: double.parse(_amountController.text),
-        date: DateFormat('yyyy-MM-dd').format(_selectedDate), // Store date as String
+        date: DateFormat('yyyy-MM-dd').format(_selectedDate).toString(), // Store date as String
       );
 
       if (widget.income == null) {
