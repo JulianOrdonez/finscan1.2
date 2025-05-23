@@ -38,7 +38,12 @@ class AuthService {
 
   /// Logs out the current user.
   Future<void> signOut() async {
- await _firebaseAuth.signOut();
+    try {
+      await _firebaseAuth.signOut();
+    } catch (e) {
+      print('Error signing out: $e'); // Print the error for debugging
+      rethrow; // Rethrow the exception
+    }
   }
 
   /// Gets the ID of the currently logged-in user.
