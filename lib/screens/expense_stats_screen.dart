@@ -35,7 +35,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
     final authService = Provider.of<AuthService>(context);
     final currencyProvider = Provider.of<CurrencyProvider>(context);
 
-    final userId = authService.currentUser?.uid;
+    final userId = authService.getCurrentUserId();
 
     return Scaffold( // Scaffold removed as it's part of HomePage
       appBar: AppBar(

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
+import '../models/income.dart'; // Import the Income model
 
 class IncomeFormScreen extends StatefulWidget {
   final int userId;
@@ -70,13 +71,15 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
       }
 
       final income = Income(
-        id: widget.income?.id,
+        id: widget.income?.id, // Use existing id for edit, null for new
+        userId: userId, // Assign the current user ID
         title: _titleController.text,
         description: _descriptionController.text,
-      } else {
-        await DatabaseHelper.instance.updateIncome(income);
-      }
+        amount: double.parse(_amountController.text),
+        date: DateFormat('yyyy-MM-dd').format(_selectedDate), // Store date as String
+      );
 
+      }
       Navigator.of(context).pop();
     }
   }

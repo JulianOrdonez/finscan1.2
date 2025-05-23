@@ -12,16 +12,12 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+
+class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   String? _email;
   String? _password;
-  bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkLoginStatus();
+  
   void _login() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -44,23 +40,19 @@ class _LoginScreenState extends State<LoginScreen> {
           message = 'Login failed: ${e.message}';
         }
         ScaffoldMessenger.of(context).showSnackBar(
-          ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(message)),
           );
       } on Exception catch (e) {
          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Login failed: ${e.toString()}')),
-          );
+            SnackBar(content: Text('Login failed: ${e.toString()}'))
+         );
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
       }
     }
   }
 
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
@@ -145,18 +137,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     onSaved: (value) {
                       _password = value;
-                    }
+                    },
                   ),
                   const SizedBox(height: 30.0),
-                  _isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : ElevatedButton(
-                          onPressed: _login,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange, // Orange background
-                            padding: const EdgeInsets.symmetric(vertical: 15.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
+ ElevatedButton(
+ onPressed: _login,
+ style: ElevatedButton.styleFrom(
+ backgroundColor: Colors.orange, // Orange background
+ padding: const EdgeInsets.symmetric(vertical: 15.0),
+ shape: RoundedRectangleBorder(
+ borderRadius: BorderRadius.circular(8.0),
                             ),
                           ),
                           child: const Text(

@@ -32,8 +32,15 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
 
   @override
   Widget build(BuildContext context) {
-      body: FutureBuilder<List<Income>>(
-        future: _incomesFuture,
+    final authService = Provider.of<AuthService>(context);
+    final firestoreService = Provider.of<FirestoreService>(context);
+    final userId = authService.getCurrentUserId();
+
+    return Scaffold(
+      body: userId == null
+          ? const Center(child: Text('User not logged in')) // Handle case where user is not logged in
+          : StreamBuilder<List<Income>>(
+        stream: firestoreService.getIncomes(userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

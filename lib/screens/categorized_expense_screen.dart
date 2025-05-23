@@ -20,15 +20,13 @@ class CategorizedExpenseScreen extends StatefulWidget {
 class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
   @override
   Widget build(BuildContext context) {
- final firestoreService = Provider.of<FirestoreService>(context);
+    final firestoreService = Provider.of<FirestoreService>(context);
     final authService = Provider.of<AuthService>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gastos por Categoría'),
       ),
-      body: FutureBuilder<Map<String, List<Expense>>>(
-        future: _categorizedExpensesFuture,
-        builder: (context, snapshot) {
+      body:
  return StreamBuilder<List<Expense>>(
         stream: authService.currentUser != null
  ? firestoreService.getExpenses(authService.currentUser!.uid)
@@ -46,7 +44,7 @@ class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
  final expenses = snapshot.data!;
             final Map<String, List<Expense>> categorizedExpenses = {};
 
- for (var expense in expenses) {
+            for (var expense in expenses) {
  if (!categorizedExpenses.containsKey(expense.category)) {
  categorizedExpenses[expense.category] = [];
  }
@@ -95,6 +93,5 @@ class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
         },
       ),
  );
-    );
   }
 }

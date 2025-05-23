@@ -9,7 +9,6 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:intl/intl.dart';
 
-import '../services/database_helper.dart';
 import '../models/expense.dart';
 import '../models/income.dart';
 import '../services/auth_service.dart';
@@ -54,6 +53,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (status.isGranted) {
       final expenses = await DatabaseHelper.instance.getExpenses(userId);
       final incomes = await DatabaseHelper.instance.getIncomes(userId);
+
+      final firestoreService =
+          Provider.of<FirestoreService>(context, listen: false);
+      final expenses = await firestoreService.getExpenses(userId).first;
+      final incomes = await firestoreService.getIncomes(userId).first;
 
       final pdf = pw.Document();
 

@@ -16,6 +16,7 @@ class ExpenseListScreen extends StatefulWidget {
 }
 
 class _ExpenseListScreenState extends State<ExpenseListScreen> {
+
   Future<void> _deleteExpense(int id) async {
     final confirmDelete = await showDialog(
       context: context,
@@ -46,7 +47,6 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Expense deleted successfully')),
       );
-      _refreshExpenses();
     }
   }
 
@@ -66,7 +66,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
     final userId = authService.getCurrentUserId();
     return Scaffold(
       body: StreamBuilder<List<Expense>>(
-        future: _expensesFuture,
+        stream: firestoreService.getExpenses(userId!),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
