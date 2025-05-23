@@ -6,7 +6,7 @@ import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
  
 class ExpenseFormScreen extends StatefulWidget {
-  final String userId;
+  final String? userId;
   final Expense? expense;
 
   const ExpenseFormScreen({Key? key, required this.userId, this.expense}) : super(key: key);
