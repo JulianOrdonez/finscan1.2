@@ -15,7 +15,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  late List<Widget> _screens;
+  List<Widget> _screens = [];
   String? _userId;
 
   @override
