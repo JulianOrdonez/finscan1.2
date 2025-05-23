@@ -7,6 +7,7 @@ import 'package:flutter_application_2/screens/home_page.dart';
 import 'package:flutter_application_2/services/auth_service.dart';
 import 'package:flutter_application_2/screens/register_screen.dart';
 import 'package:firebase_core/firebase_core.dart'; // Importa firebase_core
+import 'package:flutter_application_2/services/firestore_service.dart'; // Import FirestoreService
 import 'package:firebase_auth/firebase_auth.dart'; // Import for Firebase User type
 import 'firebase_options.dart'; // Importa firebase_options.dart
 
