@@ -2,6 +2,16 @@ import 'database_helper.dart'; // Asegúrate de que la ruta de importación sea 
 import 'package:flutter_application_2/models/user.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class UserExistsException implements Exception {
+  final String message;
+  UserExistsException(this.message);
+}
+
+class WeakPasswordException implements Exception {
+  final String message;
+  WeakPasswordException(this.message);
+}
  
 class AuthService {
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
@@ -26,9 +36,9 @@ class AuthService {
         print('User ID ${user.id} stored in SharedPreferences and session.');
         return true;
       }
-      print('Login failed for email: $email');
-      return false;
+      return false; // User not found or password incorrect
     } catch (e) {
+      print('Error during login: $e');
       throw Exception('Error during login: $e');
     }
   }
@@ -49,16 +59,16 @@ class AuthService {
   Future<bool> register(String name, String email, String password) async {
     // Verificar si ya existe un usuario con el mismo email
     final existingUser = await _databaseHelper.getUserByEmail(email);
-    if (existingUser != null) throw Exception('Registration failed: User with email $email already exists.');
+    if (existingUser != null) throw UserExistsException('Registration failed: User with email $email already exists.');
     
-    // Basic email format validation
-    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (!emailRegex.hasMatch(email)) throw Exception('Registration failed: Invalid email format.');
+    // Basic password length validation
+    if (password.length < 6) {
+      throw WeakPasswordException('Registration failed: Password must be at least 6 characters long.');
+    }
 
     try {
       final newUser = User(name: name, email: email, password: password); // El ID será auto-generado por la base de datos
       final id = await _databaseHelper.insertUser(newUser);
-      print('User registered successfully with ID: $id');
       // Optionally, log the inserted user details if needed
       // print('Inserted user: ${newUser.toMap()}');
       return true;
