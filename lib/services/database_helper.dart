@@ -24,6 +24,9 @@ class DatabaseHelper {
 
   _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    // IMPORTANT: Calling clearDatabase() here will wipe all existing data.
+    // Remove this call in production.
+    await clearDatabase();
     String path = join(documentsDirectory.path, _databaseName);
     return await openDatabase(
       path,
