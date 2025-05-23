@@ -23,9 +23,7 @@ class _HomePageState extends State<HomePage> {
     print('HomePage initState called');
     super.initState();
     // Initialize screens here, potentially after getting the userId
-    Future.delayed(const Duration(milliseconds: 500), () {
-      _initializeScreens();
-    });
+    _initializeScreens();
   }
 
   void _initializeScreens() {
