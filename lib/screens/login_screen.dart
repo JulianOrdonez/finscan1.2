@@ -153,11 +153,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   const SizedBox(height: 20.0),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const RegisterScreen()),
-                      );
+                      Navigator.pushReplacementNamed(context, '/register');
                     },
                     child: const Text(
                       '¿No tienes una cuenta? Regístrate',
