@@ -120,7 +120,6 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                     ),
  ),
                 ),
- final sortedExpenses = _sortExpenses(snapshot.data!);
                 Expanded(
                   child: ListView.builder(
                     itemCount: sortedExpenses.length,

@@ -153,7 +153,7 @@ class _HomePageState extends State<HomePage> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => const LoginScreen()),
-            );
+            ); // Return an empty widget while navigating
           });
           return const SizedBox.shrink(); // Return an empty widget while navigating
         } else {
