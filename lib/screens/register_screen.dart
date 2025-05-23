@@ -33,7 +33,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       print('User registered. Current user UID: ${FirebaseAuth.instance.currentUser?.uid}');
       Navigator.pop(context); // Navigate back to login
-    } on FirebaseAuthException catch (e) { // Handle FirebaseAuth specific errors
+      // Navigate to the home screen after successful registration
+      Navigator.pushReplacementNamed(context, '/home');
+
+    } on FirebaseAuthException catch (e) {
       // Display a more user-friendly message based on the error code
       String errorMessage = 'Error de registro. Inténtalo de nuevo.';
  if (e.code == 'email-already-in-use') {
@@ -178,6 +181,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: const Text(
                       'Registrarse',
                       style: TextStyle(fontSize: 18.0, color: Colors.white), // White text
+                    ),
+                  ),
+                  const SizedBox(height: 20.0),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Navigate back to the login screen
+                    },
+                    child: const Text(
+                      '¿Ya tienes una cuenta? Inicia sesión',
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
