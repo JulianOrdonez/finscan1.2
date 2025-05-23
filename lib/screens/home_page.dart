@@ -146,18 +146,7 @@ class _HomePageState extends State<HomePage> {
           // We use snapshot.data here as the definitive source of the userId after the future completes.
           _userId = snapshot.data; // Update _userId state variable after future completes
         } else if (snapshot.hasError || _userId == null) {
-          // If there's an error or _userId is still null after loading,
-          // navigate to the LoginScreen.
-          // Using a post-frame callback to avoid issues with
-          // Navigator.push during build.
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
-            ); // Return an empty widget while navigating
-          });
-          return const SizedBox.shrink(); // Return an empty widget while navigating
-        } else {
-          return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+ return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
             // Ensure _screens is populated before accessing _screens[_selectedIndex]
             return Scaffold(
               appBar: AppBar(
@@ -212,6 +201,19 @@ class _HomePageState extends State<HomePage> {
               ),
             );
           });
+        } else if (snapshot.hasError || _userId == null) {
+          // If there's an error or _userId is still null after loading,
+          // navigate to the LoginScreen.
+          // Using a post-frame callback to avoid issues with
+          // Navigator.push during build.
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+            ); // Return an empty widget while navigating
+          });
+          return const SizedBox.shrink(); // Return an empty widget while navigating
+        } else {
+          return const SizedBox.shrink(); // Or any other fallback widget
         }
       },
     );

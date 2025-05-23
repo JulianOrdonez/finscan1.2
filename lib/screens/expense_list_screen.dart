@@ -124,6 +124,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                   child: ListView.builder(
                     itemCount: sortedExpenses.length,
                     itemBuilder: (context, index) {
+                      final currencyProvider = Provider.of<CurrencyProvider>(context);
                       final expense = sortedExpenses[index];
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 5),
