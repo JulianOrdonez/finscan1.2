@@ -7,7 +7,8 @@ import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 
 class ExpenseStatsScreen extends StatefulWidget {
-  const ExpenseStatsScreen({Key? key}) : super(key: key);
+  final String? userId;
+  const ExpenseStatsScreen({Key? key, required this.userId}) : super(key: key);
 
   @override
   _ExpenseStatsScreenState createState() => _ExpenseStatsScreenState();
@@ -34,7 +35,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
     final authService = Provider.of<AuthService>(context);
     final currencyProvider = Provider.of<CurrencyProvider>(context);
 
-    final userId = authService.getCurrentUserId();
+    final userId = widget.userId;
 
     return Scaffold( // Scaffold removed as it's part of HomePage
       appBar: AppBar(

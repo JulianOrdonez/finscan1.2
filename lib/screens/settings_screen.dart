@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
-import '../models/user.dart'; // Assuming you have a User model
 import '../models/expense.dart'; // Assuming you might need expense data here
 import '../models/income.dart'; // Assuming you might need income data here
 
