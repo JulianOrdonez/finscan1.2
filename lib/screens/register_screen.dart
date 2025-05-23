@@ -40,10 +40,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SnackBar(content: Text('Registration successful! Welcome!')),
       );
 
-      // Navigate to the login screen and remove all previous routes
-      Navigator.pushNamedAndRemoveUntil(
-          context, '/', (Route<dynamic> route) => false);
-
     } on FirebaseAuthException catch (e) {
       String errorMessage = 'Registration failed. Please try again.\n${e.message}'; // Default error message
       if (e.code == 'email-already-in-use') {
