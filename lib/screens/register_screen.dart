@@ -42,7 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       // Navigation to /home is handled by the auth state listener in main.dart
       // The StreamBuilder will detect the authenticated user and navigate.
 
-    } on Exception catch (e) { // Catch specific Firebase Auth exceptions
+    } on FirebaseAuthException catch (e) { // Catch specific Firebase Auth exceptions
       String errorMessage = 'Registration failed. Please try again.\n${e.message}'; // Default error message
       if (e.code == 'email-already-in-use') {
         errorMessage = 'The email address is already in use.';
