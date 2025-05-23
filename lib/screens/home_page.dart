@@ -124,6 +124,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Use FutureBuilder to wait for _loadUserId to complete
     return FutureBuilder<void>(
       future: _loadUserId(),
       builder: (context, snapshot) {
@@ -145,6 +146,7 @@ class _HomePageState extends State<HomePage> {
           });
           return const SizedBox.shrink(); // Return an empty widget while navigating
         } else {
+          // Once _userId is loaded and not null, display the home page content
           // If _userId is loaded successfully, display the home page content
           return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
             return Scaffold(
@@ -203,60 +205,5 @@ class _HomePageState extends State<HomePage> {
         }
       },
     );
-  }
-}
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('FinScan'),
-          elevation: 0,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  themeProvider.themeData.colorScheme.primary,
-                  themeProvider.themeData.colorScheme.primaryContainer,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
-        ),
-        body: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          transitionBuilder: (Widget child, Animation<double> animation) =>
-              FadeTransition(opacity: animation, child: child),
-          child: Center(
-            key: ValueKey<int>(_selectedIndex),
-            child: _screens[_selectedIndex],
-          ),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Gastos'),
-            BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Ingresos'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.bar_chart), label: 'Estadísticas'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.category), label: 'Categorías'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.settings), label: 'Ajustes'),
-          ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: const Color(0xFF64B5F6),
-          unselectedItemColor: themeProvider.themeData.unselectedWidgetColor,
-          onTap: _onItemTapped,
-          backgroundColor: themeProvider.themeData.cardColor,
-          selectedLabelStyle: const TextStyle(fontFamily: 'Roboto'),
-          unselectedLabelStyle: const TextStyle(fontFamily: 'Roboto'),
-          type: BottomNavigationBarType.fixed,
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _showAddOptions(context),
-          tooltip: 'Agregar', // Already translated
-          child: const Icon(Icons.add),
-        ),
-      );
-    });
   }
 }
