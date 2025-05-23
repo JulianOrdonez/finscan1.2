@@ -33,10 +33,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       print('User registered. Current user UID: ${FirebaseAuth.instance.currentUser?.uid}');
       Navigator.pop(context); // Navigate back to login
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e) { // Handle FirebaseAuth specific errors
       // Display a more user-friendly message based on the error code
       String errorMessage = 'Error de registro. Inténtalo de nuevo.';
-      if (e.code == 'email-already-in-use') {
+ if (e.code == 'email-already-in-use') {
         errorMessage = 'El correo electrónico ya está en uso.';
       } else if (e.code == 'weak-password') {
         errorMessage = 'La contraseña es demasiado débil.';
@@ -44,10 +44,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage)),
       );
-    } finally {
- await Future.delayed(Duration(seconds: 1)); // Add a small delay
- }
- finally {}
+    } catch (e) { // Handle other potential errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ocurrió un error inesperado: ${e.toString()}')),
+      );
+    }
   }
 
   @override
