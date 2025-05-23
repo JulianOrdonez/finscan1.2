@@ -49,6 +49,7 @@ class MyApp extends StatelessWidget {
           home: StreamBuilder<User?>( // Use Firebase User type
             stream: Provider.of<AuthService>(context).authStateChanges,
             builder: (context, snapshot) {
+              print('Auth state changed. Snapshot data: ${snapshot.data}');
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else {

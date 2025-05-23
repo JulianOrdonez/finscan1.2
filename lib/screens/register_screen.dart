@@ -31,6 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Registro exitoso. Por favor, inicie sesión.')),
       );
+      print('User registered. Current user UID: ${FirebaseAuth.instance.currentUser?.uid}');
       Navigator.pop(context); // Navigate back to login
     } on FirebaseAuthException catch (e) {
       // Display a more user-friendly message based on the error code
@@ -43,7 +44,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage)),
       );
-    }
+    } finally {
+ await Future.delayed(Duration(seconds: 1)); // Add a small delay
+ }
  finally {}
   }
 
