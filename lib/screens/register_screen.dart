@@ -1,7 +1,6 @@
-coimport 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_application_2/services/auth_service.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -15,6 +14,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
   bool _isLoading = false;
 
   Future<void> _register() async {
@@ -34,8 +34,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _passwordController.text,
       );
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
+        // Show success message
         const SnackBar(content: Text('Registration successful! Welcome!')),
       );
 
@@ -43,20 +43,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
       // The StreamBuilder will detect the authenticated user and navigate.
 
     } on FirebaseAuthException catch (e) {
-      String errorMessage = 'Registration failed. Please try again.';
+      String errorMessage = 'Registration failed. Please try again.\n${e.message}'; // Default error message
       if (e.code == 'email-already-in-use') {
         errorMessage = 'The email address is already in use.';
       } else if (e.code == 'weak-password') {
         errorMessage = 'The password is too weak.';
-      } else {
-         errorMessage = 'Registration failed: ${e.message}';
       }
+      // Handle other potential errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage)),
       );
     } catch (e) {
-      // Handle other potential errors
       ScaffoldMessenger.of(context).showSnackBar(
+        // Handle other potential errors
         SnackBar(content: Text('An unexpected error occurred: ${e.toString()}')),
       );
     } finally {
@@ -94,6 +93,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 32.0,
+                    color: Colors.blue, // Example color
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -101,6 +101,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.person),
+                    filled: true,
+                    fillColor: Colors.white70,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8.0))),
                     labelText: 'Name',
                   ),
                   validator: (value) {
@@ -115,6 +120,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.email),
+                    filled: true,
+                    fillColor: Colors.white70,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8.0))),
                     labelText: 'Email',
                   ),
                   validator: (value) {
@@ -132,6 +142,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _passwordController,
                   obscureText: true,
                   decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.lock),
+                    filled: true,
+                    fillColor: Colors.white70,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8.0))),
                     labelText: 'Password',
                   ),
                   validator: (value) {
@@ -147,10 +162,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 30.0),
                 _isLoading
                     ? const Center(child: CircularProgressIndicator())
-                    : ElevatedButton(
+                    : ElevatedButton( // Use ElevatedButton directly
                         onPressed: _register,
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue, // Example color
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0))),
                         child: const Text('Register'),
                       ),
+                const SizedBox(height: 20.0), // Added for spacing
+                const Text(
+                  'Please remember your password.',
+                  textAlign: TextAlign.center, style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),),
                 const SizedBox(height: 20.0),
                 TextButton(
                   onPressed: () {
