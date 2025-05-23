@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
     _loadUserId();
   }
 
-  Future<void> _loadUserId() async {
+  Future<int?> _loadUserId() async {
     // Use AuthService to get the current user ID, which now reads from the database session table.
     final userId = await AuthService().getCurrentUserId(); 
     
@@ -46,6 +46,7 @@ class _HomePageState extends State<HomePage> {
         ];
       }
     });
+    return userId; // Return the fetched user ID
   }
 
   void _onItemTapped(int index) {
@@ -128,10 +129,10 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     // Use FutureBuilder to wait for _loadUserId to complete
-    // The FutureBuilder needs to await the result of _loadUserId to determine
-    // whether to show the loading indicator, the home content, or the login screen.
+    // The FutureBuilder awaits the result of _loadUserId to determine
+    // whether to show the loading indicator or the home content/login screen.
     return FutureBuilder<int?>( // Specify the return type of the future
-      future: _loadUserId(),
+      future: _loadUserId(), // The future that provides the user ID
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -139,9 +140,11 @@ class _HomePageState extends State<HomePage> {
               child: CircularProgressIndicator(),
             ),
           ); // Show loading indicator while waiting
-        } else if (snapshot.hasData && snapshot.data != null) {
-          // If the future completed successfully and _userId is not null,
-          // display the home page content.
+        } else if (snapshot.hasData && snapshot.data != null) { // Check if the snapshot has data and it's not null
+          // If the future completed successfully and data (userId) is not null,
+          // proceed to build the main content using the Consumer.
+          // We use snapshot.data here as the definitive source of the userId after the future completes.
+          _userId = snapshot.data; // Update _userId state variable after future completes
         } else if (snapshot.hasError || _userId == null) {
           // If there's an error or _userId is still null after loading,
           // navigate to the LoginScreen.
@@ -154,9 +157,8 @@ class _HomePageState extends State<HomePage> {
           });
           return const SizedBox.shrink(); // Return an empty widget while navigating
         } else {
-          // Once _userId is loaded and not null, display the home page content
-          // If _userId is loaded successfully, display the home page content
           return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+            // Ensure _screens is populated before accessing _screens[_selectedIndex]
             return Scaffold(
               appBar: AppBar(
                 title: const Text('FinScan'),

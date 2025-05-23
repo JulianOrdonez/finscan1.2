@@ -92,8 +92,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
               ),
             );
           }
-
-          final currencyProvider = Provider.of<CurrencyProvider>(context);
+          final sortedExpenses = _sortExpenses(snapshot.data!);
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -114,13 +113,12 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        Text(
- 'Total Gastado: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(_calculateTotal(snapshot.data!)))}',
+ Text('Total Gastado: ${Provider.of<CurrencyProvider>(context).getCurrencySymbol()}${Provider.of<CurrencyProvider>(context).formatAmount(Provider.of<CurrencyProvider>(context).convertAmountToSelectedCurrency(_calculateTotal(sortedExpenses)))}',
                            style: TextStyle(fontSize: 16)
                         ),
                       ],
                     ),
-                  ),
+ ),
                 ),
  final sortedExpenses = _sortExpenses(snapshot.data!);
                 Expanded(
