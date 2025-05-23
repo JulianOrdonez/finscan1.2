@@ -1,5 +1,4 @@
-continuaimport 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
 import '../models/expense.dart'; // Assuming you might need expense data here
