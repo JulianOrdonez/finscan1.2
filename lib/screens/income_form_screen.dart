@@ -13,7 +13,9 @@ class IncomeFormScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  _IncomeFormScreenState createState() => _IncomeFormScreenState();
+  State<IncomeFormScreen> createState() => _IncomeFormScreenState();
+}
+
 class _IncomeFormScreenState extends State<IncomeFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
@@ -78,9 +80,11 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
       );
 
       if (widget.income == null) {
-        await firestoreService.addIncome(userId, income);
+        // Ensure income object is non-nullable when adding
+        await firestoreService.addIncome(userId, newOrUpdatedIncome);
       } else {
-        await firestoreService.updateIncome(userId, income);
+        // Ensure income object is non-nullable when updating
+        await firestoreService.updateIncome(userId, newOrUpdatedIncome);
       }
       Navigator.of(context).pop();
     }

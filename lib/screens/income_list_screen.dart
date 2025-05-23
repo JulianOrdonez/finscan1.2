@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_application_2/models/income.dart';
+import 'package:provider/provider.dart';
+import '../currency_provider.dart';
+import '../models/income.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 import 'income_form_screen.dart';
@@ -11,106 +12,174 @@ class IncomeListScreen extends StatefulWidget {
   const IncomeListScreen({Key? key, required this.userId}) : super(key: key);
 
   @override
-  _IncomeListScreenState createState() => _IncomeListScreenState();
+  State<IncomeListScreen> createState() => _IncomeListScreenState();
 }
 
 class _IncomeListScreenState extends State<IncomeListScreen> {
-  Future<void> _deleteIncome(BuildContext context, String incomeId) async {
-    final authService = Provider.of<AuthService>(context, listen: false);
-    final firestoreService = Provider.of<FirestoreService>(context, listen: false);
-    final userId = authService.getCurrentUserId();
+  Future<void> _deleteIncome(String id) async {
+    final confirmDelete = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmar eliminación'),
+        content: const Text('¿Estás seguro de que deseas eliminar este ingreso?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
 
-    if (userId != null) {
-      await firestoreService.deleteIncome(userId, incomeId);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Income deleted successfully')),
-      );
+    if (confirmDelete == true) {
+      final firestoreService = Provider.of<FirestoreService>(context, listen: false);
+      if (widget.userId != null) {
+        await firestoreService.deleteIncome(widget.userId!, id);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Ingreso eliminado exitosamente')),
+        );
+      }
     }
+  }
+
+  double _calculateTotal(List<Income> incomes) {
+    return incomes.fold(0, (sum, income) => sum + income.amount);
+  }
+
+  // Sort incomes by date in descending order (latest first)
+  List<Income> _sortIncomes(List<Income> incomes) {
+    return incomes..sort((a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
   }
 
   @override
   Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(context);
     final firestoreService = Provider.of<FirestoreService>(context);
-    final userId = widget.userId;
+    final authService = Provider.of<AuthService>(context);
+    final userId = authService.getCurrentUserId();
+
+    if (userId == null) {
+      return const Center(child: Text('Usuario no autenticado.'));
+    }
 
     return Scaffold(
-      body: userId == null
-          ? const Center(child: Text('User not logged in')) // Handle case where user is not logged in
-          : StreamBuilder<List<Income>>(
+      body: StreamBuilder<List<Income>>(
         stream: firestoreService.getIncomes(userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
+          }
+
+          if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
               child: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text(
-                  'Aún no hay ingresos registrados.',
+                  'No hay ingresos registrados.',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16),
                 ),
               ),
             );
+          }
 
-          } else {
-            final incomes = snapshot.data!;
-            return ListView.builder(
-              itemCount: incomes.length,
-              itemBuilder: (context, index) {
-                final income = incomes[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                  child: ListTile(
-                    title: Text(income.title),
-                    subtitle: Text(income.description),
-                    trailing: Column(
+          final sortedIncomes = _sortIncomes(snapshot.data!);
+
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Row(
+                         Row(
                           children: [
-                            Text(
-                              '+${income.amount.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                color: Colors.green, // Keep green for income
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16.0,
-                              ),
-                            ),
-                            const SizedBox(width: 8.0),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {
-                                if (income.id != null) {
-                                  _deleteIncome(context, income.id!);
-                                }
-                              },
-                            ),
+                            Icon(Icons.attach_money),
+                            const SizedBox(width: 8),
+                             Text('Resumen de Ingresos',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
                           ],
                         ),
-                        const SizedBox(height: 4.0),
-                        Text(
-                          DateFormat('dd/MM/yyyy')
-                              .format(DateTime.parse(income.date)),
-                          style: const TextStyle(
-                            fontSize: 12.0,
-                            color: Colors.grey,
-                          ),
+                        const SizedBox(height: 16),
+                         Text('Total Ingresado: ${Provider.of<CurrencyProvider>(context).getCurrencySymbol()}${Provider.of<CurrencyProvider>(context).formatAmount(Provider.of<CurrencyProvider>(context).convertAmountToSelectedCurrency(_calculateTotal(sortedIncomes)))}',
+                           style: TextStyle(fontSize: 16)
                         ),
                       ],
-
                     ),
-
-                    // You can add onTap for editing/deleting later
                   ),
-                );
-              },
-            );
-          }
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: sortedIncomes.length,
+                    itemBuilder: (context, index) {
+                       final currencyProvider = Provider.of<CurrencyProvider>(context);
+                      final income = sortedIncomes[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 5),
+                        child: Padding(
+                           padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.green, // Default color for income
+                              child: Icon(Icons.monetization_on,
+                                  color: Colors.white, size: 20), // Default icon for income
+                            ),
+                            title: Text(
+                              income.title,
+                              style: TextStyle(fontSize: 18, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                '${income.description} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(income.date))}',
+                                style: const TextStyle(fontSize: 14)),
+                            ),
+                            trailing: Row(
+                               mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(income.amount)),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16)),
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () {
+                                    if (income.id != null) {
+                                      _deleteIncome(income.id!);
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                             onTap: () async {
+                              await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => IncomeFormScreen(
+                                          income: income, userId: widget.userId)));
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
         },
       ),
     );

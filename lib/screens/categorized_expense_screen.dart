@@ -1,116 +1,125 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../currency_provider.dart';
+import '../models/expense.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
-import '../models/expense.dart'; // Import the Expense model
-class CategorizedExpenseScreen extends StatefulWidget {
-  // Assuming userId is needed for fetching categorized expenses
+
+class CategorizedExpenseScreen extends StatelessWidget {
   final String? userId;
+  final String category;
 
-  const CategorizedExpenseScreen({Key? key, required this.userId})
-      : super(key: key);
+  const CategorizedExpenseScreen({Key? key, required this.userId, required this.category}) : super(key: key);
 
-  @override
-  _CategorizedExpenseScreenState createState() =>
-      _CategorizedExpenseScreenState();
-}
-
-class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
-  Color _getCategoryColor(String category) {
-    switch (category) {
-      case 'Comida':
-        return Colors.deepOrange;
-      case 'Transporte':
-        return Colors.blueAccent;
-      case 'Entretenimiento':
-        return Colors.purpleAccent;
-      default:
-        return Colors.grey; // Default color
-    }
-  }
-  IconData _getCategoryIcon(String category) {
-    switch (category) {
-      case 'Comida':
+  // Basic category icon mapping (can be expanded)
+  IconData getCategoryIcon(String category) {
+    switch (category.toLowerCase()) {
+      case 'comida':
         return Icons.fastfood;
-      case 'Transporte':
+      case 'transporte':
         return Icons.directions_car;
-      case 'Entretenimiento':
+      case 'entretenimiento':
         return Icons.movie;
+      case 'compras':
+        return Icons.shopping_bag;
+      case 'servicios':
+        return Icons.electrical_services;
+      case 'salud':
+        return Icons.health_and_safety;
       default:
         return Icons.category;
     }
   }
+
+  // Basic category color mapping (can be expanded)
+  Color getCategoryColor(String category) {
+    switch (category.toLowerCase()) {
+      case 'comida':
+        return Colors.orange;
+      case 'transporte':
+        return Colors.blue;
+      case 'entretenimiento':
+        return Colors.purple;
+      default:
+        return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final firestoreService = Provider.of<FirestoreService>(context);
     final authService = Provider.of<AuthService>(context);
+    final currentUserId = authService.getCurrentUserId();
+
+    if (currentUserId == null) {
+      return const Center(child: Text('User not logged in'));
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gastos por Categoría'),
+        title: Text('$category Expenses'),
       ),
       body: StreamBuilder<List<Expense>>(
- stream: widget.userId != null
- ? firestoreService.getExpenses(widget.userId!)
- : Stream.empty(),
- builder: (context, snapshot) {
+        stream: firestoreService.getExpenses(currentUserId),
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
- child: Text('No se encontraron gastos categorizados.')
- );
-          } else {
- final expenses = snapshot.data!;
-            final Map<String, List<Expense>> categorizedExpenses = {};
- 
-            for (var expense in expenses) {
- if (!categorizedExpenses.containsKey(expense.category)) {
- categorizedExpenses[expense.category] = [];
- }
- categorizedExpenses[expense.category]!.add(expense);
-            }
-            final categories = categorizedExpenses.keys.toList();
-            return ListView.builder(
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final category = categories[index];
-                final expensesInCategory = categorizedExpenses[category]!;
+          }
 
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 4.0),
-                  elevation: 2.0,
-                  child: ExpansionTile(// Placeholder
-                    leading: CircleAvatar(
-                      backgroundColor: _getCategoryColor(category),
-                      child: Icon(// Placeholder
-                        _getCategoryIcon(category),
-                        color: Colors.white,
-                      ),
-                    ),
-                    title: Text(
-                      '$category (${expensesInCategory.length})',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    children: expensesInCategory.map<Widget>((expense) { // Explicitly specify the type as Widget
- return ListTile(
- title: Text(expense.title ?? ''), // Handle null title
- subtitle: Text(
- '${expense.description} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(expense.date))}'),
- trailing: Text(
- '\$${expense.amount.toStringAsFixed(2)}',
- style: const TextStyle(fontWeight: FontWeight.bold),
- ),
- );
-                    }).toList(), // .toList() creates a List<Widget>
-                  ),
-                );
-              },
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text('No expenses found in this category.'),
             );
           }
+
+          final filteredExpenses = snapshot.data!.where((expense) => expense.category == category).toList();
+
+          if (filteredExpenses.isEmpty) {
+            return const Center(
+              child: Text('No expenses found in this category.'),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: filteredExpenses.length,
+            itemBuilder: (context, index) {
+              final expense = filteredExpenses[index];
+              final currencyProvider = Provider.of<CurrencyProvider>(context);
+
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 5),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: getCategoryColor(expense.category),
+                      child: Icon(getCategoryIcon(expense.category), color: Colors.white, size: 20),
+                    ),
+                    title: Text(
+                      expense.title ?? '',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+                      ),
+                    ),
+                    subtitle: Text('${expense.description ?? ''} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(expense.date))}'),
+                    trailing: Text(
+                      currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(expense.amount)),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    // onTap: () {
+                    //   // Implement navigation to edit expense if needed
+                    // },
+                  ),
+                ),
+              );
+            },
+          );
         },
       ),
     );

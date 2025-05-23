@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../helpers.dart';
+import 'package:provider/provider.dart';
 import '../currency_provider.dart';
 import '../models/expense.dart';
 import '../services/firestore_service.dart';
@@ -8,8 +8,9 @@ import '../services/auth_service.dart';
 import 'expense_form_screen.dart';
 
 class ExpenseListScreen extends StatefulWidget {
-  final String userId;
+  final String? userId;
   const ExpenseListScreen({Key? key, required this.userId}) : super(key: key);
+
   @override
   State<ExpenseListScreen> createState() => _ExpenseListScreenState();
 }
@@ -44,12 +45,18 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
         return Colors.blue;
       case 'entretenimiento':
         return Colors.purple;
+      case 'compras':
+        return Colors.green;
+      case 'servicios':
+        return Colors.teal;
+      case 'salud':
+        return Colors.red;
       default:
         return Colors.grey;
     }
   }
 
-  Future<void> _deleteExpense(int id) async {
+  Future<void> _deleteExpense(String id) async {
     final confirmDelete = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -68,14 +75,9 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
       ),
     );
 
-    final authService = Provider.of<AuthService>(context, listen: false);
-    final firestoreService = Provider.of<FirestoreService>(context, listen: false);
-    final userId = authService.getCurrentUserId();
-
-    if (confirmDelete) {
-      if (userId != null) {
-        await firestoreService.deleteExpense(userId, id.toString()); // Assuming expense ID is String in Firestore
-      }
+    if (confirmDelete == true && widget.userId != null) {
+      final firestoreService = Provider.of<FirestoreService>(context, listen: false);
+      await firestoreService.deleteExpense(widget.userId!, id);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Expense deleted successfully')),
       );
@@ -86,19 +88,22 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
     return expenses.fold(0, (sum, expense) => sum + expense.amount);
   }
 
-  // Sort expenses by date in descending order (latest first)
   List<Expense> _sortExpenses(List<Expense> expenses) {
-    // Sort expenses by date in descending order (latest first)
     return expenses..sort((a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
   }
+
   @override
   Widget build(BuildContext context) {
     final firestoreService = Provider.of<FirestoreService>(context);
-    final authService = Provider.of<AuthService>(context);
-    final userId = authService.getCurrentUserId();
+    final currencyProvider = Provider.of<CurrencyProvider>(context);
+
+    if (widget.userId == null) {
+      return const Center(child: Text('User not logged in.'));
+    }
+
     return Scaffold(
       body: StreamBuilder<List<Expense>>(
-        stream: firestoreService.getExpenses(userId!),
+        stream: firestoreService.getExpenses(widget.userId!),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -120,7 +125,9 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
               ),
             );
           }
+
           final sortedExpenses = _sortExpenses(snapshot.data!);
+
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -132,27 +139,27 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
-                          children: [
+                          children: const [
                             Icon(Icons.money),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Text('Resumen de Gastos',
                                 style: TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.bold)),
                           ],
                         ),
                         const SizedBox(height: 16),
- Text('Total Gastado: ${Provider.of<CurrencyProvider>(context).getCurrencySymbol()}${Provider.of<CurrencyProvider>(context).formatAmount(Provider.of<CurrencyProvider>(context).convertAmountToSelectedCurrency(_calculateTotal(sortedExpenses)))}',
-                           style: TextStyle(fontSize: 16)
+                        Text(
+                          'Total Gastado: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(_calculateTotal(sortedExpenses)))}',
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
- ),
+                  ),
                 ),
                 Expanded(
                   child: ListView.builder(
                     itemCount: sortedExpenses.length,
                     itemBuilder: (context, index) {
-                      final currencyProvider = Provider.of<CurrencyProvider>(context);
                       final expense = sortedExpenses[index];
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 5),
@@ -160,7 +167,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 10),
                           child: ListTile(
-                            contentPadding: EdgeInsets.zero, // Asegura que el ListTile use el espacio completo
+                            contentPadding: EdgeInsets.zero,
                             leading: CircleAvatar(
                               backgroundColor: getCategoryColor(expense.category),
                               child: Icon(getCategoryIcon(expense.category),
@@ -176,32 +183,37 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                             subtitle: Padding(
                               padding: const EdgeInsets.only(top: 4.0),
                               child: Text(
-                                  '${expense.description} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(expense.date))}',
+                                  '${expense.description ?? ''} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(expense.date))}',
                                   style: const TextStyle(fontSize: 14)),
                             ),
-
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(expense.amount)),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-
-                                        fontSize: 16)),
+                                Text(
+                                  currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(expense.amount)),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                                ),
                                 IconButton(
                                   icon: const Icon(Icons.delete,
                                       color: Colors.red),
-                                  onPressed: () { if (expense.id != null) _deleteExpense(int.parse(expense.id!)); },
+                                  onPressed: () {
+                                    if (expense.id != null) {
+                                      _deleteExpense(expense.id!);
+                                    }
+                                  },
                                 ),
                               ],
                             ),
                             onTap: () async {
                               await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ExpenseFormScreen(
-                                          expense: expense, userId: widget.userId)));
-
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ExpenseFormScreen(
+                                      expense: expense, userId: widget.userId),
+                                ),
+                              );
                             },
                           ),
                         ),
