@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../models/expense.dart';
-import '../services/database_helper.dart';
+import '../models/user.dart';
+import '../services/firestore_service.dart';
+import '../services/auth_service.dart';
 import '../helpers.dart'; // Assuming Helpers.getCategoryColor and Helpers.getCategoryIcon exist
-
 class CategorizedExpenseScreen extends StatefulWidget {
   final int userId;
 
@@ -16,30 +18,10 @@ class CategorizedExpenseScreen extends StatefulWidget {
 }
 
 class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
-  late Future<Map<String, List<Expense>>> _categorizedExpensesFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _categorizedExpensesFuture = _fetchAndCategorizeExpenses();
-  }
-
-  Future<Map<String, List<Expense>>> _fetchAndCategorizeExpenses() async {
-    final expenses = await DatabaseHelper.instance.getExpenses(widget.userId);
-    final Map<String, List<Expense>> categorizedExpenses = {};
-
-    for (var expense in expenses) {
-      if (!categorizedExpenses.containsKey(expense.category)) {
-        categorizedExpenses[expense.category] = [];
-      }
-      categorizedExpenses[expense.category]!.add(expense);
-    }
-
-    return categorizedExpenses;
-  }
-
   @override
   Widget build(BuildContext context) {
+ final firestoreService = Provider.of<FirestoreService>(context);
+    final authService = Provider.of<AuthService>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gastos por Categoría'),
@@ -47,17 +29,30 @@ class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
       body: FutureBuilder<Map<String, List<Expense>>>(
         future: _categorizedExpensesFuture,
         builder: (context, snapshot) {
+ return StreamBuilder<List<Expense>>(
+        stream: authService.currentUser != null
+ ? firestoreService.getExpenses(authService.currentUser!.uid)
+ : Stream.empty(),
+ builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
-                child: Text('No se encontraron gastos categorizados.'));
+ child: Text('No se encontraron gastos categorizados.')
+ );
           } else {
-            final categorizedExpenses = snapshot.data!;
-            final categories = categorizedExpenses.keys.toList();
+ final expenses = snapshot.data!;
+            final Map<String, List<Expense>> categorizedExpenses = {};
 
+ for (var expense in expenses) {
+ if (!categorizedExpenses.containsKey(expense.category)) {
+ categorizedExpenses[expense.category] = [];
+ }
+ categorizedExpenses[expense.category]!.add(expense);
+            }
+            final categories = categorizedExpenses.keys.toList();
             return ListView.builder(
               itemCount: categories.length,
               itemBuilder: (context, index) {
@@ -99,6 +94,7 @@ class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
           }
         },
       ),
+ );
     );
   }
 }

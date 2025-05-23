@@ -3,25 +3,18 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 import '../currency_provider.dart';
 import '../models/expense.dart';
-import '../services/database_helper.dart';
+import '../services/firestore_service.dart';
+import '../services/auth_service.dart';
+import '../models/user.dart'; // Import User model if needed, though AuthService provides the ID
 
 class ExpenseStatsScreen extends StatefulWidget {
-  final int userId;
-
-  const ExpenseStatsScreen({Key? key, required this.userId}) : super(key: key);
+  const ExpenseStatsScreen({Key? key}) : super(key: key);
 
   @override
   _ExpenseStatsScreenState createState() => _ExpenseStatsScreenState();
 }
 
 class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
-  late Future<List<Expense>> _expensesFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _expensesFuture = DatabaseHelper.instance.getExpenses(widget.userId);
-  }
 
   Map<String, double> _getExpenseDataByCategory(List<Expense> expenses) {
     Map<String, double> data = {};
@@ -38,14 +31,20 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final firestoreService = Provider.of<FirestoreService>(context);
+    final authService = Provider.of<AuthService>(context);
     final currencyProvider = Provider.of<CurrencyProvider>(context);
+
+    final userId = authService.currentUser?.uid;
 
     return Scaffold( // Scaffold removed as it's part of HomePage
       appBar: AppBar(
         title: const Text('Expense Statistics'),
       ),
-      body: FutureBuilder<List<Expense>>(
-        future: _expensesFuture,
+      body: userId == null
+          ? const Center(child: Text('User not logged in.')) // Handle case where user is not logged in
+          : StreamBuilder<List<Expense>>(
+        stream: firestoreService.getExpenses(userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

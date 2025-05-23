@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_2/models/income.dart';
-import 'package:flutter_application_2/services/database_helper.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import '../models/income.dart';
+import '../services/firestore_service.dart';
+import '../services/auth_service.dart';
+import 'income_form_screen.dart';
+import '../models/user.dart';
 
 class IncomeListScreen extends StatefulWidget {
   final int userId;
@@ -13,23 +17,21 @@ class IncomeListScreen extends StatefulWidget {
 }
 
 class _IncomeListScreenState extends State<IncomeListScreen> {
-  late Future<List<Income>> _incomesFuture;
+  Future<void> _deleteIncome(BuildContext context, String incomeId) async {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final firestoreService = Provider.of<FirestoreService>(context, listen: false);
+    final userId = authService.getCurrentUserId();
 
-  @override
-  void initState() {
-    super.initState();
-    _refreshIncomeList();
-  }
-
-  Future<void> _refreshIncomeList() async {
-    setState(() {
-      _incomesFuture = DatabaseHelper.instance.getIncomes(widget.userId);
-    });
+    if (userId != null) {
+      await firestoreService.deleteIncome(userId, incomeId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Income deleted successfully')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
       body: FutureBuilder<List<Income>>(
         future: _incomesFuture,
         builder: (context, snapshot) {
@@ -64,21 +66,38 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          '+${income.amount.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            color: Colors.green, // Keep green for income
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16.0,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              '+${income.amount.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                color: Colors.green, // Keep green for income
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16.0,
+                              ),
+                            ),
+                            const SizedBox(width: 8.0),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                if (income.id != null) {
+                                  _deleteIncome(context, income.id!);
+                                }
+                              },
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 4.0),
                         Text(
-                          // Assuming income.date is a String in 'yyyy-MM-dd' format
-                          DateFormat('dd/MM/yyyy').format(DateTime.parse(income.date)),
-                          style: const TextStyle(fontSize: 12.0, color: Colors.grey),
+                          DateFormat('dd/MM/yyyy')
+                              .format(DateTime.parse(income.date)),
+                          style: const TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
+
                     ),
 
                     // You can add onTap for editing/deleting later

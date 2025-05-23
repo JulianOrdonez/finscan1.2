@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/screens/register_screen.dart';
 import 'package:flutter_application_2/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_2/screens/home_page.dart'; // Assuming you have a home page
 
@@ -21,17 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     _checkLoginStatus();
-  }
-
-  void _checkLoginStatus() async {
-    final userId = await Provider.of<AuthService>(context, listen: false).getCurrentUserId();
-    if (userId != null) {
-      Navigator.pushReplacementNamed(context, '/home'); // Use named route if available
-       // Alternatively: Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
-    }
-  }
-
-
   void _login() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -42,16 +32,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
       try {
         final authService = Provider.of<AuthService>(context, listen: false);
-        final success = await authService.login(_email!, _password!);
-
-        if (success) {
-          Navigator.pushReplacementNamed(context, '/home'); // Use named route if available
-          // Alternatively: Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+        await authService.login(_email!, _password!);
+        // Navigation to /home will be handled by the auth state listener
+      } on FirebaseAuthException catch (e) {
+        String message = 'An error occurred. Please try again.';
+        if (e.code == 'user-not-found') {
+          message = 'No user found for that email.';
+        } else if (e.code == 'wrong-password') {
+          message = 'Wrong password provided for that user.';
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Invalid email or password')),
-          );
+          message = 'Login failed: ${e.message}';
         }
+        ScaffoldMessenger.of(context).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message)),
+          );
       } on Exception catch (e) {
          ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Login failed: ${e.toString()}')),

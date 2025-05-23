@@ -3,14 +3,18 @@ import 'package:provider/provider.dart';
 import 'package:flutter_application_2/screens/login_screen.dart';
 import 'package:flutter_application_2/theme_provider.dart';
 import 'package:flutter_application_2/currency_provider.dart';
-import 'package:flutter_application_2/services/database_helper.dart';
 import 'package:flutter_application_2/screens/home_page.dart';
 import 'package:flutter_application_2/services/auth_service.dart';
 import 'package:flutter_application_2/screens/register_screen.dart';
 import 'package:flutter_application_2/models/user.dart';
+import 'package:firebase_core/firebase_core.dart'; // Importa firebase_core
+import 'firebase_options.dart'; // Importa firebase_options.dart
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() async { // main ahora es async
+  WidgetsFlutterBinding.ensureInitialized(); // Asegura que los widgets estén inicializados
+  await Firebase.initializeApp( // Inicializa Firebase
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // await DatabaseHelper.instance.clearDatabase(); // FOR DEBUGGING ONLY - REMOVE LATER
   runApp(
     MultiProvider(
@@ -40,26 +44,16 @@ class MyApp extends StatelessWidget {
           theme: themeProvider.themeData,
           routes: {
             '/register': (context) => RegisterScreen(),
- '/home': (context) => HomePage(),
+            '/home': (context) => HomePage(),
           },
           home: FutureBuilder<User?>(
-            future: (() async {
-              print('Checking for logged in user...'); // Add debug print
-              await Future.delayed(Duration(milliseconds: 500)); // Add a small delay
-              final userId = await AuthService().getCurrentUserId();
-              print('Retrieved userId: $userId');
-              if (userId != null) {
-                return await DatabaseHelper.instance.getUserById(userId);
-              }
-              return null;
-            })(),
+            stream: Provider.of<AuthService>(context).authStateChanges,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else {
-                print('User snapshot data: ${snapshot.data}');
-                final user = snapshot.data; // Access the user from the snapshot
-                if (user != null) {
+                // If there is data, it means a user is logged in
+                if (snapshot.hasData) {
                   return const HomePage();
                 } else {
                   return LoginScreen();

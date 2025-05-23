@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Expense {
-  int? id;
+  String? id;
   int userId;
   String title;
   String description;
@@ -19,9 +21,8 @@ class Expense {
     this.receiptPath,
   });
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'user_id': userId,
       'title': title,
       'description': description,
@@ -32,16 +33,19 @@ class Expense {
     };
   }
 
-  factory Expense.fromMap(Map<String, dynamic> map) {
+  factory Expense.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> map = doc.data() as Map<String, dynamic>;
     return Expense(
-      id: map['id'],
+      id: doc.id,
       userId: map['user_id'],
       title: map['title'],
       description: map['description'] ?? '',
-      amount: map['amount'],
+      amount: map['amount'] is int ? (map['amount'] as int).toDouble() : map['amount'],
       category: map['category'],
       date: map['date'],
-      receiptPath: map['receiptPath'],
+      // Firestore stores timestamp, convert to String if needed or handle as Timestamp
+      // For simplicity here, assuming date is stored as String
+      receiptPath: map['receiptPath'] as String?,
     );
   }
 }

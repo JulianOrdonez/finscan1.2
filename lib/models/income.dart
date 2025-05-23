@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Income {
-  int? id;
+  String? id; // Changed id type to String?
+  // userId is no longer needed in the model if using Firebase Auth UID
   final int userId;
   final String title;
   final String description;
@@ -7,7 +10,7 @@ class Income {
   final String date;
 
   Income({
-    this.id,
+    this.id, // Changed id type to String?
     required this.userId,
     required this.title,
     this.description = '',
@@ -16,9 +19,8 @@ class Income {
   });
 
   // Convertir un objeto Income a un Map
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() { // Renamed to toJson
     return {
-      'id': id,
       'user_id': userId,
       'title': title,
       'description': description,
@@ -28,14 +30,15 @@ class Income {
   }
 
   // Crear un objeto Income a partir de un Map
-  factory Income.fromMap(Map<String, dynamic> map) {
+  factory Income.fromFirestore(DocumentSnapshot doc) { // Renamed to fromFirestore and takes DocumentSnapshot
+    final map = doc.data() as Map<String, dynamic>;
     return Income(
-      id: map['id'],
+      id: doc.id, // Get id from DocumentSnapshot
       userId: map['user_id'],
       title: map['title'],
       description: map['description'] ?? '',
-      amount: map['amount'],
-      date: map['date'],
+      amount: map['amount'] is int ? (map['amount'] as int).toDouble() : map['amount'], // Handle potential int amount from Firestore
+      date: map['date'], // Assuming date is stored as String in Firestore
     );
   }
 }

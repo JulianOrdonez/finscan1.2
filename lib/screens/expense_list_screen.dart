@@ -3,8 +3,9 @@ import 'package:intl/intl.dart';
 import '../helpers.dart';
 import 'package:provider/provider.dart';
 import '../currency_provider.dart';
+import '../models/user.dart';
 import '../models/expense.dart';
-import '../services/database_helper.dart';
+import '../services/firestore_service.dart';
 import 'expense_form_screen.dart';
 
 class ExpenseListScreen extends StatefulWidget {
@@ -15,20 +16,6 @@ class ExpenseListScreen extends StatefulWidget {
 }
 
 class _ExpenseListScreenState extends State<ExpenseListScreen> {
-  late Future<List<Expense>> _expensesFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _refreshExpenses();
-  }
-
-  Future<void> _refreshExpenses() async {
-    setState(() {
-      _expensesFuture = DatabaseHelper.instance.getExpenses(widget.userId);
-    });
-  }
-
   Future<void> _deleteExpense(int id) async {
     final confirmDelete = await showDialog(
       context: context,
@@ -48,8 +35,14 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
       ),
     );
 
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final firestoreService = Provider.of<FirestoreService>(context, listen: false);
+    final userId = authService.getCurrentUserId();
+
     if (confirmDelete) {
-      await DatabaseHelper.instance.deleteExpense(id);
+      if (userId != null) {
+        await firestoreService.deleteExpense(userId, id.toString()); // Assuming expense ID is String in Firestore
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Expense deleted successfully')),
       );
@@ -68,8 +61,11 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    final firestoreService = Provider.of<FirestoreService>(context);
+    final authService = Provider.of<AuthService>(context);
+    final userId = authService.getCurrentUserId();
     return Scaffold(
-      body: FutureBuilder<List<Expense>>(
+      body: StreamBuilder<List<Expense>>(
         future: _expensesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -165,7 +161,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                                 IconButton(
                                   icon: const Icon(Icons.delete,
                                       color: Colors.red),
-                                  onPressed: () { if (expense.id != null) _deleteExpense(expense.id!); },
+                                  onPressed: () { if (expense.id != null) _deleteExpense(int.parse(expense.id!)); },
                                 ),
                               ],
                             ),
@@ -175,7 +171,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                                   MaterialPageRoute(
                                       builder: (context) => ExpenseFormScreen(
                                           expense: expense, userId: widget.userId)));
-                              _refreshExpenses();
+
                             },
                           ),
                         ),

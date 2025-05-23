@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -20,6 +21,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    setState(() {
+      _isLoading = true;
+    });
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
       await authService.register(
@@ -31,18 +35,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SnackBar(content: Text('Registro exitoso. Por favor, inicie sesión.')),
       );
       Navigator.pop(context); // Navigate back to login
-    } on UserExistsException catch (e) {
+    } on FirebaseAuthException catch (e) {
+      // Display a more user-friendly message based on the error code
+      String errorMessage = 'Error de registro. Inténtalo de nuevo.';
+      if (e.code == 'email-already-in-use') {
+        errorMessage = 'El correo electrónico ya está en uso.';
+      } else if (e.code == 'weak-password') {
+        errorMessage = 'La contraseña es demasiado débil.';
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error en el registro: ${e.message}')),
+        SnackBar(content: Text(errorMessage)),
       );
-    } on WeakPasswordException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error en el registro: ${e.message}')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error de registro: ${e.toString()}')),
-      );
+    }
+ finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 

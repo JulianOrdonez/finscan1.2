@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/income.dart';
-import '../services/database_helper.dart';
+import 'package:provider/provider.dart';
+import '../services/firestore_service.dart';
+import '../services/auth_service.dart';
 
 class IncomeFormScreen extends StatefulWidget {
   final int userId;
@@ -59,17 +60,19 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
 
   Future<void> _saveIncome() async {
     if (_formKey.currentState!.validate()) {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      final firestoreService = Provider.of<FirestoreService>(context, listen: false);
+      final userId = authService.getCurrentUserId();
+
+      if (userId == null) {
+        // Handle case where user is not logged in
+        return;
+      }
+
       final income = Income(
         id: widget.income?.id,
-        userId: widget.userId,
         title: _titleController.text,
         description: _descriptionController.text,
-        amount: double.parse(_amountController.text),
-        date: DateFormat('yyyy-MM-dd').format(_selectedDate), // Store date as String
-      );
-
-      if (widget.income == null) {
-        await DatabaseHelper.instance.insertIncome(income);
       } else {
         await DatabaseHelper.instance.updateIncome(income);
       }

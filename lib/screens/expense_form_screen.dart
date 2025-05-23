@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/expense.dart';
-import '../services/database_helper.dart';
+import 'package:provider/provider.dart';
+import '../services/firestore_service.dart';
 import '../helpers.dart';
-
+ 
 class ExpenseFormScreen extends StatefulWidget {
   final int userId;
   final Expense? expense;
@@ -61,27 +62,29 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
 
   Future<void> _saveExpense() async {
     if (_formKey.currentState!.validate()) {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      final firestoreService =
+          Provider.of<FirestoreService>(context, listen: false);
+      final String? userId = authService.getCurrentUser()?.uid;
+      if (userId == null) {
+        // Handle case where user is not logged in (should not happen with current flow)
+        return;
+      }
       final newExpense = Expense(
-        id: widget.expense?.id, // Use existing id for edit, null for new
-        userId: widget.userId,
         title: _titleController.text,
         description: _descriptionController.text,
-        amount: double.parse(_amountController.text),
-        category: _selectedCategory,
-        date: _dateController.text,
-        receiptPath: '', // Placeholder for receipt path
       );
 
       if (widget.expense == null) {
         await DatabaseHelper.instance.insertExpense(newExpense);
       } else {
-        await DatabaseHelper.instance.updateExpense(newExpense);
+        await firestoreService.updateExpense(userId, newExpense);
       }
 
       Navigator.of(context).pop();
     }
   }
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
