@@ -40,14 +40,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SnackBar(content: Text('Registration successful! Welcome!')),
       );
 
+      // Navigate to the home screen after successful registration
+      Navigator.pushNamedAndRemoveUntil(
+          context, '/home', (Route<dynamic> route) => false);
+
     } on FirebaseAuthException catch (e) {
-      String errorMessage = 'Registration failed. Please try again.\n${e.message}'; // Default error message
-      if (e.code == 'email-already-in-use') {
-        errorMessage = 'The email address is already in use.';
-      } else if (e.code == 'weak-password') {
-        errorMessage = 'The password is too weak.';
-      }
-      // Handle other potential errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage)),
       );
