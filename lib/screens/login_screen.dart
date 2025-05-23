@@ -31,13 +31,26 @@ class _LoginScreenState extends State<LoginScreen> {
   void _login() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      bool success = await Provider.of<AuthService>(context, listen: false)
-          .signIn(_email!, _password!);
-      if (success) {
+      try {
+        bool success = await Provider.of<AuthService>(context, listen: false)
+            .signIn(_email!, _password!);
+        if (success) {
         Navigator.pushReplacementNamed(context, '/home');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid email or password')),
+            const SnackBar(content: Text('Invalid email or password')),
+          );
+        }
+      } catch (e) {
+        // Handle specific authentication errors
+        String errorMessage = 'Login failed. Please try again.';
+        if (e.toString().contains('User not found')) {
+          errorMessage = 'User not found. Please check your email.';
+        } else if (e.toString().contains('Incorrect password')) {
+        errorMessage = 'Incorrect password. Please try again.';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
         );
       }
     }

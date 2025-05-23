@@ -12,22 +12,25 @@ class AuthService {
   /// Consulta la base de datos para un usuario con el email y la contraseña proporcionados.
   /// Retorna `true` y almacena el ID del usuario si el inicio de sesión es exitoso, `false` de lo contrario.
   Future<bool> login(String email, String password) async {
-    final user = await _databaseHelper.getUserByEmailAndPassword(email, password);
-    if (user != null) {
-      // Guardar la sesión en SQLite
-      final db = await _databaseHelper.database;
-      await db.insert('sessions', {'userId': user.id});
+    try {
+      final user = await _databaseHelper.getUserByEmailAndPassword(email, password);
+      if (user != null) {
+        // Guardar la sesión en SQLite
+        final db = await _databaseHelper.database;
+        await db.insert('sessions', {'userId': user.id});
 
-      // Store the user ID in SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(_loggedInUserIdKey, user.id!);
+        // Store the user ID in SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt(_loggedInUserIdKey, user.id!);
 
-      print('User ID ${user.id} stored in SharedPreferences and session.');
-      return true;
+        print('User ID ${user.id} stored in SharedPreferences and session.');
+        return true;
+      }
+      print('Login failed for email: $email');
+      return false;
+    } catch (e) {
+      throw Exception('Error during login: $e');
     }
-    print('Login failed for email: $email');
-
-    return false;
   }
 
   /// Handles the sign-in process from the UI.
@@ -36,7 +39,7 @@ class AuthService {
   Future<bool> signIn(String email, String password) async {
     final bool success = await login(email, password);
     // Additional logic can be added here if needed before returning the result
-    return false;
+    return success;
   }
 
   /// Registra un nuevo usuario.
@@ -46,10 +49,11 @@ class AuthService {
   Future<bool> register(String name, String email, String password) async {
     // Verificar si ya existe un usuario con el mismo email
     final existingUser = await _databaseHelper.getUserByEmail(email);
-    if (existingUser != null) {
-      print('Registration failed: User with email $email already exists.');
-      return false; // Ya existe un usuario con este email
-    }
+    if (existingUser != null) throw Exception('Registration failed: User with email $email already exists.');
+    
+    // Basic email format validation
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(email)) throw Exception('Registration failed: Invalid email format.');
 
     try {
       final newUser = User(name: name, email: email, password: password); // El ID será auto-generado por la base de datos
@@ -59,8 +63,7 @@ class AuthService {
       // print('Inserted user: ${newUser.toMap()}');
       return true;
     } catch (e) {
-      print('Error al registrar usuario: $e');
-      return false;
+      throw Exception('Error during registration: $e');
     }
   }
 

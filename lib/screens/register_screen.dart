@@ -21,24 +21,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     try {
-      final success = await _authService.register(
+      await _authService.register(
         _nameController.text,
         _emailController.text,
         _passwordController.text,
       );
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registro exitoso. Por favor, inicie sesión.')),
-        );
-        Navigator.pop(context); // Navigate back to login
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error en el registro. El correo ya puede estar en uso.')),
-        );
-      }
-    } catch (e) {
+      // If registration is successful, AuthService.register completes without throwing an exception.
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error de registro: ${e.toString()}')),
+        const SnackBar(content: Text('Registro exitoso. Por favor, inicie sesión.')),
+      );
+      Navigator.pop(context); // Navigate back to login
+    } on UserExistsException {
+      // Handle the specific exception for existing user
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error en el registro: El correo electrónico ya está en uso.')),
+      );
+    } on WeakPasswordException {
+      // Handle the specific exception for weak password
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error en el registro: La contraseña es demasiado débil.')),
+      );
+    } catch (e) {
+      // Handle any other unexpected errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error desconocido durante el registro: ${e.toString()}')),
       );
     }
   }

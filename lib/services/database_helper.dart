@@ -71,6 +71,13 @@ class DatabaseHelper {
         FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
       )
     ''');
+    await db.execute('''
+      CREATE TABLE sessions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        userId INTEGER NOT NULL UNIQUE,
+        FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+      )
+    ''');
   }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -79,6 +86,7 @@ class DatabaseHelper {
     await db.execute('DROP TABLE IF EXISTS users');
     await db.execute('DROP TABLE IF EXISTS incomes');
     await db.execute('DROP TABLE IF EXISTS expenses');
+    await db.execute('DROP TABLE IF EXISTS sessions');
     await _onCreate(db, newVersion);
   }
 
@@ -236,6 +244,7 @@ class DatabaseHelper {
     await db.execute('DROP TABLE IF EXISTS users');
     await db.execute('DROP TABLE IF EXISTS incomes');
     await db.execute('DROP TABLE IF EXISTS expenses');
+    await db.execute('DROP TABLE IF EXISTS sessions');
     await _onCreate(db, _databaseVersion);
     // Cerrar y reabrir la base de datos para asegurar que los cambios se apliquen
     await db.close();
