@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+continuaimport 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
@@ -52,8 +52,6 @@ class SettingsScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () async {
                   await authService.signOut();
-                  // Navigate to login or splash screen after logout
-                  Navigator.of(context).pushReplacementNamed('/'); // Adjust route as needed
                 },
                 child: const Text('Logout'),
               ),
