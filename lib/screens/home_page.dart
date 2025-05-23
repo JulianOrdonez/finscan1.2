@@ -30,7 +30,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadUserId() async {
-    final userId = await AuthService().getCurrentUserId(); // Use AuthService
+    // Use AuthService to get the current user ID, which now reads from the database session table.
+    final userId = await AuthService().getCurrentUserId(); 
+    
+    // No need to await this setState, as it's synchronous.
     setState(() {
       _userId = userId;
       if (_userId != null) {
@@ -125,7 +128,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     // Use FutureBuilder to wait for _loadUserId to complete
-    return FutureBuilder<void>(
+    // The FutureBuilder needs to await the result of _loadUserId to determine
+    // whether to show the loading indicator, the home content, or the login screen.
+    return FutureBuilder<int?>( // Specify the return type of the future
       future: _loadUserId(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -133,7 +138,10 @@ class _HomePageState extends State<HomePage> {
             body: Center(
               child: CircularProgressIndicator(),
             ),
-          );
+          ); // Show loading indicator while waiting
+        } else if (snapshot.hasData && snapshot.data != null) {
+          // If the future completed successfully and _userId is not null,
+          // display the home page content.
         } else if (snapshot.hasError || _userId == null) {
           // If there's an error or _userId is still null after loading,
           // navigate to the LoginScreen.

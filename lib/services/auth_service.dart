@@ -78,13 +78,11 @@ class AuthService {
         return false; // Invalid email or password
       }
 
-      // Store the user ID in SharedPreferences for session management
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(_loggedInUserIdKey, user.id!);
-
-      // You might also want to store session information in the database if needed
-      // final db = await _databaseHelper.database;
-      // await db.insert('sessions', {'userId': user.id!});
+      // Insert session information into the database
+      final db = await _databaseHelper.database;
+      // Before inserting, delete any existing session for this user to ensure only one active session
+      await db.delete('sessions', where: 'userId = ?', whereArgs: [user.id!]);
+      await db.insert('sessions', {'userId': user.id!});
 
       print('User logged in successfully: ${user.email}');
       return true;
@@ -98,12 +96,14 @@ class AuthService {
   /// Logs out the current user.
   Future<void> logout() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_loggedInUserIdKey);
-
-      // You might also want to remove session information from the database
-      // final db = await _databaseHelper.database;
-      // await db.delete('sessions', where: 'userId = ?', whereArgs: [userId]); // Need to get current user ID first
+      // Get the current user ID from the session table before deleting
+      final currentUserId = await getCurrentUserId();
+      if (currentUserId != null) {
+        // Remove session information from the database
+        final db = await _databaseHelper.database;
+        await db.delete('sessions', where: 'userId = ?', whereArgs: [currentUserId]);
+        print('Session for user $currentUserId deleted from database.');
+      }
 
       print('User logged out.');
     } catch (e) {
@@ -116,8 +116,15 @@ class AuthService {
   /// Returns null if no user is logged in.
   Future<int?> getCurrentUserId() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getInt(_loggedInUserIdKey);
+      final db = await _databaseHelper.database;
+      final List<Map<String, dynamic>> sessions = await db.query('sessions', limit: 1);
+      if (sessions.isNotEmpty) {
+        return sessions.first['userId'] as int;
+      }
+      // Fallback to SharedPreferences if needed (though database should be primary source)
+      // final prefs = await SharedPreferences.getInstance();
+      // return prefs.getInt(_loggedInUserIdKey);
+      return null; // No active session found
     } catch (e) {
       print('Error getting current user ID: $e');
       return null;
