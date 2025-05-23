@@ -52,6 +52,7 @@ class SettingsScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () async {
                   await authService.signOut();
+                  await Future.delayed(const Duration(milliseconds: 500)); // Added delay
                   // Navigate to the login screen and remove all previous routes
                   Navigator.pushNamedAndRemoveUntil(
                       context, '/', (Route<dynamic> route) => false);
