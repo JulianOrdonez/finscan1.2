@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -42,7 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       // Navigation to /home is handled by the auth state listener in main.dart
       // The StreamBuilder will detect the authenticated user and navigate.
 
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e) { // Catch specific Firebase Auth exceptions
       String errorMessage = 'Registration failed. Please try again.\n${e.message}'; // Default error message
       if (e.code == 'email-already-in-use') {
         errorMessage = 'The email address is already in use.';
@@ -173,8 +174,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                 const SizedBox(height: 20.0), // Added for spacing
                 const Text(
-                  'Please remember your password.',
-                  textAlign: TextAlign.center, style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),),
+ 'Please remember your password.',
+ textAlign: TextAlign.center,
+ style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+ ),
                 const SizedBox(height: 20.0),
                 TextButton(
                   onPressed: () {
