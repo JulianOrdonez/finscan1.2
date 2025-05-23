@@ -45,8 +45,8 @@ class MyApp extends StatelessWidget {
           routes: {
             '/register': (context) => RegisterScreen(),
             '/home': (context) => HomePage(),
-          },
-          home: FutureBuilder<User?>(
+          }, // Removed trailing comma
+          home: StreamBuilder<User?>( // Changed FutureBuilder to StreamBuilder
             stream: Provider.of<AuthService>(context).authStateChanges,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Income {
   String? id; // Changed id type to String?
   // userId is no longer needed in the model if using Firebase Auth UID
-  final int userId;
+  final String userId;
   final String title;
   final String description;
   final double amount;

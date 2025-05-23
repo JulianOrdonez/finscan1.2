@@ -26,10 +26,9 @@ class _CategorizedExpenseScreenState extends State<CategorizedExpenseScreen> {
       appBar: AppBar(
         title: const Text('Gastos por Categoría'),
       ),
-      body:
- return StreamBuilder<List<Expense>>(
-        stream: authService.currentUser != null
- ? firestoreService.getExpenses(authService.currentUser!.uid)
+      body: StreamBuilder<List<Expense>>(
+ stream: authService.getCurrentUserId() != null
+ ? firestoreService.getExpenses(authService.getCurrentUserId()!)
  : Stream.empty(),
  builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

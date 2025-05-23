@@ -79,6 +79,10 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
         date: DateFormat('yyyy-MM-dd').format(_selectedDate), // Store date as String
       );
 
+      if (widget.income == null) {
+        await firestoreService.addIncome(userId, income);
+      } else {
+        await firestoreService.updateIncome(userId, income);
       }
       Navigator.of(context).pop();
     }

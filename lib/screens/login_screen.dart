@@ -22,10 +22,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      setState(() {
-        _isLoading = true;
-      });
-
       try {
         final authService = Provider.of<AuthService>(context, listen: false);
         await authService.login(_email!, _password!);

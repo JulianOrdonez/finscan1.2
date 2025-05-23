@@ -6,6 +6,7 @@ import '../currency_provider.dart';
 import '../models/user.dart';
 import '../models/expense.dart';
 import '../services/firestore_service.dart';
+import '../services/auth_service.dart';
 import 'expense_form_screen.dart';
 
 class ExpenseListScreen extends StatefulWidget {

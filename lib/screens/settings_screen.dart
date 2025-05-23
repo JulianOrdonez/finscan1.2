@@ -11,7 +11,6 @@ import 'package:intl/intl.dart';
 
 import '../models/expense.dart';
 import '../models/income.dart';
-import '../services/auth_service.dart';
 import 'package:flutter_application_2/screens/login_screen.dart';
 import 'package:flutter_application_2/screens/support_screen.dart';
 import '../currency_provider.dart';
@@ -48,12 +47,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _generateAndShareReport(BuildContext context) async {
     final userId = widget.userId;
-
-    final status = await Permission.storage.request();
+ // Request storage permission
+ final status = await Permission.storage.request();
     if (status.isGranted) {
-      final expenses = await DatabaseHelper.instance.getExpenses(userId);
-      final incomes = await DatabaseHelper.instance.getIncomes(userId);
-
       final firestoreService =
           Provider.of<FirestoreService>(context, listen: false);
       final expenses = await firestoreService.getExpenses(userId).first;
@@ -141,15 +137,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> _logout(BuildContext context) async {
-    await AuthService().logout();
-    // ignore: use_build_context_synchronously
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -202,7 +189,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSettingCard(
                 title: 'Cerrar Sesión',
                 leading: Icon(Icons.logout),
-                onTap: () => _logout(context)),
+                onTap: () async {
+ final authService = Provider.of<AuthService>(context, listen: false);
+ await authService.logout();
+ // ignore: use_build_context_synchronously
+ Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+ );
+ }),
             _buildSettingCard(
               title: 'Soporte al Usuario',
               leading: Icon(Icons.support_agent),

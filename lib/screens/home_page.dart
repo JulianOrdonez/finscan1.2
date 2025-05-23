@@ -20,7 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  int? _userId;
+  String? _userId;
   List<Widget> _screens = [];
 
   @override
@@ -29,17 +29,17 @@ class _HomePageState extends State<HomePage> {
     _loadUserId();
   }
 
-  Future<int?> _loadUserId() async {
+  Future<String?> _loadUserId() async {
     // Use AuthService to get the current user ID, which now reads from the database session table.
-    final userId = await AuthService().getCurrentUserId(); 
-    
+    final userId = AuthService().getCurrentUserId();
+
     // No need to await this setState, as it's synchronous.
     setState(() {
       _userId = userId;
       if (_userId != null) {
         _screens = [
           ExpenseListScreen(userId: _userId!),
-          IncomeListScreen(userId: _userId!),
+          IncomeListScreen(userId: int.parse(_userId!)), // Assuming IncomeListScreen still expects int
           ExpenseStatsScreen(userId: _userId!),
           CategorizedExpenseScreen(userId: _userId!),
           SettingsScreen(userId: _userId!),
@@ -132,7 +132,7 @@ class _HomePageState extends State<HomePage> {
     // The FutureBuilder awaits the result of _loadUserId to determine
     // whether to show the loading indicator or the home content/login screen.
     return FutureBuilder<int?>( // Specify the return type of the future
-      future: _loadUserId(), // The future that provides the user ID
+      future: _loadUserId().then((userId) => userId != null ? int.parse(userId) : null), // The future that provides the user ID
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(

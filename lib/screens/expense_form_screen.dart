@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import '../models/expense.dart';
 import 'package:provider/provider.dart';
 import '../services/firestore_service.dart';
-import '../helpers.dart';
+import '../services/auth_service.dart';
  
 class ExpenseFormScreen extends StatefulWidget {
   final int userId;
@@ -71,16 +71,22 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
         return;
       }
       final newExpense = Expense(
+        id: widget.expense?.id, // Use existing ID for updates
+        userId: userId, // Pass the Firebase user ID (String)
         title: _titleController.text,
         description: _descriptionController.text,
+        amount: double.parse(_amountController.text),
+        date: _dateController.text,
+        category: _selectedCategory,
       );
 
       if (widget.expense == null) {
-        await DatabaseHelper.instance.insertExpense(newExpense);
+        // Add new expense to Firestore
+        await firestoreService.addExpense(userId, newExpense);
       } else {
+        // Update existing expense in Firestore
         await firestoreService.updateExpense(userId, newExpense);
       }
-
       Navigator.of(context).pop();
     }
   }

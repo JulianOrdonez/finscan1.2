@@ -21,9 +21,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
       await authService.register(
@@ -47,11 +44,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         SnackBar(content: Text(errorMessage)),
       );
     }
- finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+ finally {}
   }
 
   @override
