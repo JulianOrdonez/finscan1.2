@@ -20,6 +20,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    print('HomePage initState called');
     super.initState();
     // Initialize screens here, potentially after getting the userId
     _initializeScreens();
@@ -28,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   void _initializeScreens() {
     final authService = Provider.of<AuthService>(context, listen: false);
     _userId = authService.getCurrentUserId();
+    print('HomePage _initializeScreens userId: $_userId');
 
     if (_userId != null) {
       _screens = <Widget>[
