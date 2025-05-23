@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+coimport 'package:flutter/material.dart';
 import 'package:flutter_application_2/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,11 +15,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
@@ -28,29 +33,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _emailController.text,
         _passwordController.text,
       );
+
+      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registro exitoso. ¡Bienvenido!')),
+        const SnackBar(content: Text('Registration successful! Welcome!')),
       );
-      print('User registered. Current user UID: ${FirebaseAuth.instance.currentUser?.uid}');
-      // Add a delay to allow auth state to propagate and stabilize
-      Navigator.pushReplacementNamed(context, '/home');
+
+      // Navigation to /home is handled by the auth state listener in main.dart
+      // The StreamBuilder will detect the authenticated user and navigate.
 
     } on FirebaseAuthException catch (e) {
-      // Display a more user-friendly message based on the error code
-      String errorMessage = 'Error de registro. Inténtalo de nuevo.';
- if (e.code == 'email-already-in-use') {
-        errorMessage = 'El correo electrónico ya está en uso.';
+      String errorMessage = 'Registration failed. Please try again.';
+      if (e.code == 'email-already-in-use') {
+        errorMessage = 'The email address is already in use.';
       } else if (e.code == 'weak-password') {
-        errorMessage = 'La contraseña es demasiado débil.';
+        errorMessage = 'The password is too weak.';
+      } else {
+         errorMessage = 'Registration failed: ${e.message}';
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage)),
       );
-    } catch (e) { // Handle other potential errors
-      print('Unexpected error during registration: $e');
+    } catch (e) {
+      // Handle other potential errors
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ocurrió un error inesperado: ${e.toString()}')),
+        SnackBar(content: Text('An unexpected error occurred: ${e.toString()}')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -66,135 +78,89 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registro'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        title: const Text('Register'),
       ),
-      extendBodyBehindAppBar: true,
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF42A5F5), // A shade of blue
-              Color(0xFF90CAF9), // A lighter shade of blue
-            ],
-          ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  const Text(
-                    'Crear Cuenta',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                const Text(
+                  'Create Account',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 32.0,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 40.0),
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      hintText: 'Nombre',
-                      prefixIcon: const Icon(Icons.person_outline, color: Colors.blue),
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.8),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide.none,
+                ),
+                const SizedBox(height: 40.0),
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Name',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    if (!value.contains('@') || !value.contains('.')) {
+                      return 'Please enter a valid email';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters long';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 30.0),
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ElevatedButton(
+                        onPressed: _register,
+                        child: const Text('Register'),
                       ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, ingrese su nombre';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20.0),
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      hintText: 'Email',
-                      prefixIcon: const Icon(Icons.email_outlined, color: Colors.blue),
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.8),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, ingrese su correo';
-                      }
-                       if (!value.contains('@') || !value.contains('.')) {
-                         return 'Por favor, ingrese un correo válido';
-                       }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20.0),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      hintText: 'Contraseña',
-                      prefixIcon: const Icon(Icons.lock_outline, color: Colors.blue),
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.8),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, ingrese su contraseña';
-                      }
-                      if (value.length < 6) {
-                        return 'La contraseña debe tener al menos 6 caracteres';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 30.0),
-                  ElevatedButton(
-                    onPressed: _register,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange, // Orange background
-                      padding: const EdgeInsets.symmetric(vertical: 15.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                    child: const Text(
-                      'Registrarse',
-                      style: TextStyle(fontSize: 18.0, color: Colors.white), // White text
-                    ),
-                  ),
-                  const SizedBox(height: 20.0),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Navigate back to the login screen
-                    },
-                    child: const Text(
-                      '¿Ya tienes una cuenta? Inicia sesión',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
+                const SizedBox(height: 20.0),
+                TextButton(
+                  onPressed: () {
+                    // Navigate back to the login screen using the named route
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/', (Route<dynamic> route) => false);
+                  },
+                  child: const Text('Already have an account? Login'),
+                ),
+              ],
             ),
           ),
         ),
