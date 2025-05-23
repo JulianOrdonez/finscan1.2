@@ -71,11 +71,11 @@ class AuthService {
   ///
   /// Throws [AuthenticationException] if login fails (invalid email or password).
   /// Throws [Exception] for other login errors.
-  Future<void> login(String email, String password) async {
+  Future<bool> login(String email, String password) async {
     try {
       final user = await _databaseHelper.getUserByEmailAndPassword(email, password);
       if (user == null) {
-        throw AuthenticationException('Invalid email or password.');
+        return false; // Invalid email or password
       }
 
       // Store the user ID in SharedPreferences for session management
@@ -84,15 +84,14 @@ class AuthService {
 
       // You might also want to store session information in the database if needed
       // final db = await _databaseHelper.database;
-      // await db.insert('sessions', {'userId': user.id});
+      // await db.insert('sessions', {'userId': user.id!});
 
       print('User logged in successfully: ${user.email}');
+      return true;
     } catch (e) {
       print('Error during login: $e');
-      if (e is AuthenticationException) {
-        rethrow; // Rethrow the specific authentication exception
-      }
-      throw Exception('Failed to log in.');
+      // Consider more specific error handling or rethrowing if needed
+      return false; // Indicate login failure for other errors
     }
   }
 

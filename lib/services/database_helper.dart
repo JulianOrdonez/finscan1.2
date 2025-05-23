@@ -150,4 +150,88 @@ class DatabaseHelper {
     await db.close();
     _database = null; // Reset the database instance
   }
+
+  // Métodos para la tabla de ingresos
+  Future<int> insertIncome(Income income) async {
+    Database db = await instance.database;
+    return await db.insert('incomes', income.toMap());
+  }
+
+  Future<List<Income>> getIncomes(int userId) async {
+    Database db = await instance.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'incomes',
+      where: 'userId = ?',
+      whereArgs: [userId],
+      orderBy: 'date DESC',
+    );
+    return List.generate(maps.length, (i) {
+      return Income.fromMap(maps[i]);
+    });
+  }
+
+  Future<int> updateIncome(Income income) async {
+    Database db = await instance.database;
+    return await db.update(
+      'incomes',
+      income.toMap(),
+      where: 'id = ?',
+      whereArgs: [income.id],
+    );
+  }
+
+  Future<int> deleteIncome(int id) async {
+    Database db = await instance.database;
+    return await db.delete(
+      'incomes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  // Métodos para la tabla de gastos
+  Future<int> insertExpense(Expense expense) async {
+    Database db = await instance.database;
+    return await db.insert('expenses', expense.toMap());
+  }
+
+  Future<List<Expense>> getExpenses(int userId) async {
+    Database db = await instance.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'expenses',
+      where: 'userId = ?',
+      whereArgs: [userId],
+      orderBy: 'date DESC',
+    );
+    return List.generate(maps.length, (i) {
+      return Expense.fromMap(maps[i]);
+    });
+  }
+
+  Future<List<Expense>> getAllExpenses() async {
+    Database db = await instance.database;
+    final List<Map<String, dynamic>> maps = await db.query('expenses');
+    return List.generate(maps.length, (i) {
+      return Expense.fromMap(maps[i]);
+    });
+  }
+
+  Future<int> updateExpense(Expense expense) async {
+    Database db = await instance.database;
+    return await db.update(
+      'expenses',
+      expense.toMap(),
+      where: 'id = ?',
+      whereArgs: [expense.id],
+    );
+  }
+
+  Future<int> deleteExpense(int id) async {
+    Database db = await instance.database;
+    return await db.delete(
+      'expenses',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }
