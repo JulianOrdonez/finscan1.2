@@ -105,6 +105,13 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(labelText: 'Título'),
+ decoration: InputDecoration(
+ labelText: 'Título',
+ border: OutlineInputBorder(
+ borderRadius: BorderRadius.circular(8.0),
+ ),
+ prefixIcon: Icon(Icons.text_fields), // Added icon
+ ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor ingresa un título';
@@ -114,6 +121,13 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
               ),
               TextFormField(
                 controller: _descriptionController,
+ decoration: InputDecoration(
+ labelText: 'Descripción',
+ border: OutlineInputBorder(
+ borderRadius: BorderRadius.circular(8.0),
+ ),
+ prefixIcon: Icon(Icons.description), // Added icon
+ ),
                 decoration: const InputDecoration(labelText: 'Descripción'),
               ),
               TextFormField(
@@ -121,6 +135,13 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
                 decoration: const InputDecoration(labelText: 'Cantidad'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
+ decoration: InputDecoration(
+ labelText: 'Cantidad',
+ border: OutlineInputBorder(
+ borderRadius: BorderRadius.circular(8.0),
+ ),
+ prefixIcon: Icon(Icons.attach_money), // Added icon
+ ),
                   if (value == null || value.isEmpty) {
                     return 'Por favor ingresa una cantidad';
                   }
@@ -131,11 +152,23 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
                 },
               ),
               const SizedBox(height: 20),
-              ListTile(
-                title: const Text('Date'),
-                subtitle: Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
-                trailing: const Icon(Icons.calendar_today),
+              InkWell( // Use InkWell to make it tappable and look like a form field
                 onTap: () => _selectDate(context),
+                child: InputDecorator( // InputDecorator to give it a form field look
+                  decoration: InputDecoration(
+ labelText: 'Fecha',
+ border: OutlineInputBorder(
+ borderRadius: BorderRadius.circular(8.0),
+ ),
+ prefixIcon: Icon(Icons.calendar_today), // Added icon
+ ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
+                    ],
+                  ),
+                ),
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(

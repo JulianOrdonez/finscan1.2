@@ -114,8 +114,11 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
             children: <Widget>[
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
-                validator: (value) {
+ decoration: const InputDecoration(
+ labelText: 'Title',
+ border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+ ),
+                validator: (value) { // Existing validator
                   if (value == null || value.isEmpty) {
                     return 'Please enter a title';
                   }
@@ -124,11 +127,17 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
               ),
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
+ decoration: const InputDecoration(
+ labelText: 'Description',
+ border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+ ),
               ),
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(labelText: 'Amount'),
+ decoration: const InputDecoration(
+ labelText: 'Amount',
+ border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+ ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -142,7 +151,10 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
               ),
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
-                decoration: const InputDecoration(labelText: 'Category'),
+ decoration: const InputDecoration(
+ labelText: 'Category',
+ border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+ ),
                 items: expenseCategories.map((String category) { // Use the defined list
                   return DropdownMenuItem<String>(
                     value: category,
@@ -161,6 +173,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                 controller: _dateController,
                 decoration: const InputDecoration(
                   labelText: 'Date',
+ border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
                   suffixIcon: Icon(Icons.calendar_today),
                 ),
                 readOnly: true,
