@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart'; // Import rxdart to combine streams
+import 'package:rxdart/rxdart.dart';
 import '../currency_provider.dart';
 import '../models/expense.dart';
 import '../models/income.dart';
@@ -34,6 +34,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
   Map<String, double> _getIncomeDataByCategory(List<Income> incomes) {
     Map<String, double> data = {};
     for (var income in incomes) {
+      // Use title as category for now, as Income model doesn't have category field
       data.update(income.title, (value) => value + income.amount,
           ifAbsent: () => income.amount);
     }
@@ -68,18 +69,17 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
         return Colors.cyanAccent;
       case 'Otros':
         return Colors.grey;
-      case 'Salario': // New income category
+      case 'Salario':
         return Colors.lightGreen;
-      case 'Inversiones': // New income category
+      case 'Inversiones':
         return Colors.blueGrey;
-      case 'Regalos': // New income category
+      case 'Regalos':
         return Colors.pinkAccent;
       // Add more cases for other categories (both expense and income)
       default:
         return Colors.blueGrey;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -127,13 +127,14 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                   // Balance Section
                   Card(
                     elevation: 4,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Balance General:',
+                            'Balance General',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
@@ -141,7 +142,110 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                           Text(
                             '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(balance))}',
                             style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold, color: balance >= 0 ? Colors.green : Colors.red), // Color based on balance
+                                fontSize: 24, fontWeight: FontWeight.bold, color: balance >= 0 ? Colors.green : Colors.red),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Income vs Expense Bar Chart
+                  Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Ingresos vs Gastos',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            height: 200,
+                            child: BarChart(
+                              BarChartData(
+                                alignment: BarChartAlignment.spaceAround,
+                                maxY: (totalIncome > totalExpenses ? totalIncome : totalExpenses) * 1.1, // Add some padding at the top
+                                barGroups: [
+                                  BarChartGroupData(
+                                    x: 0,
+                                    barRods: [
+                                      BarChartRodData(
+                                        y: totalIncome,
+                                        colors: [Colors.greenAccent],
+                                        width: 25,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ],
+                                    showingTooltipIndicators: [0],
+                                  ),
+                                  BarChartGroupData(
+                                    x: 1,
+                                    barRods: [
+                                      BarChartRodData(
+                                        y: totalExpenses,
+                                        colors: [Colors.redAccent],
+                                        width: 25,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ],
+                                    showingTooltipIndicators: [0],
+                                  ),
+                                ],
+                                titlesData: FlTitlesData(
+                                  show: true,
+                                  bottomTitles: SideTitles(
+                                    showTitles: true,
+                                    getTextStyles: (context, value) => const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+                                    margin: 16,
+                                    getTitles: (double value) {
+                                      switch (value.toInt()) {
+                                        case 0:
+                                          return 'Ingresos';
+                                        case 1:
+                                          return 'Gastos';
+                                        default:
+                                          return '';
+                                      }
+                                    },
+                                  ),
+                                  leftTitles: SideTitles(showTitles: false),
+                                ),
+                                borderData: FlBorderData(
+                                  show: false,
+                                ),
+                                barTouchData: BarTouchData(
+                                  touchTooltipData: BarTouchTooltipData(
+                                    tooltipBgColor: Colors.blueGrey,
+                                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                      String label;
+                                      switch (group.x.toInt()) {
+                                        case 0:
+                                          label = 'Ingresos';
+                                          break;
+                                        case 1:
+                                          label = 'Gastos';
+                                          break;
+                                        default:
+                                          throw Error();
+                                      }
+                                      return BarTooltipItem(
+                                        '$label: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(rod.y))}',
+                                        const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -152,176 +256,200 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                   // Total Expenses Section
                   Card(
                     elevation: 4,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Total Gastos:',
+                            'Resumen de Gastos',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(totalExpenses))}',
+                            'Total: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(totalExpenses))}',
                             style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.redAccent), // Color for expenses
+                                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.redAccent),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                   const SizedBox(height: 24),
+
 
                   // Expense Pie Chart
-                  Text(
-                    'Gastos por Categoría:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  expenseDataByCategory.isEmpty
-                      ? const Center(child: Text('No hay datos de gastos por categoría.'))
-                      : Container(
-                    height: 250, // Adjusted height
-                    child: PieChart(
-                      PieChartData(
-                        sections: expenseDataByCategory.entries.map((entry) {
-                          final percentage = (entry.value / totalExpenses) * 100;
-                          return PieChartSectionData(
-                            color: _getColorForCategory(entry.key), // Apply color based on category
-                            value: entry.value,
-                            title: '${percentage.toStringAsFixed(1)}%',
-                            radius: 80, // Increased radius
-                            titleStyle: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                            badgeWidget: _buildCategoryBadge(entry.key, entry.value, currencyProvider), // Add badge for category name and amount
-                            badgePositionPercentageOffset: 1.2, // Adjust badge position
-                          );
-                        }).toList(),
-                        sectionsSpace: 2,
-                        centerSpaceRadius: 60, // Increased center space
+                  Card(
+                    elevation: 4,
+                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                           Text(
+                            'Gastos por Categoría',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 16),
+                          expenseDataByCategory.isEmpty
+                              ? const Center(child: Text('No hay datos de gastos por categoría.'))
+                              : Container(
+                            height: 250,
+                            child: PieChart(
+                              PieChartData(
+                                sections: expenseDataByCategory.entries.map((entry) {
+                                  final percentage = totalExpenses > 0 ? (entry.value / totalExpenses) * 100 : 0.0;
+                                  return PieChartSectionData(
+                                    color: _getColorForCategory(entry.key),
+                                    value: entry.value,
+                                    title: '${percentage.toStringAsFixed(1)}%',
+                                    radius: 80,
+                                    titleStyle: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                     badgeWidget: _buildCategoryBadge(entry.key, entry.value, currencyProvider),
+                                     badgePositionPercentageOffset: 1.2,
+                                  );
+                                }).toList(),
+                                sectionsSpace: 2,
+                                centerSpaceRadius: 60,
+                              ),
+                            ),
+                          ),
+                           const SizedBox(height: 16),
+                           Text(
+                            'Detalle de Gastos por Categoría:',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          expenseDataByCategory.isEmpty
+                              ? const Center(child: Text('No hay detalles de gastos por categoría.'))
+                              : ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: expenseDataByCategory.length,
+                            itemBuilder: (context, index) {
+                              final entry = expenseDataByCategory.entries.elementAt(index);
+                               final percentage = totalExpenses > 0 ? (entry.value / totalExpenses) * 100 : 0.0;
+                              return ListTile(
+                                leading: Container(
+                                  width: 16,
+                                  height: 16,
+                                  color: _getColorForCategory(entry.key),
+                                ),
+                                title: Text(entry.key),
+                                trailing: Text(
+                                    '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)'),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Expense Details List
-                  Text(
-                    'Detalle de Gastos por Categoría:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  expenseDataByCategory.isEmpty
-                      ? const Center(child: Text('No hay detalles de gastos por categoría.'))
-                      : ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: expenseDataByCategory.length,
-                    itemBuilder: (context, index) {
-                      final entry = expenseDataByCategory.entries.elementAt(index);
-                      final percentage = (entry.value / totalExpenses) * 100;
-                      return ListTile(
-                        leading: Container(
-                          width: 16,
-                          height: 16,
-                          color: _getColorForCategory(entry.key), // Apply color based on category
-                        ),
-                        title: Text(entry.key),
-                        trailing: Text(
-                            '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)'),
-                      );
-                    },
                   ),
                   const SizedBox(height: 24),
 
                   // Total Income Section
-                  Card(
+                   Card(
                     elevation: 4,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Total Ingresos:',
+                           Text(
+                            'Resumen de Ingresos',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(totalIncome))}',
+                            'Total: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(totalIncome))}',
                             style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.greenAccent), // Color for income
+                                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.greenAccent),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                   const SizedBox(height: 24),
+
 
                   // Income Pie Chart
-                  Text(
-                    'Ingresos por Categoría:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  incomeDataByCategory.isEmpty
-                      ? const Center(child: Text('No hay datos de ingresos por categoría.'))
-                      : Container(
-                    height: 250, // Adjusted height
-                    child: PieChart(
-                      PieChartData(
-                        sections: incomeDataByCategory.entries.map((entry) {
-                          final percentage = (entry.value / totalIncome) * 100;
-                          return PieChartSectionData(
-                            color: _getColorForCategory(entry.key), // Reuse color function or create a new one for income categories
-                            value: entry.value,
-                            title: '${percentage.toStringAsFixed(1)}%',
-                             radius: 80, // Increased radius
-                            titleStyle: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                             badgeWidget: _buildCategoryBadge(entry.key, entry.value, currencyProvider), // Add badge for category name and amount
-                             badgePositionPercentageOffset: 1.2, // Adjust badge position
-                          );
-                        }).toList(),
-                        sectionsSpace: 2,
-                        centerSpaceRadius: 60, // Increased center space
-                      ),
+                  Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    child: Padding(
+                       padding: const EdgeInsets.all(16.0),
+                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Ingresos por Categoría',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 16),
+                          incomeDataByCategory.isEmpty
+                              ? const Center(child: Text('No hay datos de ingresos por categoría.'))
+                              : Container(
+                            height: 250,
+                            child: PieChart(
+                              PieChartData(
+                                sections: incomeDataByCategory.entries.map((entry) {
+                                  final percentage = totalIncome > 0 ? (entry.value / totalIncome) * 100 : 0.0;
+                                  return PieChartSectionData(
+                                    color: _getColorForCategory(entry.key),
+                                    value: entry.value,
+                                    title: '${percentage.toStringAsFixed(1)}%',
+                                    radius: 80,
+                                    titleStyle: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                     badgeWidget: _buildCategoryBadge(entry.key, entry.value, currencyProvider),
+                                     badgePositionPercentageOffset: 1.2,
+                                  );
+                                }).toList(),
+                                sectionsSpace: 2,
+                                centerSpaceRadius: 60,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Detalle de Ingresos por Categoría:',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          incomeDataByCategory.isEmpty
+                              ? const Center(child: Text('No hay detalles de ingresos por categoría.'))
+                              : ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: incomeDataByCategory.length,
+                            itemBuilder: (context, index) {
+                              final entry = incomeDataByCategory.entries.elementAt(index);
+                               final percentage = totalIncome > 0 ? (entry.value / totalIncome) * 100 : 0.0;
+                              return ListTile(
+                                leading: Container(
+                                  width: 16,
+                                  height: 16,
+                                  color: _getColorForCategory(entry.key),
+                                ),
+                                title: Text(entry.key),
+                                trailing: Text(
+                                    '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)'),
+                              );
+                            },
+                          ),
+                        ],
+                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Income Details List
-                  Text(
-                    'Detalle de Ingresos por Categoría:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  incomeDataByCategory.isEmpty
-                      ? const Center(child: Text('No hay detalles de ingresos por categoría.'))
-                      : ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: incomeDataByCategory.length,
-                    itemBuilder: (context, index) {
-                      final entry = incomeDataByCategory.entries.elementAt(index);
-                      final percentage = (entry.value / totalIncome) * 100;
-                      return ListTile(
-                        leading: Container(
-                          width: 16,
-                          height: 16,
-                          color: _getColorForCategory(entry.key), // Reuse color function or create a new one for income categories
-                        ),
-                        title: Text(entry.key),
-                        trailing: Text(
-                            '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)'),
-                      );
-                    },
                   ),
                 ],
               ),
