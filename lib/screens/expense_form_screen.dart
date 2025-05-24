@@ -6,8 +6,9 @@ import 'package:provider/provider.dart';
 
 class ExpenseFormScreen extends StatefulWidget {
   final Expense? expense;
+  final String? userId;
 
-  ExpenseFormScreen({this.expense});
+  const ExpenseFormScreen({super.key, this.expense, this.userId});
 
   @override
   _ExpenseFormScreenState createState() => _ExpenseFormScreenState();
@@ -35,7 +36,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
     super.initState();
     if (widget.expense != null) {
       _titleController.text = widget.expense!.title;
-      _descriptionController.text = widget.expense!.description;
+      _descriptionController.text = widget.expense!.description ?? '';
       _amountController.text = widget.expense!.amount.toString();
       _selectedCategory = widget.expense!.category;
       _selectedDate = widget.expense!.date;
@@ -65,13 +66,18 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
       _formKey.currentState!.save();
       final expense = Expense(
         id: widget.expense?.id,
+        userId: widget.userId!, // Include userId here
         title: _titleController.text,
         description: _descriptionController.text,
         amount: double.parse(_amountController.text),
         category: _selectedCategory!,
         date: _selectedDate,
       );
-      await FirestoreService().saveExpense(expense);
+      if (widget.expense == null) {
+        await FirestoreService().addExpense(widget.userId!, expense);
+      } else {
+        await FirestoreService().updateExpense(widget.userId!, expense);
+      }
       Navigator.of(context).pop();
     }
   }
@@ -193,6 +199,12 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
               ElevatedButton(
                 onPressed: _saveExpense,
                 child: Text(widget.expense == null ? 'Guardar Gasto' : 'Actualizar Gasto'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0), // Add padding
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                  ),
+                ),
               ),
             ],
           ),
