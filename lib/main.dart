@@ -55,17 +55,14 @@ class MyApp extends StatelessWidget {
             builder: (context, snapshot) {
               print('Auth state changed. Snapshot data: ${snapshot.data}');
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.connectionState == ConnectionState.active) {
+                return const Center(child: CircularProgressIndicator()); // Show loading indicator while waiting
+              } else {
                 // If there is data, it means a user is logged in
                 if (snapshot.hasData) {
-                  return const HomePage();
+                  return const HomePage(); // User is logged in, show home page
                 } else {
-                  return LoginScreen();
+                  return LoginScreen(); // User is not logged in, show login page
                 }
-              } else {
-                // Handle other connection states if necessary, perhaps show an error
-                return const Center(child: Text('An error occurred.'));
               }
             },
           ),
