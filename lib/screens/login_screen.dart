@@ -23,6 +23,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       _formKey.currentState!.save();
 
       try {
+        print('Attempting login with Email: $_email, Password: $_password');
         final authService = Provider.of<AuthService>(context, listen: false);
         await authService.login(_email!, _password!);
         // Navigation to /home will be handled by the auth state listener
