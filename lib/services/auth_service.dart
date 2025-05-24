@@ -30,6 +30,8 @@ class AuthService {
   /// Logs in a user.
   Future<bool> login(String email, String password) async {
     print('Attempting user login...');
+    await _firebaseAuth.signOut();
+
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
