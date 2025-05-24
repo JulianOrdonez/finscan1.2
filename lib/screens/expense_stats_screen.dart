@@ -175,7 +175,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                     x: 0,
                                     barRods: [
                                       BarChartRodData(
-                                        y: totalIncome,
+ toY: totalIncome,
                                         colors: [Colors.greenAccent],
                                         width: 25,
                                         borderRadius: BorderRadius.circular(4),
@@ -187,7 +187,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                     x: 1,
                                     barRods: [
                                       BarChartRodData(
-                                        y: totalExpenses,
+ toY: totalExpenses,
                                         colors: [Colors.redAccent],
                                         width: 25,
                                         borderRadius: BorderRadius.circular(4),
@@ -199,8 +199,8 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                 titlesData: FlTitlesData(
                                   show: true,
                                   bottomTitles: SideTitles(
-                                    showTitles: true,
-                                    getTextStyles: (context, value) => const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+ showTitles: true,
+ getTitlesWidget: (double value, TitleMeta meta) => Text(
                                     margin: 16,
                                     getTitles: (double value) {
                                       switch (value.toInt()) {
@@ -213,13 +213,19 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                       }
                                     },
                                   ),
-                                  leftTitles: SideTitles(showTitles: false),
+                                ),
+ left: AxisTitles(
+ sideTitles: SideTitles(showTitles: false),
+ ),
+ bottom: AxisTitles(
+ sideTitles: SideTitles(showTitles: true,
+ ),
                                 ),
                                 borderData: FlBorderData(
                                   show: false,
                                 ),
                                 barTouchData: BarTouchData(
-                                  touchTooltipData: BarTouchTooltipData(
+                                  touchTooltipData: BarTouchTooltipData(tooltipStyle: TooltipStyle(
                                     tooltipBgColor: Colors.blueGrey,
                                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                       String label;
@@ -234,7 +240,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                           throw Error();
                                       }
                                       return BarTooltipItem(
-                                        '$label: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(rod.y))}',
+                                        '$label: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(rod.toY))}',
                                         const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
