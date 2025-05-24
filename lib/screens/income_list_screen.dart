@@ -95,9 +95,8 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
 
           final sortedIncomes = _sortIncomes(snapshot.data!);
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
- padding: EdgeInsets.only(top: topPadding + 16.0, left: 16.0, right: 16.0, bottom: 16.0), // Add top padding to push content down
+          return Padding( // Wrap the content with padding to push it down
+            padding: EdgeInsets.only(top: topPadding + 16.0, left: 16.0, right: 16.0, bottom: 16.0), // Add top padding to push content down
             child: Column(
               children: [
                 Card(
