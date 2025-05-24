@@ -73,7 +73,8 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
   Future<void> _saveExpense() async {
     if (_formKey.currentState!.validate()) {
       final firestoreService = Provider.of<FirestoreService>(context, listen: false);
-      final authService = Provider.of<AuthService>(context, listen: false);
+      final authService =
+          Provider.of<AuthService>(context, listen: false);
       final String? userId = authService.getCurrentUserId(); // Correct way to get Firebase user ID
  if (userId == null) {
         // Handle case where user is not logged in (should not happen with current flow)
@@ -103,13 +104,14 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar( // Keep AppBar as it is
+      appBar: AppBar(
         title: Text(widget.expense == null ? 'Agregar Gasto' : 'Editar Gasto'),
-      ), // Added a comma here
+ ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0), // Increased padding
-        child: Form( // Keep Form widget
+        padding: const EdgeInsets.all(20.0),
+        child: Form(
           key: _formKey,
+
           child: ListView(
             children: <Widget>[
               _buildTextFormField(_titleController, 'Título', 'Por favor ingresa un título'),
@@ -137,14 +139,19 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
     );
   }
 
-  Widget _buildTextFormField(TextEditingController controller, String labelText, String? validationMessage, {int? maxLines}) {
+  Widget _buildTextFormField(TextEditingController controller,
+      String labelText, String? validationMessage,
+      {int? maxLines}) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
         border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.0), // More rounded corners
- borderColor: Colors.blueAccent, // Added border color
+ borderSide: BorderSide(
+ color: Colors.blueAccent, // Added border color
+
+ ),
         ),
         filled: true,
         fillColor: Colors.grey[200],
@@ -163,10 +170,12 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
- labelText: 'Categoría', // Changed label to Spanish
- border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
- borderColor: Colors.blueAccent,
+        labelText: 'Monto',
+        border: OutlineInputBorder(
+ borderRadius: BorderRadius.circular(12.0),
+ borderSide: BorderSide(
+ color: Colors.blueAccent,
+ ),
  ), // Added border color
                   filled: true,
                   fillColor: Colors.grey[200],
@@ -192,7 +201,9 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
         labelText: 'Categoría',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.0),
-          borderColor: Colors.blueAccent,
+          borderSide: BorderSide(
+ color: Colors.blueAccent,
+ ),
         ),
         filled: true,
         fillColor: Colors.grey[200],
@@ -220,17 +231,18 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
         labelText: 'Fecha',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.0),
-          borderColor: Colors.blueAccent,
+          borderSide: BorderSide(
+ color: Colors.blueAccent,
+ ),
         ),
         filled: true,
         fillColor: Colors.grey[200],
         suffixIcon: Icon(Icons.calendar_today),
       ),
       readOnly: true,
-      onTap: () => _selectDate(context),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor selecciona una fecha'; // Changed error message to Spanish
+      onTap: () => _selectDate(context), validator: (value) {
+ if (value == null || value.isEmpty) {
+ return 'Por favor selecciona una fecha'; // Changed error message to Spanish
                   }
                   return null;
                 },

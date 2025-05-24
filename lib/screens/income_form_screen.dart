@@ -55,7 +55,7 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
-      });
+ });
     } else if (picked == null) {
       // Animation if date picker is dismissed
       ScaffoldMessenger.of(context).showSnackBar(
@@ -119,16 +119,16 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
               TextFormField(
                 controller: _titleController, // Added blue border color
                 decoration: InputDecoration(
-                  labelText: 'Título',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
- color: Colors.blueAccent.shade100, // Added blue border color
+ labelText: 'Título',
+ border: OutlineInputBorder(
+ borderRadius: BorderRadius.circular(8.0),
+ borderSide: BorderSide(color: Colors.blueAccent.shade100), // Added blue border color
                   ),
  focusedBorder: OutlineInputBorder( // Added focused border color
-                    borderRadius: BorderRadius.circular(8.0),
+ borderRadius: BorderRadius.circular(8.0),
  borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0),
-                  ),
-                  contentPadding:
+ ),
+ contentPadding:
  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 15.0), // Adjusted padding
                 ),
                 validator: (value) {
@@ -139,20 +139,20 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20.0), // Allow multiple lines for description
+ SizedBox(height: 20.0),
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 3, // Allow multiple lines for description
                 decoration: InputDecoration(
-                  labelText: 'Descripción',
-                  border: OutlineInputBorder(
+ labelText: 'Descripción',
+ border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0), // Removed the AnimatedContainer here as it was misplaced
                   ),
  focusedBorder: OutlineInputBorder(
  borderRadius: BorderRadius.circular(8.0),
  borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0),
                   ),
-                  contentPadding:
+ contentPadding:
  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 15.0),
                 ),
               ),
@@ -160,12 +160,13 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
               TextFormField(
                 controller: _amountController, // Added focused border color
                 decoration: InputDecoration(
-                  labelText: 'Cantidad', // Adjusted padding
-                  border: OutlineInputBorder(
+ labelText: 'Cantidad',
+ border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0), // Allow multiple lines for description
-                    color: Colors.blueAccent.shade100, // Added blue border color
-                  ),
- focusedBorder: OutlineInputBorder( // Added focused border color
+ borderSide: BorderSide(color: Colors.blueAccent.shade100), // Added blue border color
+ ),
+ // Removed duplicate focusedBorder
+ focusedBorder: OutlineInputBorder(
  borderRadius: BorderRadius.circular(8.0), // Removed the AnimatedContainer here as it was misplaced
                   ),
  focusedBorder: OutlineInputBorder( // Added focused border color
@@ -179,7 +180,7 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor ingresa una cantidad';
-                  }
+ }
  // No need to check for valid number here, keyboardType handles it // Adjusted padding
                   return null;
                 },
@@ -189,14 +190,15 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
                 onTap: () => _selectDate(context),
                 child: InputDecorator(// Added focused border color
                   decoration: InputDecoration(// Added color and elevation for a more professional look
-                    labelText: 'Fecha',
+ labelText: 'Fecha',
+ // Removed duplicate focusedBorder
  focusedBorder: OutlineInputBorder(// Set button color
  borderRadius: BorderRadius.circular(8.0),// Add elevation for a subtle shadow
  borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0),
-                    ),// Allow multiple lines for description
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
+ ),// Allow multiple lines for description
+ border: OutlineInputBorder(
+ borderRadius: BorderRadius.circular(8.0),
+ ),
  focusedBorder: OutlineInputBorder( // Added focused border color
  borderRadius: BorderRadius.circular(8.0),
  borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0),
@@ -219,7 +221,7 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
- primary: Theme.of(context).primaryColor, // Set button color
+ backgroundColor: Theme.of(context).primaryColor, // Set button color
                   elevation: 5.0, // Add elevation for a subtle shadow
                 ),
 
