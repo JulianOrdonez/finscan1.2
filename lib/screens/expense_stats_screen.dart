@@ -135,8 +135,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
             });
 
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
+            return SingleChildScrollView(padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -155,7 +154,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 8,),
                           Text(
                             '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(balance))}',
                             style: TextStyle(
@@ -164,8 +163,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                 color: balance >= 0 ? Colors.green : Colors.red),
                           ),
                         ],
-                      ),
-                    ),
+                      ),),
                   ),
                   const SizedBox(height: 24),
 
@@ -184,7 +182,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 16,),
                           Container(
                             height: 200,
                             child: BarChart(
@@ -237,8 +235,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                           default:
                                             title = '';
                                         }
-                                        return SideTitleWidget(
-                                            axisSide: meta.axisSide, // Pass the meta.axisSide
+                                        return SideTitleWidget(axisSide: meta.axisSide, // Pass the meta.axisSide
                                             child: Text(title, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14))
                                         );
                                       },
@@ -253,8 +250,8 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                 ),
                                 barTouchData: BarTouchData(
                                   touchTooltipData: BarTouchTooltipData(
-                                    tooltipStyle: TooltipStyle(backgroundColor: Colors.blueGrey), // Corrected parameter
-                                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                    tooltipBgColor: Colors.blueGrey, // Corrected parameter
+                                    getTooltipItem: (BarChartGroupData group, int groupIndex, BarChartRodData rod, int rodIndex) {
                                       String label;
                                       switch (group.x.toInt()) {
                                         case 0:
@@ -268,8 +265,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                       }
                                       return BarTooltipItem(
                                         '$label: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(rod.toY))}',
-                                        const TextStyle(
-                                          color: Colors.white,
+                                        const TextStyle(color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 14,
                                         ),
@@ -279,8 +275,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                 ),
                               ),
                             ),
-                          ),
-                        ],\n                      ),\n                    ),\n                  ),\n                  const SizedBox(height: 24),\n\n                  // Total Expenses Section\n                  Card(\n                    elevation: 4,\n                    shape: RoundedRectangleBorder(\n                        borderRadius: BorderRadius.circular(10)),\n                    child: Padding(\n                      padding: const EdgeInsets.all(16.0),\n                      child: Column(\n                        crossAxisAlignment: CrossAxisAlignment.start,\n                        children: [\n                          Text(\n                            'Resumen de Gastos',\n                            style: TextStyle(\n                                fontSize: 18, fontWeight: FontWeight.bold),\n                          ),\n                          const SizedBox(height: 8),\n                          Text(\n                            'Total: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(totalExpenses))}',
+                          ),],),),),
                             style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -289,8 +284,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                         ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
+                  ),const SizedBox(height: 24,),
 
                   // Expense Pie Chart
                   Card(
@@ -307,7 +301,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 16,),
                           expenseDataByCategory.isEmpty
                               ? const Center(
                                   child:
@@ -348,7 +342,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 8,),
                           expenseDataByCategory.isEmpty
                               ? const Center(
                                   child: Text(
@@ -371,8 +365,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                       ),
                                       title: Text(entry.key),
                                       trailing: Text(
-                                          '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)\'),
-                                    );
+                                          '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)'),),);
                                   },
                                 ),
                         ],
@@ -380,8 +373,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Total Income Section
+                  // Total Income Section\n
                   Card(
                     elevation: 4,
                     shape: RoundedRectangleBorder(
@@ -396,7 +388,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 8,),
                           Text(
                             'Total: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(totalIncome))}',
                             style: TextStyle(
@@ -407,8 +399,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                         ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
+                  ),const SizedBox(height: 24,),
 
                   // Income Pie Chart
                   Card(
@@ -425,7 +416,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 16,),
                           incomeDataByCategory.isEmpty
                               ? const Center(
                                   child: Text(
@@ -466,7 +457,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 8,),
                           incomeDataByCategory.isEmpty
                               ? const Center(
                                   child: Text(
@@ -487,8 +478,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                       ),
                                       title: Text(entry.key),
                                       trailing: Text(
-                                          '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)\'),
-                                    );
+                                          '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)'),),);
                                   },
                                 ),
                         ],
