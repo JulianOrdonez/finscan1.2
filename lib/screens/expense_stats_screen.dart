@@ -238,7 +238,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                             title = '';
                                         }
                                         return SideTitleWidget(
-                                            space: 4.0,
+                                            axisSide: meta.axisSide,
                                             child: Text(title, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14))
                                         );
                                       },
@@ -254,7 +254,9 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                 barTouchData: BarTouchData(
                                   touchTooltipData: BarTouchTooltipData(
                                     tooltipBgColor: Colors.blueGrey,
-                                    getTooltipItem:
+                                    tooltipStyle: TooltipStyle(
+                                      backgroundColor: Colors.blueGrey,
+                                    ),                                    getTooltipItem:
                                         (group, groupIndex, rod, rodIndex) {
                                       String label;
                                       switch (group.x.toInt()) {
