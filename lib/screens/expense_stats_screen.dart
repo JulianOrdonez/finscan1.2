@@ -238,6 +238,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                             title = '';
                                         }
                                         return SideTitleWidget(
+                                            axisSide: meta.axisSide, // Pass the meta.axisSide
                                             child: Text(title, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14))
                                         );
                                       },
@@ -252,10 +253,8 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                 ),
                                 barTouchData: BarTouchData(
                                   touchTooltipData: BarTouchTooltipData(
-                                    tooltipBgColor: Colors.blueGrey,
+                                    tooltipStyle: TooltipStyle(backgroundColor: Colors.blueGrey), // Corrected parameter
                                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                                      // Moved tooltipStyle inside BarTouchTooltipData constructor
-                                      final tooltipStyle = TooltipStyle(backgroundColor: Colors.blueGrey);
                                       String label;
                                       switch (group.x.toInt()) {
                                         case 0:
@@ -281,30 +280,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Total Expenses Section
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Resumen de Gastos',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Total: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(totalExpenses))}',
+                        ],\n                      ),\n                    ),\n                  ),\n                  const SizedBox(height: 24),\n\n                  // Total Expenses Section\n                  Card(\n                    elevation: 4,\n                    shape: RoundedRectangleBorder(\n                        borderRadius: BorderRadius.circular(10)),\n                    child: Padding(\n                      padding: const EdgeInsets.all(16.0),\n                      child: Column(\n                        crossAxisAlignment: CrossAxisAlignment.start,\n                        children: [\n                          Text(\n                            'Resumen de Gastos',\n                            style: TextStyle(\n                                fontSize: 18, fontWeight: FontWeight.bold),\n                          ),\n                          const SizedBox(height: 8),\n                          Text(\n                            'Total: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(totalExpenses))}',
                             style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -395,7 +371,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                       ),
                                       title: Text(entry.key),
                                       trailing: Text(
-                                          '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)'),
+                                          '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)\'),
                                     );
                                   },
                                 ),
@@ -511,7 +487,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                       ),
                                       title: Text(entry.key),
                                       trailing: Text(
-                                          '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)'),
+                                          '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)\'),
                                     );
                                   },
                                 ),
