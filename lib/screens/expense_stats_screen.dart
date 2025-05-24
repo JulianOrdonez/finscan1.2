@@ -34,7 +34,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
   Map<String, double> _getIncomeDataByCategory(List<Income> incomes) {
     Map<String, double> data = {};
     for (var income in incomes) {
-      data.update(income.category, (value) => value + income.amount,
+      data.update(income.title, (value) => value + income.amount,
           ifAbsent: () => income.amount);
     }
     return data;
