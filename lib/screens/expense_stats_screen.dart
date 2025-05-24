@@ -175,7 +175,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                     x: 0,
                                     barRods: [
                                       BarChartRodData( // Removed extra parenthesis here
- toY: totalIncome,
+                                        toY: totalIncome,
                                         colors: [Colors.greenAccent],
                                         width: 25,
                                         borderRadius: BorderRadius.circular(4),
@@ -187,7 +187,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                     x: 1,
                                     barRods: [
                                       BarChartRodData( // Removed extra parenthesis here
- toY: totalExpenses,
+                                        toY: totalExpenses,
                                         colors: [Colors.redAccent],
                                         width: 25,
                                         borderRadius: BorderRadius.circular(4),
@@ -200,23 +200,21 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                   show: true,
                                   bottomTitles: SideTitles(
  showTitles: true,
- getTitlesWidget: (double value, TitleMeta meta) { // Changed getTextStyles to getTitlesWidget and updated signature
- return Text( // Added Text widget
-                                    getTitles: (double value) {
+                                    getTitlesWidget: (double value, TitleMeta meta) {
+                                      String title;
                                       switch (value.toInt()) {
                                         case 0:
-                                          return 'Ingresos';
+                                          title = 'Ingresos';
+                                          break;
                                         case 1:
-                                          return 'Gastos';
-                                        default:
-                                          return '';
+                                          title = 'Gastos';
+                                          break;
+                                        default: return Container(); // Return an empty container if no title
                                       }
-                                    },
- ); // Added closing parenthesis
+                                      return SideTitleWidget(axisSide: meta.axisSide, space: 4.0, child: Text(title, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14)));
  },
                                 ),
-                                leftTitles: SideTitles(showTitles: false), // Reverted to leftTitles and SideTitles
-                                bottomTitles: SideTitles(showTitles: true), // Reverted to bottomTitles and SideTitles
+                                leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                                 ),
                                 borderData: FlBorderData(
                                   show: false,
@@ -237,7 +235,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                           throw Error();
                                       }
                                       return BarTooltipItem(
-                                        '$label: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(rod.toY))}',
+                                        '$label: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(rod.toY))}', // Using toY
                                         const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
@@ -246,7 +244,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                       );
                                     },
                                   ),
-                                ), // Removed extra parenthesis
+                                ),
                               ),
                             ),
                           ),
