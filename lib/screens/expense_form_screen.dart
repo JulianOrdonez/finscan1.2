@@ -35,11 +35,11 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
   void initState() {
     super.initState();
     if (widget.expense != null) {
-      _titleController.text = widget.expense!.title;
+      _titleController.text = widget.expense!.title ?? '';
       _descriptionController.text = widget.expense!.description ?? '';
       _amountController.text = widget.expense!.amount.toString();
       _selectedCategory = widget.expense!.category;
-      _selectedDate = widget.expense!.date;
+      _selectedDate = DateTime.parse(widget.expense!.date);
       _dateController.text = _selectedDate.toLocal().toString().split(' ')[0];
     } else {
       _dateController.text = _selectedDate.toLocal().toString().split(' ')[0];
@@ -71,7 +71,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
         description: _descriptionController.text,
         amount: double.parse(_amountController.text),
         category: _selectedCategory!,
-        date: _selectedDate,
+        date: _selectedDate.toIso8601String().split('T')[0],
       );
       if (widget.expense == null) {
         await FirestoreService().addExpense(widget.userId!, expense);
