@@ -65,10 +65,13 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
       return const Center(child: Text('Usuario no autenticado.'));
     }
 
+    // Use MediaQuery to get the top padding, including the status bar and notch
+    final double topPadding = MediaQuery.of(context).padding.top;
+
     return Scaffold(
       body: StreamBuilder<List<Income>>(
         stream: firestoreService.getIncomes(userId),
-        builder: (context, snapshot) {
+        builder: (context, snapshot) { // Wrap the content with padding to push it down
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -94,6 +97,7 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
+ padding: EdgeInsets.only(top: topPadding + 16.0, left: 16.0, right: 16.0, bottom: 16.0), // Add top padding to push content down
             child: Column(
               children: [
                 Card(
