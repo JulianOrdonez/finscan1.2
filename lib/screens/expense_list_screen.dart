@@ -131,6 +131,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch, // Ensure summary card stretches
               children: [
                 Card(
                   child: Padding(
@@ -138,6 +139,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        SizedBox(height: 8), // Added space above summary title
                         Row(
                           children: const [
                             Icon(Icons.money),
