@@ -198,30 +198,26 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                 ],
                                 titlesData: FlTitlesData(
                                   show: true,
-                                  bottom: AxisTitles(
-                                    sideTitles: SideTitles(
-                                      showTitles: true,
-                                      reservedSize: 30,
-                                      getTitlesWidget: (double value, TitleMeta meta) {
-                                        String title;
-                                        switch (value.toInt()) {
-                                          case 0:
-                                            title = 'Ingresos';
-                                            break;
-                                          case 1:
-                                            title = 'Gastos';
-                                            break;
-                                          default:
-                                            title = '';
-                                            break;
-                                        }
-                                        return SideTitleWidget(
-                                          axisSide: meta.axisSide,
-                                          space: 4.0,
-                                          child: Text(title, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14)),
-                                        );
-                                      },
-                                    ),
+                                  bottomTitles: SideTitles(
+                                    showTitles: true,
+                                    getTextStyles: (context, value) => const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+                                    margin: 16,
+                                    getTitles: (double value) {
+                                      switch (value.toInt()) {
+                                        case 0:
+                                          return 'Ingresos';
+                                        case 1:
+                                          return 'Gastos';
+                                        default:
+                                          return '';
+                                      }
+                                    },
+                                  ),
+                                  leftTitles: SideTitles(showTitles: false),
+                                ),
+                                borderData: FlBorderData(
+                                  show: false,
+                                ),
                                   ),
                                   left: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                                 ),
@@ -230,7 +226,9 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                 ),
                                 barTouchData: BarTouchData(
                                   touchTooltipData: BarTouchTooltipData(
-                                    tooltipBgColor: Colors.blueGrey,
+                                    tooltipStyle: TooltipStyle(
+                                      backgroundColor: Colors.blueGrey,
+                                    ),
                                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                       String label;
                                       switch (group.x.toInt()) {
