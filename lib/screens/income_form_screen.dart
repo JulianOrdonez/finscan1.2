@@ -62,7 +62,8 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
   Future<void> _saveIncome() async {
     if (_formKey.currentState!.validate()) {
       final authService = Provider.of<AuthService>(context, listen: false);
-      final firestoreService = Provider.of<FirestoreService>(context, listen: false);
+      final firestoreService =
+          Provider.of<FirestoreService>(context, listen: false);
       final userId = authService.getCurrentUserId();
 
       if (userId == null) {
@@ -76,14 +77,14 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
         title: _titleController.text,
         description: _descriptionController.text,
         amount: double.parse(_amountController.text),
-        date: DateFormat('yyyy-MM-dd').format(_selectedDate).toString(), // Store date as String
+        date: DateFormat('yyyy-MM-dd')
+            .format(_selectedDate)
+            .toString(), // Store date as String
       );
 
       if (widget.income == null) {
-        // Ensure income object is non-nullable when adding
         await firestoreService.addIncome(userId, newOrUpdatedIncome);
       } else {
-        // Ensure income object is non-nullable when updating
         await firestoreService.updateIncome(userId, newOrUpdatedIncome);
       }
       Navigator.of(context).pop();
@@ -104,12 +105,12 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
             children: <Widget>[
               TextFormField(
                 controller: _titleController,
- labelText: 'Título',
- border: OutlineInputBorder(
- borderRadius: BorderRadius.circular(8.0),
- ),
- prefixIcon: Icon(Icons.text_fields), // Added icon
- ),
+                decoration: InputDecoration(
+                  labelText: 'Título',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor ingresa un título';
@@ -117,22 +118,27 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 16.0),
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Descripción'),
+                decoration: InputDecoration(
+                  labelText: 'Descripción',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
               ),
+              SizedBox(height: 16.0),
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(labelText: 'Cantidad'),
+                decoration: InputDecoration(
+                  labelText: 'Cantidad',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
- if (value == null || value.isEmpty) {
- return 'Por favor ingresa una cantidad';
- }
- if (double.tryParse(value) == null) {
- return 'Por favor ingresa un número válido';
- }
- ),
                   if (value == null || value.isEmpty) {
                     return 'Por favor ingresa una cantidad';
                   }
@@ -142,29 +148,36 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
-              InkWell( // Use InkWell to make it tappable and look like a form field
+              SizedBox(height: 16.0),
+              InkWell(
                 onTap: () => _selectDate(context),
-                child: InputDecorator( // InputDecorator to give it a form field look
+                child: InputDecorator(
                   decoration: InputDecoration(
- labelText: 'Fecha', // Changed label to match
- border: OutlineInputBorder(
- borderRadius: BorderRadius.circular(8.0),
- ),
- prefixIcon: Icon(Icons.calendar_today), // Added icon
- ),
+                    labelText: 'Fecha',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
+                      Icon(Icons.calendar_today),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 16.0),
+              SizedBox(height: 24.0),
               ElevatedButton(
                 onPressed: _saveIncome,
-                child: Text(widget.income == null ? 'Save Income' : 'Update Income'),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                child:
+                    Text(widget.income == null ? 'Guardar Ingreso' : 'Actualizar Ingreso'),
               ),
             ],
           ),
