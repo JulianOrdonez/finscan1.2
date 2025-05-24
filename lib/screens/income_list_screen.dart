@@ -182,6 +182,16 @@ class _IncomeListScreenState extends State<IncomeListScreen> {
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => IncomeFormScreen(income: null, userId: userId)),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
