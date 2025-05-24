@@ -44,6 +44,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
          );
       } finally {
       }
+      _formKey.currentState!.reset();
     }
   }
 
