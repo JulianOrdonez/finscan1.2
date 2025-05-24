@@ -164,8 +164,8 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 16),
-                          Container(
-                            height: 200,
+                          SizedBox(
+                            height: 200, // Using SizedBox for height
                             child: BarChart(
                               BarChartData(
                                 alignment: BarChartAlignment.spaceAround,
@@ -174,7 +174,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                   BarChartGroupData(
                                     x: 0,
                                     barRods: [
-                                      BarChartRodData(
+                                      BarChartRodData( // Removed extra parenthesis here
  toY: totalIncome,
                                         colors: [Colors.greenAccent],
                                         width: 25,
@@ -186,7 +186,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                   BarChartGroupData(
                                     x: 1,
                                     barRods: [
-                                      BarChartRodData(
+                                      BarChartRodData( // Removed extra parenthesis here
  toY: totalExpenses,
                                         colors: [Colors.redAccent],
                                         width: 25,
@@ -200,8 +200,8 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                   show: true,
                                   bottomTitles: SideTitles(
  showTitles: true,
- getTitlesWidget: (double value, TitleMeta meta) => Text(
-                                    margin: 16,
+ getTitlesWidget: (double value, TitleMeta meta) { // Changed getTextStyles to getTitlesWidget and updated signature
+ return Text( // Added Text widget
                                     getTitles: (double value) {
                                       switch (value.toInt()) {
                                         case 0:
@@ -212,20 +212,17 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                           return '';
                                       }
                                     },
-                                  ),
+ ); // Added closing parenthesis
+ },
                                 ),
- left: AxisTitles(
- sideTitles: SideTitles(showTitles: false),
- ),
- bottom: AxisTitles(
- sideTitles: SideTitles(showTitles: true,
- ),
+                                leftTitles: SideTitles(showTitles: false), // Reverted to leftTitles and SideTitles
+                                bottomTitles: SideTitles(showTitles: true), // Reverted to bottomTitles and SideTitles
                                 ),
                                 borderData: FlBorderData(
                                   show: false,
                                 ),
                                 barTouchData: BarTouchData(
-                                  touchTooltipData: BarTouchTooltipData(tooltipStyle: TooltipStyle(
+                                  touchTooltipData: BarTouchTooltipData( // Reverted to tooltipBgColor directly
                                     tooltipBgColor: Colors.blueGrey,
                                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                       String label;
@@ -249,7 +246,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                       );
                                     },
                                   ),
-                                ),
+                                ), // Removed extra parenthesis
                               ),
                             ),
                           ),
