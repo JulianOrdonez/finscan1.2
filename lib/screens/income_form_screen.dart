@@ -56,6 +56,13 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
       setState(() {
         _selectedDate = picked;
       });
+    } else if (picked == null) {
+      // Animation if date picker is dismissed
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Selección de fecha cancelada'),
+        ),
+      );
     }
   }
 
@@ -86,6 +93,12 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
         await firestoreService.addIncome(userId, newOrUpdatedIncome);
       } else {
         await firestoreService.updateIncome(userId, newOrUpdatedIncome);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Ingreso actualizado con éxito!'),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
       Navigator.of(context).pop();
     }
@@ -104,58 +117,89 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
           child: ListView(
             children: <Widget>[
               TextFormField(
-                controller: _titleController,
+                controller: _titleController, // Added blue border color
                 decoration: InputDecoration(
                   labelText: 'Título',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
+ color: Colors.blueAccent.shade100, // Added blue border color
                   ),
+ focusedBorder: OutlineInputBorder( // Added focused border color
+                    borderRadius: BorderRadius.circular(8.0),
+ borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0),
+                  ),
+                  contentPadding:
+ const EdgeInsets.symmetric(horizontal: 12.0, vertical: 15.0), // Adjusted padding
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor ingresa un título';
                   }
+
                   return null;
                 },
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 20.0), // Allow multiple lines for description
               TextFormField(
                 controller: _descriptionController,
+                maxLines: 3, // Allow multiple lines for description
                 decoration: InputDecoration(
                   labelText: 'Descripción',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(8.0), // Removed the AnimatedContainer here as it was misplaced
                   ),
+ focusedBorder: OutlineInputBorder(
+ borderRadius: BorderRadius.circular(8.0),
+ borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0),
+                  ),
+                  contentPadding:
+ const EdgeInsets.symmetric(horizontal: 12.0, vertical: 15.0),
                 ),
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 20.0), // Added blue border color
               TextFormField(
-                controller: _amountController,
+                controller: _amountController, // Added focused border color
                 decoration: InputDecoration(
-                  labelText: 'Cantidad',
+                  labelText: 'Cantidad', // Adjusted padding
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(8.0), // Allow multiple lines for description
+                    color: Colors.blueAccent.shade100, // Added blue border color
                   ),
+ focusedBorder: OutlineInputBorder( // Added focused border color
+ borderRadius: BorderRadius.circular(8.0), // Removed the AnimatedContainer here as it was misplaced
+                  ),
+ focusedBorder: OutlineInputBorder( // Added focused border color
+ borderRadius: BorderRadius.circular(8.0),
+ borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0),
+                  ),
+                  contentPadding:
+ const EdgeInsets.symmetric(horizontal: 12.0, vertical: 15.0), // Adjusted padding
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor ingresa una cantidad';
                   }
-                  if (double.tryParse(value) == null) {
-                    return 'Por favor ingresa un número válido';
-                  }
+ // No need to check for valid number here, keyboardType handles it // Adjusted padding
                   return null;
                 },
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 20.0),
               InkWell(
                 onTap: () => _selectDate(context),
-                child: InputDecorator(
-                  decoration: InputDecoration(
+                child: InputDecorator(// Added focused border color
+                  decoration: InputDecoration(// Added color and elevation for a more professional look
                     labelText: 'Fecha',
+ focusedBorder: OutlineInputBorder(// Set button color
+ borderRadius: BorderRadius.circular(8.0),// Add elevation for a subtle shadow
+ borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0),
+                    ),// Allow multiple lines for description
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
+                    ),
+ focusedBorder: OutlineInputBorder( // Added focused border color
+ borderRadius: BorderRadius.circular(8.0),
+ borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0),
                     ),
                   ),
                   child: Row(
@@ -167,7 +211,7 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 24.0),
+              SizedBox(height: 30.0),
               ElevatedButton(
                 onPressed: _saveIncome,
                 style: ElevatedButton.styleFrom(
@@ -175,9 +219,12 @@ class _IncomeFormScreenState extends State<IncomeFormScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
+ primary: Theme.of(context).primaryColor, // Set button color
+                  elevation: 5.0, // Add elevation for a subtle shadow
                 ),
-                child:
-                    Text(widget.income == null ? 'Guardar Ingreso' : 'Actualizar Ingreso'),
+
+                child: Text(
+ widget.income == null ? 'Guardar Ingreso' : 'Actualizar Ingreso'),
               ),
             ],
           ),

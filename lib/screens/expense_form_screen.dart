@@ -89,7 +89,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
         category: _selectedCategory,
       );
 
-      if (widget.expense == null) {
+      if (widget.expense == null) { // Correct comparison
         // Add new expense to Firestoreß
         await firestoreService.addExpense(userId, newExpense);
       } else {
@@ -103,97 +103,138 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.expense == null ? 'Add Expense' : 'Edit Expense'),
-      ),
+      appBar: AppBar( // Keep AppBar as it is
+        title: Text(widget.expense == null ? 'Agregar Gasto' : 'Editar Gasto'),
+      ), // Added a comma here
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
+        padding: const EdgeInsets.all(20.0), // Increased padding
+        child: Form( // Keep Form widget
           key: _formKey,
           child: ListView(
             children: <Widget>[
-              TextFormField(
-                controller: _titleController,
- decoration: const InputDecoration(
- labelText: 'Title',
- border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
- ),
-                validator: (value) { // Existing validator
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a title';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _descriptionController,
- decoration: const InputDecoration(
- labelText: 'Description',
- border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
- ),
-              ),
-              TextFormField(
-                controller: _amountController,
- decoration: const InputDecoration(
- labelText: 'Amount',
- border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
- ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter an amount';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
-              ),
-              DropdownButtonFormField<String>(
-                value: _selectedCategory,
- decoration: const InputDecoration(
- labelText: 'Category',
- border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
- ),
-                items: expenseCategories.map((String category) { // Use the defined list
-                  return DropdownMenuItem<String>(
-                    value: category,
-                    child: Text(category),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    setState(() {
-                      _selectedCategory = newValue;
-                    });
-                  }
-                },
-              ),
-              TextFormField(
-                controller: _dateController,
-                decoration: const InputDecoration(
-                  labelText: 'Date',
- border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
-                  suffixIcon: Icon(Icons.calendar_today),
-                ),
-                readOnly: true,
-                onTap: () => _selectDate(context),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a date';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
+              _buildTextFormField(_titleController, 'Título', 'Por favor ingresa un título'),
+              SizedBox(height: 16.0),
+              _buildTextFormField(_descriptionController, 'Descripción', '', maxLines: 3),
+              SizedBox(height: 16.0),
+              _buildAmountTextFormField(_amountController),
+              SizedBox(height: 16.0),
+              _buildCategoryDropdown(),
+              SizedBox(height: 16.0),
+              _buildDateFormField(),
+              SizedBox(height: 24.0),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 14.0),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                ),
                 onPressed: _saveExpense,
-                child: Text(widget.expense == null ? 'Save Expense' : 'Update Expense'),
+                child: Text(widget.expense == null ? 'Guardar Gasto' : 'Actualizar Gasto'),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextFormField(TextEditingController controller, String labelText, String? validationMessage, {int? maxLines}) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0), // More rounded corners
+ borderColor: Colors.blueAccent, // Added border color
+        ),
+        filled: true,
+        fillColor: Colors.grey[200],
+      ),
+      maxLines: maxLines,
+      validator: (value) {
+        if (validationMessage != null && (value == null || value.isEmpty)) {
+          return validationMessage;
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildAmountTextFormField(TextEditingController controller) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+ labelText: 'Categoría', // Changed label to Spanish
+ border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+ borderColor: Colors.blueAccent,
+ ), // Added border color
+                  filled: true,
+                  fillColor: Colors.grey[200],
+      ),
+      keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor ingresa un monto';
+        }
+        if (double.tryParse(value) == null) {
+          return 'Por favor ingresa un número válido';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildCategoryDropdown() {
+    return DropdownButtonFormField<String>(
+      isExpanded: true,
+      value: _selectedCategory,
+      decoration: InputDecoration(
+        labelText: 'Categoría',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderColor: Colors.blueAccent,
+        ),
+        filled: true,
+        fillColor: Colors.grey[200],
+      ),
+      items: expenseCategories.map((String category) {
+        return DropdownMenuItem<String>(
+          value: category,
+          child: Text(category),
+        );
+      }).toList(),
+      onChanged: (String? newValue) {
+        if (newValue != null) {
+          setState(() {
+            _selectedCategory = newValue;
+          });
+        }
+      },
+    );
+  }
+
+  Widget _buildDateFormField() {
+    return TextFormField(
+      controller: _dateController,
+      decoration: InputDecoration(
+        labelText: 'Fecha',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderColor: Colors.blueAccent,
+        ),
+        filled: true,
+        fillColor: Colors.grey[200],
+        suffixIcon: Icon(Icons.calendar_today),
+      ),
+      readOnly: true,
+      onTap: () => _selectDate(context),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor selecciona una fecha'; // Changed error message to Spanish
+                  }
+                  return null;
+                },
+              ),
     );
   }
 }
