@@ -174,8 +174,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                   BarChartGroupData(
                                     x: 0,
                                     barRods: [
-                                      BarChartRodData( // Removed extra parenthesis here
-                                        toY: totalIncome, // Use toY instead of y
+                                      BarChartRodData(
                                         colors: [Colors.greenAccent],
                                         width: 25,
                                         borderRadius: BorderRadius.circular(4),
@@ -186,8 +185,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                   BarChartGroupData(
                                     x: 1,
                                     barRods: [
-                                      BarChartRodData( // Removed extra parenthesis here
-                                        toY: totalExpenses, // Use toY instead of y
+                                      BarChartRodData(
                                         colors: [Colors.redAccent],
                                         width: 25,
                                         borderRadius: BorderRadius.circular(4),
@@ -198,23 +196,26 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                 ],
                                 titlesData: FlTitlesData(
                                   show: true,
-                                  bottomTitles: SideTitles(
-                                    showTitles: true,
-                                    getTitlesWidget: (double value, TitleMeta meta) {
-                                      String title;
-                                      switch (value.toInt()) {
-                                        case 0:
-                                          title = 'Ingresos';
-                                          break;
-                                        case 1:
-                                          title = 'Gastos'; // Corrected title
-                                          break;
-                                        default: return Container(); // Return an empty container if no title
-                                      }
-                                      return SideTitleWidget(space: 4.0, child: Text(title, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14))); // Removed axisSide
- },
-                                ),
-                                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)), // Use AxisTitles for leftTitles
+                                  bottomTitles: AxisTitles( // Use AxisTitles for bottomTitles
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      getTitlesWidget: (double value, TitleMeta meta) {
+                                        String title;
+                                        switch (value.toInt()) {
+                                          case 0:
+                                            title = 'Ingresos';
+                                            break;
+                                          case 1:
+                                            title = 'Gastos';
+                                            break;
+                                          default:
+                                            return Container(); // Return an empty container if no title
+                                        }
+                                        return SideTitleWidget(axisSide: meta.axisSide, space: 4.0, child: Text(title, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14)));
+                                      },
+                                    ),
+                                  ),
+                                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                                 ),
                                 borderData: FlBorderData(
                                   show: false,
@@ -222,7 +223,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                 barTouchData: BarTouchData(
                                   touchTooltipData: BarTouchTooltipData( // Reverted to tooltipBgColor directly
                                     tooltipBgColor: Colors.blueGrey,
-                                    getTooltipItem: (group, groupIndex, rod) { // Removed rodIndex
+                                    getTooltipItem: (group, groupIndex, rod) {
                                       String label;
                                       switch (group.x.toInt()) {
                                         case 0:
