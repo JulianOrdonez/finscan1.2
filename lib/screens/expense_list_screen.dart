@@ -129,7 +129,12 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
           final sortedExpenses = _sortExpenses(snapshot.data!);
 
           return Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 16.0, // Add top padding considering the notch
+              left: 16.0,
+              right: 16.0,
+              bottom: 16.0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch, // Ensure summary card stretches
               children: [
