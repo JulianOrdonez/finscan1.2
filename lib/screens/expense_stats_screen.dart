@@ -164,8 +164,8 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 16),
-                          SizedBox(
-                            height: 200, // Using SizedBox for height
+                          Container(
+                            height: 200,
                             child: BarChart(
                               BarChartData(
                                 alignment: BarChartAlignment.spaceAround,
@@ -175,7 +175,8 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                     x: 0,
                                     barRods: [
                                       BarChartRodData(
-                                        colors: [Colors.greenAccent],
+                                        toY: totalIncome,
+                                        color: Colors.greenAccent,
                                         width: 25,
                                         borderRadius: BorderRadius.circular(4),
                                       ),
@@ -186,7 +187,8 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                     x: 1,
                                     barRods: [
                                       BarChartRodData(
-                                        colors: [Colors.redAccent],
+                                        toY: totalExpenses,
+                                        color: Colors.redAccent,
                                         width: 25,
                                         borderRadius: BorderRadius.circular(4),
                                       ),
@@ -196,9 +198,10 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                 ],
                                 titlesData: FlTitlesData(
                                   show: true,
-                                  bottomTitles: AxisTitles( // Use AxisTitles for bottomTitles
+                                  bottom: AxisTitles(
                                     sideTitles: SideTitles(
                                       showTitles: true,
+                                      reservedSize: 30,
                                       getTitlesWidget: (double value, TitleMeta meta) {
                                         String title;
                                         switch (value.toInt()) {
@@ -209,21 +212,26 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                             title = 'Gastos';
                                             break;
                                           default:
-                                            return Container(); // Return an empty container if no title
+                                            title = '';
+                                            break;
                                         }
-                                        return SideTitleWidget(axisSide: meta.axisSide, space: 4.0, child: Text(title, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14)));
+                                        return SideTitleWidget(
+                                          axisSide: meta.axisSide,
+                                          space: 4.0,
+                                          child: Text(title, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14)),
+                                        );
                                       },
                                     ),
                                   ),
-                                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                  left: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                                 ),
                                 borderData: FlBorderData(
                                   show: false,
                                 ),
                                 barTouchData: BarTouchData(
-                                  touchTooltipData: BarTouchTooltipData( // Reverted to tooltipBgColor directly
+                                  touchTooltipData: BarTouchTooltipData(
                                     tooltipBgColor: Colors.blueGrey,
-                                    getTooltipItem: (group, groupIndex, rod) {
+                                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                       String label;
                                       switch (group.x.toInt()) {
                                         case 0:
@@ -236,7 +244,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                                           throw Error();
                                       }
                                       return BarTooltipItem(
-                                        '$label: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(rod.toY))}', // Using toY
+                                        '$label: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(rod.toY))}',
                                         const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
