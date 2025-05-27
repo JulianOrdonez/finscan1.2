@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../services/auth_service.dart';
-import '../services/firestore_service.dart';
+import '../theme_provider.dart'; // Importa ThemeProvider
 import '../models/expense.dart'; // Por si luego se usa
 import '../models/income.dart';  // Por si luego se usa
 
@@ -16,7 +15,6 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final User? currentUser = FirebaseAuth.instance.currentUser;
     final authService = Provider.of<AuthService>(context);
-    final firestoreService = Provider.of<FirestoreService>(context);
     final TextEditingController supportController = TextEditingController();
 
     return Scaffold(
@@ -77,13 +75,17 @@ class SettingsScreen extends StatelessWidget {
             const Divider(),
 
             // Opción: Modo oscuro
-            ListTile(
+            Consumer<ThemeProvider>( // Usa Consumer para escuchar cambios en ThemeProvider
+              builder: (context, themeProvider, child) {
+                return ListTile(
               leading: const Icon(Icons.brightness_6, color: Colors.blueAccent),
               title: const Text('Modo oscuro', style: TextStyle(fontSize: 18)),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                // TODO: Implementar alternancia de modo oscuro
-              },
+                  trailing: Switch( // Usa un Switch en lugar del icono
+                    value: themeProvider.isDarkMode,
+                    onChanged: (value) {
+                      themeProvider.toggleTheme(); // Llama al método para cambiar el tema
+                    },
+                  ),
             ),
             const Divider(),
 
