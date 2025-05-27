@@ -113,7 +113,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
             } else if (incomeSnapshot.hasError) {
               return Center(
                   child:
-                      Text('Error al cargar ingresos: ${incomeSnapshot.error}'));
+                  Text('Error al cargar ingresos: ${incomeSnapshot.error}'));
             }
 
             final incomes = incomeSnapshot.data ?? [];
@@ -156,32 +156,6 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
     );
   }
 
-  Widget _buildBalanceCard(double balance, CurrencyProvider currencyProvider) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Balance General',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(
-              '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(balance))}',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: balance >= 0 ? Colors.green : Colors.red,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildBarChart(CurrencyProvider currencyProvider) {
     return Card(
       elevation: 4,
@@ -200,8 +174,8 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
                   maxY: (totalIncome > totalExpenses
-                          ? totalIncome
-                          : totalExpenses) *
+                      ? totalIncome
+                      : totalExpenses) *
                       1.1,
                   barGroups: [
                     BarChartGroupData(x: 0, barRods: [
@@ -228,7 +202,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                         getTitlesWidget: (value, meta) {
                           final title = value.toInt() == 0 ? 'Ingresos' : 'Gastos';
                           return SideTitleWidget(
-                            side: meta.side,
+                            axisSide: meta.axisSide,
                             child: Text(title,
                                 style: const TextStyle(
                                     color: Colors.black,
@@ -251,7 +225,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                   borderData: FlBorderData(show: false),
                   barTouchData: BarTouchData(
                     touchTooltipData: BarTouchTooltipData(
-                      tooltipBackgroundColor: Colors.blueGrey,
+                      tooltipBgColor: Colors.blueGrey,
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
                         final label = group.x == 0 ? 'Ingresos' : 'Gastos';
                         return BarTooltipItem(
@@ -274,6 +248,32 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
     );
   }
 
+  Widget _buildBalanceCard(double balance, CurrencyProvider currencyProvider) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Balance General',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text(
+              '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(balance))}',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: balance >= 0 ? Colors.green : Colors.red,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildPieChart(String title, Map<String, double> data, double total, CurrencyProvider currencyProvider) {
     return Card(
       elevation: 4,
@@ -288,33 +288,33 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
             data.isEmpty
                 ? const Center(child: Text('No hay datos para mostrar.'))
                 : SizedBox(
-                    height: 250,
-                    child: PieChart(
-                      PieChartData(
-                        sections: data.entries.map((entry) {
-                          final percentage = total > 0 ? (entry.value / total) * 100 : 0.0;
-                          return PieChartSectionData(
-                            color: _getColorForCategory(entry.key),
-                            value: entry.value,
-                            title: '${percentage.toStringAsFixed(1)}%',
-                            radius: 80,
-                            titleStyle: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                            badgeWidget: _buildCategoryBadge(
-                              entry.key,
-                              entry.value,
-                              currencyProvider,
-                            ),
-                            badgePositionPercentageOffset: 1.2,
-                          );
-                        }).toList(),
-                        sectionsSpace: 2,
-                        centerSpaceRadius: 60,
+              height: 250,
+              child: PieChart(
+                PieChartData(
+                  sections: data.entries.map((entry) {
+                    final percentage = total > 0 ? (entry.value / total) * 100 : 0.0;
+                    return PieChartSectionData(
+                      color: _getColorForCategory(entry.key),
+                      value: entry.value,
+                      title: '${percentage.toStringAsFixed(1)}%',
+                      radius: 80,
+                      titleStyle: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                      badgeWidget: _buildCategoryBadge(
+                        entry.key,
+                        entry.value,
+                        currencyProvider,
                       ),
-                    ),
-                  ),
+                      badgePositionPercentageOffset: 1.2,
+                    );
+                  }).toList(),
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 60,
+                ),
+              ),
+            ),
             const SizedBox(height: 16),
             Text('Detalle por Categoría:',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -322,24 +322,24 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
             data.isEmpty
                 ? const Center(child: Text('No hay detalles disponibles.'))
                 : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: data.length,
-                    itemBuilder: (context, index) {
-                      final entry = data.entries.elementAt(index);
-                      final percentage = total > 0 ? (entry.value / total) * 100 : 0.0;
-                      return ListTile(
-                        leading: Container(
-                          width: 16,
-                          height: 16,
-                          color: _getColorForCategory(entry.key),
-                        ),
-                        title: Text(entry.key),
-                        trailing: Text(
-                            '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)'),
-                      );
-                    },
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+                final entry = data.entries.elementAt(index);
+                final percentage = total > 0 ? (entry.value / total) * 100 : 0.0;
+                return ListTile(
+                  leading: Container(
+                    width: 16,
+                    height: 16,
+                    color: _getColorForCategory(entry.key),
                   ),
+                  title: Text(entry.key),
+                  trailing: Text(
+                      '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)'),
+                );
+              },
+            ),
           ],
         ),
       ),
