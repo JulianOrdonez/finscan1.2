@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../theme_provider.dart'; // Importa ThemeProvider
 import '../models/expense.dart'; // Por si luego se usa
 import '../models/income.dart';  // Por si luego se usa
+import '../services/auth_service.dart'; // Asegúrate de tener este archivo con AuthService
 
 class SettingsScreen extends StatelessWidget {
   final String? userId;
@@ -75,17 +76,19 @@ class SettingsScreen extends StatelessWidget {
             const Divider(),
 
             // Opción: Modo oscuro
-            Consumer<ThemeProvider>( // Usa Consumer para escuchar cambios en ThemeProvider
+            Consumer<ThemeProvider>(
               builder: (context, themeProvider, child) {
                 return ListTile(
-              leading: const Icon(Icons.brightness_6, color: Colors.blueAccent),
-              title: const Text('Modo oscuro', style: TextStyle(fontSize: 18)),
-                  trailing: Switch( // Usa un Switch en lugar del icono
+                  leading: const Icon(Icons.brightness_6, color: Colors.blueAccent),
+                  title: const Text('Modo oscuro', style: TextStyle(fontSize: 18)),
+                  trailing: Switch(
                     value: themeProvider.isDarkMode,
                     onChanged: (value) {
-                      themeProvider.toggleTheme(); // Llama al método para cambiar el tema
+                      themeProvider.toggleTheme();
                     },
                   ),
+                );
+              },
             ),
             const Divider(),
 
@@ -156,7 +159,6 @@ class SettingsScreen extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // TODO: Implementar funcionalidad para enviar mensaje (e.g., correo)
                   print('Support message: ${supportController.text}');
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Mensaje enviado (simulado)')),
