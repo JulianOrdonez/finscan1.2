@@ -38,7 +38,6 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
   Map<String, double> _getIncomeDataByCategory(List<Income> incomes) {
     Map<String, double> data = {};
     for (var income in incomes) {
-      // Use title as category for now, as Income model doesn't have category field
       data.update(income.title, (value) => value + income.amount,
           ifAbsent: () => income.amount);
     }
@@ -54,8 +53,6 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
   }
 
   Color _getColorForCategory(String category) {
-    // Implement a function to return a color based on the category
-    // You can use a predefined map of categories to colors
     switch (category) {
       case 'Comida':
         return Colors.redAccent;
@@ -79,7 +76,6 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
         return Colors.blueGrey;
       case 'Regalos':
         return Colors.pinkAccent;
-      // Add more cases for other categories (both expense and income)
       default:
         return Colors.blueGrey;
     }
@@ -89,7 +85,6 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
   Widget build(BuildContext context) {
     final firestoreService = Provider.of<FirestoreService>(context);
     final currencyProvider = Provider.of<CurrencyProvider>(context);
-
     final userId = widget.userId;
 
     if (userId == null) {
@@ -126,364 +121,31 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
             incomeDataByCategory = _getIncomeDataByCategory(incomes);
             final balance = _calculateBalance(totalIncome, totalExpenses);
 
-            // Call setState here to update the state variables
-            // and trigger a rebuild with the latest data
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) {
-                setState(() {});
-              }
+              if (mounted) setState(() {});
             });
 
-
-            return SingleChildScrollView(padding: const EdgeInsets.all(16.0),
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Balance Section
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Balance General',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8,),
-                          Text(
-                            '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(balance))}',
-                            style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: balance >= 0 ? Colors.green : Colors.red),
-                          ),
-                        ],
-                      ),),
+                  _buildBalanceCard(balance, currencyProvider),
+                  const SizedBox(height: 24),
+                  _buildBarChart(currencyProvider),
+                  const SizedBox(height: 24),
+                  _buildPieChart(
+                    'Gastos por Categoría',
+                    expenseDataByCategory,
+                    totalExpenses,
+                    currencyProvider,
                   ),
                   const SizedBox(height: 24),
-
-                  // Income vs Expense Bar Chart
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Ingresos vs Gastos',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 16,),
-                          Container(
-                            height: 200,
-                            child: BarChart(
-                              BarChartData(
-                                alignment: BarChartAlignment.spaceAround,
-                                maxY: (totalIncome > totalExpenses
-                                        ? totalIncome
-                                        : totalExpenses) *
-                                    1.1, // Add some padding at the top
-                                barGroups: [
-                                  BarChartGroupData(
-                                    x: 0,
-                                    barRods: [
-                                      BarChartRodData(
-                                        toY: totalIncome,
-                                        color: Colors.greenAccent,
-                                        width: 25,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                    ],
-                                    showingTooltipIndicators: [0],
-                                  ),
-                                  BarChartGroupData(
-                                    x: 1,
-                                    barRods: [
-                                      BarChartRodData(
-                                        toY: totalExpenses,
-                                        color: Colors.redAccent,
-                                        width: 25,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                    ],
-                                    showingTooltipIndicators: [0],
-                                  ),
-                                ],
-                                titlesData: FlTitlesData(
-                                  show: true,
-                                  bottomTitles: AxisTitles(
-                                    sideTitles: SideTitles(
-                                      showTitles: true,
-                                      getTitlesWidget: (double value, TitleMeta meta) {
-                                         String title;
-                                        switch (value.toInt()) {
-                                          case 0:
-                                            title = 'Ingresos';
-                                            break;
-                                          case 1:
-                                            title = 'Gastos';
-                                            break;
-                                          default:
-                                            title = '';
-                                        }
-                                        return SideTitleWidget(axisSide: meta.axisSide, // Pass the meta.axisSide
-                                            child: Text(title, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14))
-                                        );
-                                      },
-                                      reservedSize: 20, // Adjust size as needed
-                                      interval: 1, // Show titles for each bar group
-                                    ),
-                                  ),
-                                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                ),
-                                borderData: FlBorderData(
-                                  show: false,
-                                ),
-                                barTouchData: BarTouchData(
-                                  touchTooltipData: BarTouchTooltipData(
-                                    tooltipBgColor: Colors.blueGrey, // Corrected parameter
-                                    getTooltipItem: (BarChartGroupData group, int groupIndex, BarChartRodData rod, int rodIndex) {
-                                      String label;
-                                      switch (group.x.toInt()) {
-                                        case 0:
-                                          label = 'Ingresos';
-                                          break;
-                                        case 1:
-                                          label = 'Gastos';
-                                          break;
-                                        default:
-                                          throw Error();
-                                      }
-                                      return BarTooltipItem(
-                                        '$label: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(rod.toY))}',
-                                        const TextStyle(color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),],),),),
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.redAccent),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),const SizedBox(height: 24,),
-
-                  // Expense Pie Chart
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Gastos por Categoría',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 16,),
-                          expenseDataByCategory.isEmpty
-                              ? const Center(
-                                  child:
-                                      Text('No hay datos de gastos por categoría.'))
-                              : Container(
-                                  height: 250,
-                                  child: PieChart(
-                                    PieChartData(
-                                      sections: expenseDataByCategory.entries
-                                          .map((entry) {
-                                        final percentage = totalExpenses > 0
-                                            ? (entry.value / totalExpenses) * 100
-                                            : 0.0;
-                                        return PieChartSectionData(
-                                          color: _getColorForCategory(entry.key),
-                                          value: entry.value,
-                                          title: '${percentage.toStringAsFixed(1)}%',
-                                          radius: 80,
-                                          titleStyle: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white),
-                                          badgeWidget: _buildCategoryBadge(
-                                              entry.key,
-                                              entry.value,
-                                              currencyProvider),
-                                          badgePositionPercentageOffset: 1.2,
-                                        );
-                                      }).toList(),
-                                      sectionsSpace: 2,
-                                      centerSpaceRadius: 60,
-                                    ),
-                                  ),
-                                ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Detalle de Gastos por Categoría:',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8,),
-                          expenseDataByCategory.isEmpty
-                              ? const Center(
-                                  child: Text(
-                                      'No hay detalles de gastos por categoría.'))
-                              : ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  itemCount: expenseDataByCategory.length,
-                                  itemBuilder: (context, index) {
-                                    final entry = expenseDataByCategory.entries
-                                        .elementAt(index);
-                                    final percentage = totalExpenses > 0
-                                        ? (entry.value / totalExpenses) * 100
-                                        : 0.0;
-                                    return ListTile(
-                                      leading: Container(
-                                        width: 16,
-                                        height: 16,
-                                        color: _getColorForCategory(entry.key),
-                                      ),
-                                      title: Text(entry.key),
-                                      trailing: Text(
-                                          '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)'),),);
-                                  },
-                                ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  // Total Income Section\n
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Resumen de Ingresos',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8,),
-                          Text(
-                            'Total: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(totalIncome))}',
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.greenAccent),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),const SizedBox(height: 24,),
-
-                  // Income Pie Chart
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Ingresos por Categoría',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 16,),
-                          incomeDataByCategory.isEmpty
-                              ? const Center(
-                                  child: Text(
-                                      'No hay datos de ingresos por categoría.'))
-                              : Container(
-                                  height: 250,
-                                  child: PieChart(
-                                    PieChartData(
-                                      sections: incomeDataByCategory.entries
-                                          .map((entry) {
-                                        final percentage = totalIncome > 0
-                                            ? (entry.value / totalIncome) * 100
-                                            : 0.0;
-                                        return PieChartSectionData(
-                                          color: _getColorForCategory(entry.key),
-                                          value: entry.value,
-                                          title: '${percentage.toStringAsFixed(1)}%',
-                                          radius: 80,
-                                          titleStyle: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white),
-                                          badgeWidget: _buildCategoryBadge(
-                                              entry.key,
-                                              entry.value,
-                                              currencyProvider),
-                                          badgePositionPercentageOffset: 1.2,
-                                        );
-                                      }).toList(),
-                                      sectionsSpace: 2,
-                                      centerSpaceRadius: 60,
-                                    ),
-                                  ),
-                                ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Detalle de Ingresos por Categoría:',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8,),
-                          incomeDataByCategory.isEmpty
-                              ? const Center(
-                                  child: Text(
-                                      'No hay detalles de ingresos por categoría.'))
-                              : ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  itemCount: incomeDataByCategory.length,
-                                  itemBuilder: (context, index) {
-                                    final entry = incomeDataByCategory.entries
-                                        .elementAt(index);
-                                     final percentage = totalIncome > 0 ? (entry.value / totalIncome) * 100 : 0.0;
-                                    return ListTile(
-                                      leading: Container(
-                                        width: 16,
-                                        height: 16,
-                                        color: _getColorForCategory(entry.key),
-                                      ),
-                                      title: Text(entry.key),
-                                      trailing: Text(
-                                          '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)'),),);
-                                  },
-                                ),
-                        ],
-                      ),
-                    ),
+                  _buildPieChart(
+                    'Ingresos por Categoría',
+                    incomeDataByCategory,
+                    totalIncome,
+                    currencyProvider,
                   ),
                 ],
               ),
@@ -494,16 +156,206 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
     );
   }
 
+  Widget _buildBalanceCard(double balance, CurrencyProvider currencyProvider) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Balance General',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text(
+              '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(balance))}',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: balance >= 0 ? Colors.green : Colors.red,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBarChart(CurrencyProvider currencyProvider) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Ingresos vs Gastos',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 200,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: (totalIncome > totalExpenses
+                          ? totalIncome
+                          : totalExpenses) *
+                      1.1,
+                  barGroups: [
+                    BarChartGroupData(x: 0, barRods: [
+                      BarChartRodData(
+                        toY: totalIncome,
+                        color: Colors.greenAccent,
+                        width: 25,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ]),
+                    BarChartGroupData(x: 1, barRods: [
+                      BarChartRodData(
+                        toY: totalExpenses,
+                        color: Colors.redAccent,
+                        width: 25,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ]),
+                  ],
+                  titlesData: FlTitlesData(
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final title = value.toInt() == 0 ? 'Ingresos' : 'Gastos';
+                          return SideTitleWidget(
+                            side: meta.side,
+                            child: Text(title,
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14)),
+                          );
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      tooltipBackgroundColor: Colors.blueGrey,
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        final label = group.x == 0 ? 'Ingresos' : 'Gastos';
+                        return BarTooltipItem(
+                          '$label: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(rod.toY))}',
+                          const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPieChart(String title, Map<String, double> data, double total, CurrencyProvider currencyProvider) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            data.isEmpty
+                ? const Center(child: Text('No hay datos para mostrar.'))
+                : SizedBox(
+                    height: 250,
+                    child: PieChart(
+                      PieChartData(
+                        sections: data.entries.map((entry) {
+                          final percentage = total > 0 ? (entry.value / total) * 100 : 0.0;
+                          return PieChartSectionData(
+                            color: _getColorForCategory(entry.key),
+                            value: entry.value,
+                            title: '${percentage.toStringAsFixed(1)}%',
+                            radius: 80,
+                            titleStyle: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                            badgeWidget: _buildCategoryBadge(
+                              entry.key,
+                              entry.value,
+                              currencyProvider,
+                            ),
+                            badgePositionPercentageOffset: 1.2,
+                          );
+                        }).toList(),
+                        sectionsSpace: 2,
+                        centerSpaceRadius: 60,
+                      ),
+                    ),
+                  ),
+            const SizedBox(height: 16),
+            Text('Detalle por Categoría:',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            data.isEmpty
+                ? const Center(child: Text('No hay detalles disponibles.'))
+                : ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      final entry = data.entries.elementAt(index);
+                      final percentage = total > 0 ? (entry.value / total) * 100 : 0.0;
+                      return ListTile(
+                        leading: Container(
+                          width: 16,
+                          height: 16,
+                          color: _getColorForCategory(entry.key),
+                        ),
+                        title: Text(entry.key),
+                        trailing: Text(
+                            '${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(entry.value))} (${percentage.toStringAsFixed(1)}%)'),
+                      );
+                    },
+                  ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildCategoryBadge(String category, double amount, CurrencyProvider currencyProvider) {
     return Container(
-      padding: EdgeInsets.all(6),
+      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.5),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
-        '${category}: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(amount))}',
-        style: TextStyle(
+        '$category: ${currencyProvider.getCurrencySymbol()}${currencyProvider.formatAmount(currencyProvider.convertAmountToSelectedCurrency(amount))}',
+        style: const TextStyle(
           color: Colors.white,
           fontSize: 10,
         ),
