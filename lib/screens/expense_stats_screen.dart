@@ -121,10 +121,6 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
             incomeDataByCategory = _getIncomeDataByCategory(incomes);
             final balance = _calculateBalance(totalIncome, totalExpenses);
 
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) setState(() {});
-            });
-
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
