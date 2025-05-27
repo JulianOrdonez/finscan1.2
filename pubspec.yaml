@@ -49,6 +49,7 @@ dependencies:
   shared_preferences: ^2.5.3
   provider: ^6.1.5
   flutter_tesseract_ocr: ^0.4.28
+  url_launcher: ^6.0.0 # Or a later version
   google_ml_kit: ^0.20.0
 
 dev_dependencies:

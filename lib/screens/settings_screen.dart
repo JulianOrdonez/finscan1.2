@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../theme_provider.dart'; // Importa ThemeProvider
 import '../models/expense.dart'; // Por si luego se usa
@@ -98,7 +99,14 @@ class SettingsScreen extends StatelessWidget {
               title: const Text('Generar reporte', style: TextStyle(fontSize: 18)),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
-                // TODO: Implementar generación de reporte
+                final Uri emailLaunchUri = Uri(
+                  scheme: 'mailto',
+                  path: 'Julian.ordonez01@uceva.edu.co',
+                  queryParameters: {
+                    'subject': 'Reporte de Gastos/Ingresos',
+                  },
+                );
+                launchUrl(emailLaunchUri);
               },
             ),
             const SizedBox(height: 40),
