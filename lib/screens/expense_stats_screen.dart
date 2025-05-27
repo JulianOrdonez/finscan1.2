@@ -228,7 +228,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                         getTitlesWidget: (value, meta) {
                           final title = value.toInt() == 0 ? 'Ingresos' : 'Gastos';
                           return SideTitleWidget(
-                            axisSide: meta.axisSide,
+                            side: meta.side,
                             child: Text(title,
                                 style: const TextStyle(
                                     color: Colors.black,
@@ -251,7 +251,7 @@ class _ExpenseStatsScreenState extends State<ExpenseStatsScreen> {
                   borderData: FlBorderData(show: false),
                   barTouchData: BarTouchData(
                     touchTooltipData: BarTouchTooltipData(
-                      tooltipBgColor: Colors.blueGrey,
+                      tooltipBackgroundColor: Colors.blueGrey,
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
                         final label = group.x == 0 ? 'Ingresos' : 'Gastos';
                         return BarTooltipItem(
