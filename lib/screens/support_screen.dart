@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class SupportScreen extends StatelessWidget {
   const SupportScreen({Key? key}) : super(key: key);
+
+  // Email recipient for support
+  final String supportEmail = 'julian.ordonez01@uceva.edu.co';
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +64,21 @@ class SupportScreen extends StatelessWidget {
               leading: Icon(Icons.email),
               title: Text('Correo Electrónico'),
               subtitle: const Text('soporte@finscanapp.com'),
-              onTap: () { // TODO: Implement email sending
-                // TODO: Implement email sending
+              onTap: () async {
+                final Uri emailLaunchUri = Uri(
+                  scheme: 'mailto',
+                  path: supportEmail,
+                  queryParameters: {
+                    'subject': 'Soporte de FinScan',
+                  },
+                );
+
+                if (!await launchUrl(emailLaunchUri)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('No se pudo abrir el cliente de correo.')),
+                  );
+                }
               },
-            ),
-            ListTile(
               leading: Icon(Icons.web),
               title: Text('Sitio Web de Soporte'),
               subtitle: Text('www.finscanapp.com/support'),
