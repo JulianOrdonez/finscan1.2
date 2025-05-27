@@ -20,7 +20,7 @@ class ThemeProvider extends ChangeNotifier {
     primarySwatch: Colors.blue,
     colorScheme: const ColorScheme.light(
       primary: Colors.blue,
-      primaryContainer: Color(0xFF64B5F6), // Light blue
+      primaryContainer: Color(0xFF64B5F6),
       secondary: Colors.orange,
       background: Colors.white,
       surface: Colors.white,
@@ -41,45 +41,55 @@ class ThemeProvider extends ChangeNotifier {
       foregroundColor: Colors.white,
     ),
     cardColor: Colors.white,
-    unselectedWidgetColor: Colors.grey[600],
-    // Add other theme properties as needed
+    unselectedWidgetColor: Colors.grey,
   );
 
   static final ThemeData _darkTheme = ThemeData(
-    brightness: Brightness
-        .dark, // Set brightness to dark for the dark theme
-    primarySwatch: Colors
-        .blueGrey, // Use a suitable swatch for dark mode primary color
-    // Define a dark ColorScheme for comprehensive color control
-    colorScheme: ColorScheme.dark(
-      primary:
-          Colors.blueGrey[700]!, // Darker blue grey for primary color
-      primaryContainer: Colors
-          .blueGrey[800]!, // Even darker blue grey for primary container
-      secondary: Colors.orangeAccent, // Use an accent color that stands out
-      background: Color(0xFF121212), // Almost black
-      surface: Color(0xFF1E1E1E), // Dark grey
-      onPrimary: Colors.white, // White text/icons on primary color
-      onSecondary: Colors.black, // Black text/icons on secondary color
-      onBackground: Colors
-          .white70, // Slightly transparent white for text on background
-      onSurface: Colors
-          .white70, // Slightly transparent white for text on surface
-      error: Colors.redAccent, // Bright red for error indication
-      onError: Colors.black, // Black text/icons on error color
+    brightness: Brightness.dark,
+    primarySwatch: Colors.blueGrey,
+    colorScheme: const ColorScheme.dark(
+      primary: Color(0xFF90CAF9),          // Light Blue for primary
+      primaryContainer: Color(0xFF1A237E), // Deep Indigo for container
+      secondary: Color(0xFFFFB74D),        // Orange accent
+      background: Color(0xFF121212),       // Dark background
+      surface: Color(0xFF1E1E1E),          // Darker surface
+      onPrimary: Colors.black,             // Text/icon on light primary
+      onSecondary: Colors.black,
+      onBackground: Colors.white,
+      onSurface: Colors.white,
+      error: Color(0xFFEF5350),
+      onError: Colors.black,
     ),
-    appBarTheme: AppBarTheme(
-      color: Colors.blueGrey[900], // Darker app bar color
+    scaffoldBackgroundColor: const Color(0xFF121212),
+    appBarTheme: const AppBarTheme(
+      color: Color(0xFF1F1F1F),
       foregroundColor: Colors.white,
       elevation: 4.0,
     ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: Colors.deepOrangeAccent,
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      backgroundColor: Color(0xFFFF7043),
       foregroundColor: Colors.white,
     ),
-    cardColor: Color(0xFF212121), // Darker grey for cards
-    unselectedWidgetColor: Colors.grey[400],
-    // Add other theme properties as needed
+    cardColor: const Color(0xFF1E1E1E),
+    unselectedWidgetColor: Colors.grey,
+    textTheme: const TextTheme(
+      bodyLarge: TextStyle(color: Colors.white),
+      bodyMedium: TextStyle(color: Colors.white70),
+      titleMedium: TextStyle(color: Colors.white),
+    ),
+    iconTheme: const IconThemeData(color: Colors.white70),
+    inputDecorationTheme: const InputDecorationTheme(
+      filled: true,
+      fillColor: Color(0xFF2C2C2C),
+      border: OutlineInputBorder(),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.grey),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Color(0xFF90CAF9)),
+      ),
+      hintStyle: TextStyle(color: Colors.white54),
+      labelStyle: TextStyle(color: Colors.white),
+    ),
   );
-
 }
