@@ -45,51 +45,61 @@ class ThemeProvider extends ChangeNotifier {
   );
 
   static final ThemeData _darkTheme = ThemeData(
-    brightness: Brightness.dark,
-    primarySwatch: Colors.blueGrey,
-    colorScheme: const ColorScheme.dark(
-      primary: Color(0xFF90CAF9),          // Light Blue for primary
-      primaryContainer: Color(0xFF1A237E), // Deep Indigo for container
-      secondary: Color(0xFFFFB74D),        // Orange accent
-      background: Color(0xFF121212),       // Dark background
-      surface: Color(0xFF1E1E1E),          // Darker surface
-      onPrimary: Colors.black,             // Text/icon on light primary
-      onSecondary: Colors.black,
-      onBackground: Colors.white,
-      onSurface: Colors.white,
-      error: Color(0xFFEF5350),
-      onError: Colors.black,
+  brightness: Brightness.dark,
+  primarySwatch: Colors.blueGrey,
+  scaffoldBackgroundColor: const Color(0xFF121212),
+  colorScheme: const ColorScheme.dark(
+    primary: Color(0xFF90CAF9), // Azul claro
+    primaryContainer: Color(0xFF1A237E),
+    secondary: Color(0xFFFFB74D), // Naranja claro
+    background: Color(0xFF121212),
+    surface: Color(0xFF1E1E1E),
+    onPrimary: Colors.black,
+    onSecondary: Colors.black,
+    onBackground: Colors.white,
+    onSurface: Colors.white,
+    error: Color(0xFFEF5350),
+    onError: Colors.black,
+  ),
+  appBarTheme: const AppBarTheme(
+    color: Color(0xFF1F1F1F),
+    foregroundColor: Colors.white,
+    elevation: 4.0,
+  ),
+  floatingActionButtonTheme: const FloatingActionButtonThemeData(
+    backgroundColor: Color(0xFFFF7043),
+    foregroundColor: Colors.white,
+  ),
+  cardColor: const Color(0xFF1E1E1E),
+  unselectedWidgetColor: Colors.grey,
+  iconTheme: const IconThemeData(color: Colors.white70),
+  textTheme: const TextTheme(
+    bodyLarge: TextStyle(color: Colors.white),
+    bodyMedium: TextStyle(color: Colors.white70),
+    titleMedium: TextStyle(color: Colors.white),
+    labelLarge: TextStyle(color: Colors.white),
+  ),
+  inputDecorationTheme: const InputDecorationTheme(
+    filled: true,
+    fillColor: Color(0xFF2C2C2C),
+    border: OutlineInputBorder(),
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: Colors.grey),
     ),
-    scaffoldBackgroundColor: const Color(0xFF121212),
-    appBarTheme: const AppBarTheme(
-      color: Color(0xFF1F1F1F),
-      foregroundColor: Colors.white,
-      elevation: 4.0,
+    focusedBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: Color(0xFF90CAF9)),
     ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: Color(0xFFFF7043),
-      foregroundColor: Colors.white,
-    ),
-    cardColor: const Color(0xFF1E1E1E),
-    unselectedWidgetColor: Colors.grey,
-    textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: Colors.white),
-      bodyMedium: TextStyle(color: Colors.white70),
-      titleMedium: TextStyle(color: Colors.white),
-    ),
-    iconTheme: const IconThemeData(color: Colors.white70),
-    inputDecorationTheme: const InputDecorationTheme(
-      filled: true,
-      fillColor: Color(0xFF2C2C2C),
-      border: OutlineInputBorder(),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.grey),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Color(0xFF90CAF9)),
-      ),
-      hintStyle: TextStyle(color: Colors.white54),
-      labelStyle: TextStyle(color: Colors.white),
-    ),
-  );
+    hintStyle: TextStyle(color: Colors.white60),
+    labelStyle: TextStyle(color: Colors.white),
+  ),
+  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+    backgroundColor: Color(0xFF1E1E1E),
+    selectedItemColor: Color(0xFF90CAF9),
+    unselectedItemColor: Colors.grey,
+    selectedIconTheme: IconThemeData(color: Color(0xFF90CAF9)),
+    unselectedIconTheme: IconThemeData(color: Colors.grey),
+    showUnselectedLabels: true,
+  ),
+);
+
 }
