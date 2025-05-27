@@ -46,27 +46,34 @@ class ThemeProvider extends ChangeNotifier {
   );
 
   static final ThemeData _darkTheme = ThemeData(
-    brightness: Brightness.dark,
-    primarySwatch: Colors.blueGrey,
-    colorScheme: const ColorScheme.dark(
-      primary: Colors.blueGrey,
-      primaryContainer: Color(0xFF78909C), // Dark blue grey
-      secondary: Colors.deepOrange,
+    brightness: Brightness
+        .dark, // Set brightness to dark for the dark theme
+    primarySwatch: Colors
+        .blueGrey, // Use a suitable swatch for dark mode primary color
+    // Define a dark ColorScheme for comprehensive color control
+    colorScheme: ColorScheme.dark(
+      primary:
+          Colors.blueGrey[700]!, // Darker blue grey for primary color
+      primaryContainer: Colors
+          .blueGrey[800]!, // Even darker blue grey for primary container
+      secondary: Colors.orangeAccent, // Use an accent color that stands out
       background: Color(0xFF121212), // Almost black
       surface: Color(0xFF1E1E1E), // Dark grey
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
-      onBackground: Colors.white,
-      onSurface: Colors.white,
-      error: Colors.redAccent,
-      onError: Colors.black,
+      onPrimary: Colors.white, // White text/icons on primary color
+      onSecondary: Colors.black, // Black text/icons on secondary color
+      onBackground: Colors
+          .white70, // Slightly transparent white for text on background
+      onSurface: Colors
+          .white70, // Slightly transparent white for text on surface
+      error: Colors.redAccent, // Bright red for error indication
+      onError: Colors.black, // Black text/icons on error color
     ),
-    appBarTheme: const AppBarTheme(
-      color: Colors.blueGrey,
+    appBarTheme: AppBarTheme(
+      color: Colors.blueGrey[900], // Darker app bar color
       foregroundColor: Colors.white,
       elevation: 4.0,
     ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: Colors.deepOrangeAccent,
       foregroundColor: Colors.white,
     ),
