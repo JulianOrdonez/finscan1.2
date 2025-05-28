@@ -106,14 +106,11 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final User? currentUser = FirebaseAuth.instance.currentUser;
-    final authService = Provider.of<AuthService>(context);
+ final User? currentUser = FirebaseAuth.instance.currentUser;
     final TextEditingController supportController = TextEditingController();
     String selectedCurrency = 'USD'; // Variable para la moneda seleccionada
 
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -206,43 +203,43 @@ class SettingsScreen extends StatelessWidget {
               leading: const Icon(Icons.insert_chart, color: Colors.blueAccent),
               title: const Text('Generar reporte', style: TextStyle(fontSize: 18)),
               trailing: const Icon(Icons.arrow_forward_ios), // Removed email functionality
+              onTap: () async { // Mark onTap as async
                 // Request storage permission
-                var status = await Permission.storage.status;
-
-                if (status.isDenied) {
-                  // Request permission if it was previously denied
-                  status = await Permission.storage.request();
-                }
+                var status = await Permission.storage.request(); // Directly request permission
 
                 if (status.isGranted) {
-                  final pdfDoc = await generateReportPdf();
                   try {
+                    final pdfDoc = await generateReportPdf();
+
                     // Get the external storage directory (more likely to be accessible for downloads)
                     final directory = await getExternalStorageDirectory();
                     if (directory == null) {
-                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('No se pudo acceder al directorio de almacenamiento externo.')),
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(
+                                'No se pudo acceder al directorio de almacenamiento externo.')),
                       );
                       return;
                     }
                     final file = File('${directory.path}/FinScan_Report.pdf');
- await file.writeAsBytes(await pdfDoc.save());
+                    await file.writeAsBytes(await pdfDoc.save());
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Reporte guardado en: ${file.path}'),
                       ),
                     );
                   } catch (e) {
+                    print('Error saving PDF: $e'); // Print error for debugging
                     ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error al guardar el reporte: $e')),
-                  );
-                }
+                      SnackBar(content: Text('Error al guardar el reporte: $e')),
+                    );
+                  }
                 } else if (status.isDenied) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Permiso de almacenamiento denegado. No se puede guardar el reporte.')),
                   );
                 } else if (status.isPermanentlyDenied) {
-                   ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Permiso de almacenamiento permanentemente denegado. Por favor, habilítelo desde la configuración de la aplicación.')),
                   );
                 }
