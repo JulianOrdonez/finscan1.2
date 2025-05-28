@@ -12,15 +12,23 @@ import '../models/income.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   final String? userId;
 
   const SettingsScreen({Key? key, this.userId}) : super(key: key);
 
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  final supportController = TextEditingController();
+  String selectedCurrency = 'USD';
+
   Future<void> generateAndSavePdf(BuildContext context) async {
     final firestoreService = FirestoreService();
-    final incomes = await firestoreService.getIncomes(userId ?? '').first;
-    final expenses = await firestoreService.getExpenses(userId ?? '').first;
+    final incomes = await firestoreService.getIncomes(widget.userId ?? '').first;
+    final expenses = await firestoreService.getExpenses(widget.userId ?? '').first;
 
     double totalIncome = incomes.fold(0, (sum, item) => sum + item.amount);
     double totalExpense = expenses.fold(0, (sum, item) => sum + item.amount);
@@ -81,7 +89,6 @@ class SettingsScreen extends StatelessWidget {
       final file = File(filePath);
       await file.writeAsBytes(await doc.save());
 
-      // Mostrar confirmación y opción para abrir
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Reporte guardado en $filePath"),
@@ -101,48 +108,114 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
-    final supportController = TextEditingController();
-    String selectedCurrency = 'USD';
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Ajustes'),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            const SizedBox(height: 40),
-            const Text(
-              'Ajustes',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 30),
-            Container(
-              padding: const EdgeInsets.all(15.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10.0),
+          children: [
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.person),
+                title: Text(currentUser?.email ?? 'Usuario no disponible'),
               ),
-              child: Row(
-                children: [
-                  const Icon(Icons.person, size: 30),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: Text(
-                      currentUser?.email ?? 'Usuario no disponible',
-                      style: const TextStyle(fontSize: 18),
-                      overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 20),
+
+            // Cambiar moneda
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.monetization_on),
+                title: const Text("Moneda"),
+                trailing: DropdownButton<String>(
+                  value: selectedCurrency,
+                  items: <String>['USD', 'COP', 'EUR'].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? newCurrency) {
+                    setState(() {
+                      selectedCurrency = newCurrency!;
+                    });
+                  },
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // Generar reporte
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.picture_as_pdf, color: Colors.blueAccent),
+                title: const Text('Generar Reporte (PDF)'),
+                trailing: const Icon(Icons.download),
+                onTap: () => generateAndSavePdf(context),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // Soporte
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Soporte", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: supportController,
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        hintText: "Escribe tu mensaje...",
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          final message = supportController.text;
+                          if (message.isNotEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Mensaje enviado a soporte")),
+                            );
+                            supportController.clear();
+                          }
+                        },
+                        icon: const Icon(Icons.send),
+                        label: const Text("Enviar"),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 30),
-            ListTile(
-              leading: const Icon(Icons.insert_chart, color: Colors.blueAccent),
-              title: const Text('Guardar Reporte PDF'),
-              trailing: const Icon(Icons.download),
-              onTap: () => generateAndSavePdf(context),
+
+            const SizedBox(height: 20),
+
+            // Cerrar sesión
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+              onPressed: () async {
+                await AuthService().logout();
+                Navigator.of(context).pushReplacementNamed('/login');
+              },
+              icon: const Icon(Icons.logout),
+              label: const Text("Cerrar sesión"),
             ),
-            const SizedBox(height: 40),
           ],
         ),
       ),
