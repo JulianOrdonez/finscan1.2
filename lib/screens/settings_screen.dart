@@ -111,8 +111,9 @@ class SettingsScreen extends StatelessWidget {
     String selectedCurrency = 'USD'; // Variable para la moneda seleccionada
 
     return Scaffold(
+      body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+ crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const SizedBox(height: 40),
             const Text(
@@ -297,7 +298,7 @@ class SettingsScreen extends StatelessWidget {
             const SizedBox(height: 40),
           ],
         ),
-      ),
-    );
+ ),
+ );
   }
 }
