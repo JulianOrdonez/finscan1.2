@@ -61,10 +61,7 @@ class SupportScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ListTile(
-              // Email contact option
               leading: Icon(Icons.email),
-              title: Text('Correo Electrónico'),
-              subtitle: const Text('soporte@finscanapp.com'),
               onTap: () async {
                 final Uri emailLaunchUri = Uri(
                   scheme: 'mailto',
@@ -80,6 +77,31 @@ class SupportScreen extends StatelessWidget {
                   );
                 }
               },
+              title: Text('Correo Electrónico'),
+              subtitle: const Text('soporte@finscanapp.com'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                final Uri emailLaunchUri = Uri(
+                  scheme: 'mailto',
+                  path: supportEmail,
+                  queryParameters: {
+                    'subject': 'Soporte FinScan',
+                  },
+                );
+
+                if (!await launchUrl(emailLaunchUri)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('No se pudo abrir el cliente de correo.')),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                textStyle: const TextStyle(fontSize: 18),
+              ),
+              child: const Text('Enviar Correo de Soporte'),
             ),
             ListTile(
               leading: Icon(Icons.web),

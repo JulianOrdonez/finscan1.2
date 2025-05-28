@@ -119,16 +119,7 @@ class SettingsScreen extends StatelessWidget {
               leading: const Icon(Icons.insert_chart, color: Colors.blueAccent),
               title: const Text('Generar reporte', style: TextStyle(fontSize: 18)),
               trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                final Uri emailLaunchUri = Uri(
-                  scheme: 'mailto',
-                  path: 'Julian.ordonez01@uceva.edu.co',
-                  queryParameters: {
-                    'subject': 'Reporte de Gastos/Ingresos',
-                  },
-                );
-                launchUrl(emailLaunchUri);
-              },
+              onTap: () { }, // Removed email functionality
             ),
             const SizedBox(height: 40),
 
