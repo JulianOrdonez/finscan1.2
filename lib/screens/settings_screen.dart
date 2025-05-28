@@ -7,6 +7,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart'; // Import path_provider
 import 'dart:io'; // Import for File operations
+import 'package:permission_handler/permission_handler.dart'; // Import permission_handler
 import 'package:printing/printing.dart';
 import '../theme_provider.dart';
 import '../models/expense.dart'; // Por si luego se usa
@@ -209,19 +210,39 @@ class SettingsScreen extends StatelessWidget {
               title: const Text('Generar reporte', style: TextStyle(fontSize: 18)),
               trailing: const Icon(Icons.arrow_forward_ios), // Removed email functionality
               onTap: () async {
-                final pdfDoc = await generateReportPdf();
-                try {
-                  final directory = await getApplicationDocumentsDirectory(); // Or getExternalStorageDirectory() for external storage
-                  final file = File('${directory.path}/FinScan_Report.pdf');
-                  await file.writeAsBytes(await pdfDoc.save());
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Reporte guardado en: ${file.path}'),
-                    ),
-                  );
-                } catch (e) {
+                // Request storage permission
+                var status = await Permission.storage.request();
+
+                if (status.isGranted) {
+                  final pdfDoc = await generateReportPdf();
+                  try {
+                    // Get the external storage directory (more likely to be accessible for downloads)
+                    final directory = await getExternalStorageDirectory();
+                    if (directory == null) {
+                       ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('No se pudo acceder al directorio de almacenamiento externo.')),
+                      );
+                      return;
+                    }
+                    final file = File('${directory.path}/FinScan_Report.pdf');
+                    await file.writeAsBytes(await pdfDoc.save());
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Reporte guardado en: ${file.path}'),
+                      ),
+                    );
+                  } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Error al guardar el reporte: $e')),
+                  );
+                }
+                } else if (status.isDenied) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Permiso de almacenamiento denegado. No se puede guardar el reporte.')),
+                  );
+                } else if (status.isPermanentlyDenied) {
+                   ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Permiso de almacenamiento permanentemente denegado. Por favor, habilítelo desde la configuración de la aplicación.')),
                   );
                 }
               },
