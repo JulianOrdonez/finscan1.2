@@ -188,7 +188,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             // Cerrar sesión
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
+                // Change the text color to white and make it bold
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                textStyle: TextStyle(fontWeight: FontWeight.bold),
                 backgroundColor: Colors.blue,
               ),
               onPressed: () async {
