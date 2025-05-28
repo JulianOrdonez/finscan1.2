@@ -159,9 +159,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     leading: const Icon(Icons.brightness_6),
                     title: const Text('Modo Oscuro'),
                     trailing: Switch(
-                      value: themeProvider.themeMode == ThemeMode.dark,
+                      value: themeProvider.isDarkMode,
                       onChanged: (bool value) {
- themeProvider.toggleTheme(value);
+ themeProvider.toggleTheme();
                       },
                     ),
                   );
