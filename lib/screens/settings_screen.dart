@@ -132,7 +132,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: ListTile(
                 leading: const Icon(Icons.monetization_on),
                 title: const Text("Moneda"),
-                trailing: Text(
+                trailing: const Text(
                 'USD',
                 style: TextStyle(fontSize: 16),
               ),
