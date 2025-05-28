@@ -210,7 +210,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
               onPressed: () async {
-                await AuthService().logout();
+                await AuthService().signOut();
                 Navigator.of(context).pushReplacementNamed('/login');
               },
               icon: const Icon(Icons.logout),
