@@ -211,7 +211,15 @@ class SettingsScreen extends StatelessWidget {
               trailing: const Icon(Icons.arrow_forward_ios), // Removed email functionality
               onTap: () async {
                 // Request storage permission
-                var status = await Permission.storage.request();
+                var status = await Permission.storage.status;
+
+                if (status.isDenied) {
+                  // Request permission if it was previously denied
+                  status = await Permission.storage.request();
+                }
+                
+                // After requesting (or if already granted), check the status again
+                status = await Permission.storage.status;
 
                 if (status.isGranted) {
                   final pdfDoc = await generateReportPdf();
