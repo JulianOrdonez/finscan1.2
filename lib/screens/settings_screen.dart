@@ -156,13 +156,11 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
-
             // Opción: Cambiar moneda
             ListTile(
               leading: const Icon(Icons.monetization_on, color: Colors.black),
               title: const Text('Cambiar moneda', style: TextStyle(fontSize: 18, color: Colors.black)),
               trailing: DropdownButton<String>(
-                value: selectedCurrency,
                 icon: const Icon(Icons.arrow_downward),
                 iconSize: 24,
                 elevation: 16,
@@ -203,13 +201,11 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
             const Divider(),
-
             // Opción: Generar reporte
             ListTile(
               leading: const Icon(Icons.insert_chart, color: Colors.blueAccent),
               title: const Text('Generar reporte', style: TextStyle(fontSize: 18)),
               trailing: const Icon(Icons.arrow_forward_ios), // Removed email functionality
-              onTap: () async {
                 // Request storage permission
                 var status = await Permission.storage.status;
 
@@ -217,9 +213,6 @@ class SettingsScreen extends StatelessWidget {
                   // Request permission if it was previously denied
                   status = await Permission.storage.request();
                 }
-                
-                // After requesting (or if already granted), check the status again
-                status = await Permission.storage.status;
 
                 if (status.isGranted) {
                   final pdfDoc = await generateReportPdf();
@@ -233,14 +226,14 @@ class SettingsScreen extends StatelessWidget {
                       return;
                     }
                     final file = File('${directory.path}/FinScan_Report.pdf');
-                    await file.writeAsBytes(await pdfDoc.save());
+ await file.writeAsBytes(await pdfDoc.save());
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Reporte guardado en: ${file.path}'),
                       ),
                     );
                   } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                    ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Error al guardar el reporte: $e')),
                   );
                 }
@@ -256,7 +249,6 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
             const SizedBox(height: 40),
-
             // Botón: Cerrar sesión
             Center(
               child: ElevatedButton(
@@ -281,7 +273,6 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 40),
-
             // Sección: Soporte
             const Text(
               'Soporte',
