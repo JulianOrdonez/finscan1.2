@@ -3,15 +3,102 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../theme_provider.dart'; // Importa ThemeProvider
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import '../theme_provider.dart';
 import '../models/expense.dart'; // Por si luego se usa
 import '../models/income.dart';  // Por si luego se usa
 import '../services/auth_service.dart'; // Asegúrate de tener este archivo con AuthService
+
+import '../services/firestore_service.dart'; // Import FirestoreService
 
 
 class SettingsScreen extends StatelessWidget {
   final String? userId;
 
+  Future<pw.Document> generateReportPdf() async {
+    final firestoreService = FirestoreService();
+
+    // Fetch income and expense data
+    final incomes = await firestoreService.getIncomes(userId ?? '').first;
+    final expenses = await firestoreService.getExpenses(userId ?? '').first;
+
+    double totalIncome = incomes.fold(0, (sum, item) => sum + item.amount);
+    double totalExpense = expenses.fold(0, (sum, item) => sum + item.amount);
+
+    final doc = pw.Document();
+
+    doc.addPage(pw.Page(
+      pageFormat: PdfPageFormat.a4,
+      build: (pw.Context context) {
+        return pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(
+              'Reporte de Gastos e Ingresos',
+              style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.SizedBox(height: 20),
+            pw.Text('Ingresos:',
+                style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+            pw.Table.fromTextArray(
+              headers: ['Fecha', 'Cantidad', 'Categoría', 'Descripción'],
+              data: incomes
+                  .map((income) => [
+                        income.date != null
+                            ? '${income.date!.day}/${income.date!.month}/${income.date!.year}'
+                            : 'N/A',
+                        '\$${income.amount.toStringAsFixed(2)}',
+                        income.category ?? 'N/A',
+                        income.description ?? 'N/A',
+                      ])
+                  .toList(),
+              headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+              cellAlignment: pw.Alignment.centerLeft,
+              cellPadding: const pw.EdgeInsets.all(5),
+            ),
+            pw.SizedBox(height: 20),
+            pw.Text('Gastos:',
+                style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+            pw.Table.fromTextArray(
+              headers: ['Fecha', 'Cantidad', 'Categoría', 'Descripción'],
+              data: expenses
+                  .map((expense) => [
+                        expense.date != null
+                            ? '${expense.date!.day}/${expense.date!.month}/${expense.date!.year}'
+                            : 'N/A',
+                        '\$${expense.amount.toStringAsFixed(2)}',
+                        expense.category ?? 'N/A',
+                        expense.description ?? 'N/A',
+                      ])
+                  .toList(),
+              headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+              cellAlignment: pw.Alignment.centerLeft,
+              cellPadding: const pw.EdgeInsets.all(5),
+            ),
+            pw.SizedBox(height: 20),
+            pw.Text(
+              'Resumen:',
+              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.Text('Total Ingresos: \$${totalIncome.toStringAsFixed(2)}'),
+            pw.Text('Total Gastos: \$${totalExpense.toStringAsFixed(2)}'),
+            pw.SizedBox(height: 10),
+            pw.Text(
+              'Balance: \$${(totalIncome - totalExpense).toStringAsFixed(2)}',
+              style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                color: (totalIncome - totalExpense) >= 0 ? PdfColors.green : PdfColors.red,
+              ),
+            ),
+            // You can add charts or advice here
+          ],
+        );
+      },
+    ));
+    return doc;
+  }
   const SettingsScreen({Key? key, this.userId}) : super(key: key);
 
   @override
@@ -118,8 +205,11 @@ class SettingsScreen extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.insert_chart, color: Colors.blueAccent),
               title: const Text('Generar reporte', style: TextStyle(fontSize: 18)),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () { }, // Removed email functionality
+              trailing: const Icon(Icons.arrow_forward_ios), // Removed email functionality
+              onTap: () async {
+                final pdfDoc = await generateReportPdf();
+                await Printing.sharePdf(bytes: await pdfDoc.save(), filename: 'reporte_finscan.pdf');
+              },
             ),
             const SizedBox(height: 40),
 

@@ -42,8 +42,8 @@ dependencies:
   intl: ^0.20.2
   fl_chart: ^0.71.0
 
-  pdf: any
-  printing: any
+  pdf: ^3.8.4
+  printing: ^5.10.0
   share_plus: any
   permission_handler: any
   shared_preferences: ^2.5.3
