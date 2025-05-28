@@ -98,28 +98,6 @@ class SettingsScreen extends StatelessWidget {
             ),
             const Divider(),
 
-            // Opción: Modo oscuro
-            Consumer<ThemeProvider>(
-              builder: (context, themeProvider, child) {
-                return ListTile(
-                  leading: const Icon(Icons.brightness_6, color: Colors.black),
-                  title: const Text('Modo oscuro', style: TextStyle(fontSize: 18, color: Colors.black)),
-                  trailing: Switch(
-                    value: themeProvider.isDarkMode,
-                    onChanged: (value) {
-                      themeProvider.toggleTheme();
-                    },
-                  ),
-                );
-              },
-            ),
-            const Divider(),
-
-            // Opción: Modo oscuro
-            // Opción: Generar reporte
-            ListTile(
-              leading: const Icon(Icons.insert_chart, color: Colors.black),
-              title: const Text('Generar reporte', style: TextStyle(fontSize: 18, color: Colors.black)),
             Consumer<ThemeProvider>(
               builder: (context, themeProvider, child) {
                 return ListTile(
