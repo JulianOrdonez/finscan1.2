@@ -61,6 +61,7 @@ class SupportScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ListTile(
+              // Email contact option
               leading: Icon(Icons.email),
               title: Text('Correo Electrónico'),
               subtitle: const Text('soporte@finscanapp.com'),
@@ -79,6 +80,8 @@ class SupportScreen extends StatelessWidget {
                   );
                 }
               },
+            ),
+            ListTile(
               leading: Icon(Icons.web),
               title: Text('Sitio Web de Soporte'),
               subtitle: Text('www.finscanapp.com/support'),
