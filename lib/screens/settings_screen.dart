@@ -47,13 +47,14 @@ class SettingsScreen extends StatelessWidget {
               data: incomes
                   .map((income) => [
                         income.date != null
-                            ? '${income.date!.day}/${income.date!.month}/${income.date!.year}'
+ ? '${DateTime.parse(income.date!).day}/${DateTime.parse(income.date!).month}/${DateTime.parse(income.date!).year}'
                             : 'N/A',
                         '\$${income.amount.toStringAsFixed(2)}',
-                        income.category ?? 'N/A',
+ // Removed category for income as per instruction
                         income.description ?? 'N/A',
                       ])
                   .toList(),
+ headers: ['Fecha', 'Cantidad', 'Descripción'], // Adjusted headers
               headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               cellAlignment: pw.Alignment.centerLeft,
               cellPadding: const pw.EdgeInsets.all(5),
@@ -66,7 +67,7 @@ class SettingsScreen extends StatelessWidget {
               data: expenses
                   .map((expense) => [
                         expense.date != null
-                            ? '${expense.date!.day}/${expense.date!.month}/${expense.date!.year}'
+ ? '${DateTime.parse(expense.date!).day}/${DateTime.parse(expense.date!).month}/${DateTime.parse(expense.date!).year}'
                             : 'N/A',
                         '\$${expense.amount.toStringAsFixed(2)}',
                         expense.category ?? 'N/A',
