@@ -5,6 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart'; // Import path_provider
+import 'dart:io'; // Import for File operations
 import 'package:printing/printing.dart';
 import '../theme_provider.dart';
 import '../models/expense.dart'; // Por si luego se usa
@@ -208,7 +210,20 @@ class SettingsScreen extends StatelessWidget {
               trailing: const Icon(Icons.arrow_forward_ios), // Removed email functionality
               onTap: () async {
                 final pdfDoc = await generateReportPdf();
-                await Printing.sharePdf(bytes: await pdfDoc.save(), filename: 'reporte_finscan.pdf');
+                try {
+                  final directory = await getApplicationDocumentsDirectory(); // Or getExternalStorageDirectory() for external storage
+                  final file = File('${directory.path}/FinScan_Report.pdf');
+                  await file.writeAsBytes(await pdfDoc.save());
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Reporte guardado en: ${file.path}'),
+                    ),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error al guardar el reporte: $e')),
+                  );
+                }
               },
             ),
             const SizedBox(height: 40),
