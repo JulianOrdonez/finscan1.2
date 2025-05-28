@@ -135,10 +135,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 trailing: const Text(
                 'USD',
                 style: TextStyle(fontSize: 16),
-              ),
-            ),
+ ),
+ ),
+ ),
 
-            const SizedBox(height: 10),
+ const SizedBox(height: 10),
 
             // Dark Mode Switch
             Card(
