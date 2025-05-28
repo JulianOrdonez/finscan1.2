@@ -108,7 +108,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
  final User? currentUser = FirebaseAuth.instance.currentUser;
     final TextEditingController supportController = TextEditingController();
-    String selectedCurrency = 'USD'; // Variable para la moneda seleccionada
+ String selectedCurrency = 'USD'; // Variable para la moneda seleccionada
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -251,7 +251,7 @@ class SettingsScreen extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () async {
-                  await authService.signOut();
+ await Provider.of<AuthService>(context, listen: false).signOut();
                   await Future.delayed(const Duration(milliseconds: 500));
                   Navigator.pushNamedAndRemoveUntil(
                     context,
