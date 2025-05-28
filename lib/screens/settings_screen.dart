@@ -48,7 +48,6 @@ class SettingsScreen extends StatelessWidget {
                   .map((income) => [
                         income.date != null
  ? '${DateTime.parse(income.date!).day}/${DateTime.parse(income.date!).month}/${DateTime.parse(income.date!).year}'
-                            : 'N/A',
                         '\$${income.amount.toStringAsFixed(2)}',
  // Removed category for income as per instruction
                         income.description ?? 'N/A',
