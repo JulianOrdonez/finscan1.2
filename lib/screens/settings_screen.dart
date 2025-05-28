@@ -43,17 +43,17 @@ class SettingsScreen extends StatelessWidget {
             pw.Text('Ingresos:',
                 style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
             pw.Table.fromTextArray(
-              headers: ['Fecha', 'Cantidad', 'Categoría', 'Descripción'],
+              headers: ['Fecha', 'Cantidad', 'Descripción'],
               data: incomes
                   .map((income) => [
                         income.date != null
  ? '${DateTime.parse(income.date!).day}/${DateTime.parse(income.date!).month}/${DateTime.parse(income.date!).year}'
+                            : 'N/A',
                         '\$${income.amount.toStringAsFixed(2)}',
  // Removed category for income as per instruction
                         income.description ?? 'N/A',
                       ])
                   .toList(),
- headers: ['Fecha', 'Cantidad', 'Descripción'], // Adjusted headers
               headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               cellAlignment: pw.Alignment.centerLeft,
               cellPadding: const pw.EdgeInsets.all(5),
