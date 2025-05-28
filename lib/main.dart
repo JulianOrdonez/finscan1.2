@@ -5,6 +5,7 @@ import 'package:flutter_application_2/theme_provider.dart';
 import 'package:flutter_application_2/currency_provider.dart';
 import 'package:flutter_application_2/screens/home_page.dart';
 import 'package:flutter_application_2/services/auth_service.dart';
+import 'package:flutter_application_2/screens/support_screen.dart';
 import 'package:flutter_application_2/screens/register_screen.dart';
 import 'package:firebase_core/firebase_core.dart'; // Importa firebase_core
 import 'package:flutter_application_2/services/firestore_service.dart'; // Import FirestoreService
@@ -49,6 +50,7 @@ class MyApp extends StatelessWidget {
           routes: {
             '/register': (context) => RegisterScreen(),
             '/home': (context) => HomePage(),
+            '/support': (context) => SupportScreen(),
           }, // Removed trailing comma
           home: StreamBuilder<User?>( // Use Firebase User type
             stream: Provider.of<AuthService>(context).authStateChanges,
