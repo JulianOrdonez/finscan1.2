@@ -10,6 +10,7 @@ import '../theme_provider.dart';
 import '../models/expense.dart';
 import '../models/income.dart';
 import '../services/firestore_service.dart';
+import 'support_screen.dart';
 import '../services/auth_service.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -150,6 +151,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             const SizedBox(height: 10),
 
+            // Dark Mode Switch
+            Card(
+              child: Consumer<ThemeProvider>(
+                builder: (context, themeProvider, child) {
+                  return ListTile(
+                    leading: const Icon(Icons.brightness_6),
+                    title: const Text('Modo Oscuro'),
+                    trailing: Switch(
+                      value: themeProvider.themeMode == ThemeMode.dark,
+                      onChanged: (bool value) {
+ themeProvider.toggleTheme(value);
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 10),
+
             // Generar reporte
             Card(
               child: ListTile(
@@ -163,51 +183,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 10),
 
             // Soporte
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Soporte", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: supportController,
-                      maxLines: 3,
-                      decoration: const InputDecoration(
-                        hintText: "Escribe tu mensaje...",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          final message = supportController.text;
-                          if (message.isNotEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Mensaje enviado a soporte")),
-                            );
-                            supportController.clear();
-                          }
-                        },
-                        icon: const Icon(Icons.send),
-                        label: const Text("Enviar"),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+           ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SupportScreen()),
+                );
+              },
+              child: const Text('Ir a Soporte'),
             ),
 
-            const SizedBox(height: 20),
+             const SizedBox(height: 20),
 
             // Cerrar sesión
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                backgroundColor: Colors.blue,
               ),
               onPressed: () async {
                 await AuthService().signOut();
