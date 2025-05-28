@@ -25,7 +25,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final supportController = TextEditingController();
-  String selectedCurrency = 'USD';
 
   Future<void> generateAndSavePdf(BuildContext context) async {
     final firestoreService = FirestoreService();
@@ -133,20 +132,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: ListTile(
                 leading: const Icon(Icons.monetization_on),
                 title: const Text("Moneda"),
-                trailing: DropdownButton<String>(
-                  value: selectedCurrency,
-                  items: <String>['USD', 'COP', 'EUR'].map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? newCurrency) {
-                    setState(() {
-                      selectedCurrency = newCurrency!;
-                    });
-                  },
-                ),
+                trailing: Text(
+                'USD',
+                style: TextStyle(fontSize: 16),
               ),
             ),
 
@@ -162,7 +150,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     trailing: Switch(
                       value: themeProvider.isDarkMode,
                       onChanged: (bool value) {
- themeProvider.toggleTheme();
+                        themeProvider.toggleTheme();
                       },
                     ),
                   );
@@ -199,7 +187,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             // Cerrar sesión
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 backgroundColor: Colors.blue,
               ),
               onPressed: () async {
