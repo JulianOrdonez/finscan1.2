@@ -8,6 +8,7 @@ import '../models/expense.dart'; // Por si luego se usa
 import '../models/income.dart';  // Por si luego se usa
 import '../services/auth_service.dart'; // Asegúrate de tener este archivo con AuthService
 
+
 class SettingsScreen extends StatelessWidget {
   final String? userId;
 
@@ -18,6 +19,7 @@ class SettingsScreen extends StatelessWidget {
     final User? currentUser = FirebaseAuth.instance.currentUser;
     final authService = Provider.of<AuthService>(context);
     final TextEditingController supportController = TextEditingController();
+    String selectedCurrency = 'USD'; // Variable para la moneda seleccionada
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -31,7 +33,7 @@ class SettingsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Colors.blueAccent,
+                color: Colors.black,
               ),
             ),
             const SizedBox(height: 30),
@@ -51,7 +53,7 @@ class SettingsScreen extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.person, size: 30, color: Colors.blueAccent),
+                  const Icon(Icons.person, size: 30, color: Colors.black),
                   const SizedBox(width: 15),
                   Expanded(
                     child: Text(
@@ -67,16 +69,57 @@ class SettingsScreen extends StatelessWidget {
 
             // Opción: Cambiar moneda
             ListTile(
-              leading: const Icon(Icons.monetization_on, color: Colors.blueAccent),
-              title: const Text('Cambiar moneda', style: TextStyle(fontSize: 18)),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                // TODO: Implementar funcionalidad de cambio de moneda
+              leading: const Icon(Icons.monetization_on, color: Colors.black),
+              title: const Text('Cambiar moneda', style: TextStyle(fontSize: 18, color: Colors.black)),
+              trailing: DropdownButton<String>(
+                value: selectedCurrency,
+                icon: const Icon(Icons.arrow_downward),
+                iconSize: 24,
+                elevation: 16,
+                style: const TextStyle(color: Colors.black),
+                underline: Container(
+                  height: 2,
+                  color: Colors.transparent,
+                ),
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    // TODO: Implementar lógica para cambiar la moneda
+                    selectedCurrency = newValue;
+                  }
+                },
+                items: <String>['USD', 'EUR', 'COP']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ),
+            const Divider(),
+
+            // Opción: Modo oscuro
+            Consumer<ThemeProvider>(
+              builder: (context, themeProvider, child) {
+                return ListTile(
+                  leading: const Icon(Icons.brightness_6, color: Colors.black),
+                  title: const Text('Modo oscuro', style: TextStyle(fontSize: 18, color: Colors.black)),
+                  trailing: Switch(
+                    value: themeProvider.isDarkMode,
+                    onChanged: (value) {
+                      themeProvider.toggleTheme();
+                    },
+                  ),
+                );
               },
             ),
             const Divider(),
 
             // Opción: Modo oscuro
+            // Opción: Generar reporte
+            ListTile(
+              leading: const Icon(Icons.insert_chart, color: Colors.black),
+              title: const Text('Generar reporte', style: TextStyle(fontSize: 18, color: Colors.black)),
             Consumer<ThemeProvider>(
               builder: (context, themeProvider, child) {
                 return ListTile(
@@ -124,14 +167,14 @@ class SettingsScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
+                  backgroundColor: Colors.blueAccent, // Fondo azul
                   padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black), // Texto negro
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.0),
                   ),
                 ),
-                child: const Text('Cerrar sesión'),
+                child: const Text('Cerrar sesión', style: TextStyle(color: Colors.black)), // Texto negro en el botón
               ),
             ),
             const SizedBox(height: 40),
@@ -142,46 +185,23 @@ class SettingsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.blueAccent,
+                color: Colors.black,
               ),
             ),
             const SizedBox(height: 15),
-            TextField(
-              controller: supportController,
-              maxLines: 5,
-              decoration: InputDecoration(
-                hintText: 'Describe tu problema o sugerencia aquí',
-                border: OutlineInputBorder(
+            // Botón para soporte
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/support'); // Navegar a SupportScreen
+              },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
-                  borderSide: const BorderSide(color: Colors.grey),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide: const BorderSide(color: Colors.blueAccent, width: 2.0),
                 ),
               ),
-            ),
-            const SizedBox(height: 15),
-
-            // Botón: Enviar mensaje de soporte
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  print('Support message: ${supportController.text}');
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Mensaje enviado (simulado)')),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-                child: const Text('Enviar mensaje'),
-              ),
+              child: const Text('Ir a Soporte'),
             ),
             const SizedBox(height: 40),
           ],
